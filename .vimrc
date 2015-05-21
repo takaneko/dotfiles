@@ -12,7 +12,9 @@ call neobundle#begin(expand('~/.vim/bundle'))
 NeoBundleFetch 'Shougo/neobundle.vim'
 call neobundle#end()
 
+call neobundle#begin(expand('~/.vim/bundle'))
 NeoBundle 'sickill/vim-monokai'
+call neobundle#end()
 
 filetype plugin indent on
 
