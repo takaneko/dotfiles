@@ -13,14 +13,14 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 call neobundle#end()
 
 call neobundle#begin(expand('~/.vim/bundle'))
-NeoBundle 'tomasr/molokai'
+NeoBundle 'sickill/vim-monokai'
 call neobundle#end()
 
 filetype plugin indent on
 
 NeoBundleCheck
 
-colorscheme molokai
+colorscheme monokai
 syntax on
 
 set tabstop=2
