@@ -14,6 +14,7 @@ call neobundle#end()
 
 call neobundle#begin(expand('~/.vim/bundle'))
 NeoBundle 'sickill/vim-monokai'
+NeoBundle 'tpope/vim-rails'
 call neobundle#end()
 
 filetype plugin indent on
