@@ -16,6 +16,7 @@ call neobundle#begin(expand('~/.vim/bundle'))
 NeoBundle 'sickill/vim-monokai'
 NeoBundle 'tpope/vim-rails'
 NeoBundle 'rust-lang/rust.vim'
+NeoBundle 'scrooloose/syntastic'
 call neobundle#end()
 
 filetype plugin indent on
@@ -31,3 +32,12 @@ set expandtab
 set shiftwidth=2
 
 set encoding=utf-8
+
+" syntastic
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_javascript_checkers = ['eslint']
