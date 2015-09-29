@@ -33,3 +33,5 @@ set expandtab
 set shiftwidth=2
 
 set encoding=utf-8
+
+source $VIMRUNTIME/macros/matchit.vim
