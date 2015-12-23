@@ -43,6 +43,13 @@ set shiftwidth=2
 " encoding
 set encoding=utf-8
 
+" statusline
+set laststatus=2
+
+set statusline=%<%f\ %m%r%h%w
+set statusline+=%{'['.(&fenc!=''?&fenc:&enc).']['.&fileformat.']'}
+set statusline+=%=%l/%L,%c%V%8P
+
 " matchit
 source $VIMRUNTIME/macros/matchit.vim
 
