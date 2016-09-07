@@ -25,6 +25,7 @@ NeoBundle 'scrooloose/syntastic'
 " useful
 NeoBundle 'tpope/vim-endwise'
 NeoBundle 'tpope/vim-fugitive'
+NeoBundle 'tpope/vim-rails'
 call neobundle#end()
 
 filetype plugin indent on
