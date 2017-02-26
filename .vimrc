@@ -15,8 +15,8 @@ call neobundle#end()
 call neobundle#begin(expand('~/.vim/bundle'))
 " color
 NeoBundle 'sickill/vim-monokai'
-NeoBundle 'rust-lang/rust.vim'
 NeoBundle 'januswel/html5.vim'
+NeoBundle 'mattn/emmet-vim'
 NeoBundle 'kchmck/vim-coffee-script'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 NeoBundle 'vim-scripts/AnsiEsc.vim'
