@@ -18,6 +18,7 @@ NeoBundle 'sickill/vim-monokai'
 NeoBundle 'januswel/html5.vim'
 NeoBundle 'mattn/emmet-vim'
 NeoBundle 'kchmck/vim-coffee-script'
+NeoBundle 'pangloss/vim-javascript'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 NeoBundle 'vim-scripts/AnsiEsc.vim'
 " check
@@ -26,11 +27,16 @@ NeoBundle 'scrooloose/syntastic'
 NeoBundle 'tpope/vim-endwise'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-rails'
+NeoBundle 'vim-scripts/gtags.vim'
+NeoBundle 'vim-jp/vimdoc-ja'
 call neobundle#end()
 
 filetype plugin indent on
 
 NeoBundleCheck
+
+" help
+set helplang=ja,en
 
 " syntax highlight
 colorscheme monokai
