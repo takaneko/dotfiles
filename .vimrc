@@ -19,6 +19,8 @@ NeoBundle 'januswel/html5.vim'
 NeoBundle 'mattn/emmet-vim'
 NeoBundle 'kchmck/vim-coffee-script'
 NeoBundle 'pangloss/vim-javascript'
+NeoBundle 'posva/vim-vue'
+NeoBundle 'leafgarland/typescript-vim'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 NeoBundle 'vim-scripts/AnsiEsc.vim'
 " check
