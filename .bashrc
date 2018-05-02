@@ -12,3 +12,8 @@ peco-select-history() {
   READLINE_POINT=${#l}
 }
 bind -x '"\C-r": peco-select-history'
+
+source ~/.git-prompt.sh
+PS1='[\u@\h \W$(__git_ps1 " (%s)")]\$ '
+
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"

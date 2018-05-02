@@ -15,17 +15,25 @@ call neobundle#end()
 call neobundle#begin(expand('~/.vim/bundle'))
 " color
 NeoBundle 'sickill/vim-monokai'
-NeoBundle 'januswel/html5.vim'
-NeoBundle 'mattn/emmet-vim'
-NeoBundle 'kchmck/vim-coffee-script'
 NeoBundle 'nathanaelkane/vim-indent-guides'
+NeoBundle 'januswel/html5.vim'
+NeoBundle 'slim-template/vim-slim'
+NeoBundle 'tpope/vim-haml'
+NeoBundle 'groenewege/vim-less'
+NeoBundle 'kchmck/vim-coffee-script'
+NeoBundle 'etdev/vim-hexcolor'
 NeoBundle 'vim-scripts/AnsiEsc.vim'
+NeoBundle 'postmodern/vim-yard'
+NeoBundle 'pangloss/vim-javascript'
+NeoBundle 'plasticboy/vim-markdown'
 " check
 NeoBundle 'scrooloose/syntastic'
 " useful
 NeoBundle 'tpope/vim-endwise'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-rails'
+NeoBundle 'mattn/emmet-vim'
+NeoBundle 'godlygeek/tabular'
 call neobundle#end()
 
 filetype plugin indent on
@@ -43,6 +51,7 @@ set expandtab
 set shiftwidth=2
 " encoding
 set encoding=utf-8
+set fileencodings=utf-8
 
 " statusline
 set laststatus=2
@@ -60,11 +69,14 @@ set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
 " remove trailing space
-autocmd BufWritePre * :%s/\s\+$//ge
+" autocmd BufWritePre * :%s/\s\+$//ge
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_javascript_checkers = ['eslint']
+" let g:syntastic_always_populate_loc_list = 1
+" let g:syntastic_auto_loc_list = 1
+" let g:syntastic_javascript_checkers = ['eslint']
+
+" let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['ruby'] }
+" let g:syntastic_ruby_checkers = ['rubocop']
 
 " vim-indent-guides
 let g:indent_guides_enable_on_vim_startup = 1
@@ -76,3 +88,14 @@ let indent_guides_color_change_percent = 10
 " fugitive
 autocmd QuickFixCmdPost *grep* cwindow
 set statusline+=%{fugitive#statusline()}
+
+" vim-markdown
+let g:vim_markdown_folding_disabled=1
+
+" peco
+function! PecoOpen()
+  for filename in split(system("find . -type f | peco"), "\n")
+    execute "e" filename
+  endfor
+endfunction
+nnoremap <Leader>op :call PecoOpen()<CR>
