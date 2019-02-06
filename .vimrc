@@ -23,6 +23,8 @@ NeoBundle 'posva/vim-vue'
 NeoBundle 'leafgarland/typescript-vim'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 NeoBundle 'vim-scripts/AnsiEsc.vim'
+NeoBundle 'rust-lang/rust.vim'
+NeoBundle 'vim-ruby/vim-ruby'
 " check
 NeoBundle 'scrooloose/syntastic'
 " useful
@@ -31,6 +33,8 @@ NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-rails'
 NeoBundle 'vim-scripts/gtags.vim'
 NeoBundle 'vim-jp/vimdoc-ja'
+NeoBundle 'jremmen/vim-ripgrep'
+NeoBundle 'junegunn/fzf.vim'
 call neobundle#end()
 
 filetype plugin indent on
@@ -80,3 +84,14 @@ let indent_guides_color_change_percent = 10
 " fugitive
 autocmd QuickFixCmdPost *grep* cwindow
 set statusline+=%{fugitive#statusline()}
+
+" Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
+" command! -bang -nargs=* Rg
+"   \ call fzf#vim#grep(
+"   \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
+"   \   <bang>0 ? fzf#vim#with_preview('up:60%')
+"   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+"   \   <bang>0)
+
+" vim-ruby
+let ruby_fold = 1
