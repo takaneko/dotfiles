@@ -14,5 +14,5 @@ export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 
 source /Users/takaneko/.phpbrew/bashrc
 
-export PATH=/usr/local/opt/imagemagick@6/bin:/usr/local/opt/mysql@5.7/bin:${PATH}
+export PATH=/Users/takaneko/Dev/test/flutter/bin:/usr/local/opt/imagemagick@6/bin:/usr/local/opt/mysql@5.7/bin:${PATH}
 export DYLD_LIBRARY_PATH=/usr/local/opt/mysql@5.7/:${DYLD_LIBRARY_PATH}

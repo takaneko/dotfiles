@@ -29,6 +29,8 @@ NeoBundle 'leafgarland/typescript-vim'
 NeoBundle 'plasticboy/vim-markdown'
 NeoBundle 'vim-scripts/smarty.vim'
 NeoBundle 'stephenway/postcss.vim'
+NeoBundle 'styled-components/vim-styled-components'
+NeoBundle 'mechatroner/rainbow_csv'
 " check
 NeoBundle 'scrooloose/syntastic'
 " useful
@@ -39,6 +41,8 @@ NeoBundle 'mattn/emmet-vim'
 NeoBundle 'godlygeek/tabular'
 NeoBundle 'jremmen/vim-ripgrep'
 NeoBundle 'junegunn/fzf.vim'
+NeoBundle 'vim-scripts/Align'
+NeoBundle 'vim-scripts/SQLUtilities'
 call neobundle#end()
 
 filetype plugin indent on
