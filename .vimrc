@@ -25,6 +25,7 @@ NeoBundle 'nathanaelkane/vim-indent-guides'
 NeoBundle 'vim-scripts/AnsiEsc.vim'
 NeoBundle 'rust-lang/rust.vim'
 NeoBundle 'vim-ruby/vim-ruby'
+NeoBundle 'hashivim/vim-terraform'
 " check
 NeoBundle 'scrooloose/syntastic'
 " useful
