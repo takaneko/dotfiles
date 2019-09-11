@@ -24,6 +24,7 @@ NeoBundle 'leafgarland/typescript-vim'
 NeoBundle 'nathanaelkane/vim-indent-guides'
 NeoBundle 'vim-scripts/AnsiEsc.vim'
 NeoBundle 'rust-lang/rust.vim'
+NeoBundle 'fatih/vim-go'
 NeoBundle 'vim-ruby/vim-ruby'
 NeoBundle 'hashivim/vim-terraform'
 " check
@@ -44,6 +45,9 @@ NeoBundleCheck
 
 " help
 set helplang=ja,en
+
+" write
+set autowrite
 
 " syntax highlight
 colorscheme monokai
@@ -96,3 +100,16 @@ set statusline+=%{fugitive#statusline()}
 
 " vim-ruby
 let ruby_fold = 1
+
+" vim-go
+let g:go_null_module_warning = 0
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_function_calls = 1
+let g:go_def_mode='gopls'
+let g:go_info_mode='gopls'
+let g:go_fmt_command = "goimports"
+au FileType go setlocal sw=4 ts=4 sts=4 noet
+filetype plugin indent on
