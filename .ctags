@@ -7,6 +7,8 @@
 --exclude=node_modules
 --exclude=gulp
 --exclude='.git*'
+--exclude=public/packs
+--exclude=public/packs-test
 
 --langmap=ruby:+.rake
 --regex-ruby=/(^|[:;])[ \t]*([A-Z][[:alnum:]_]+) *=/\2/c,class,constant/

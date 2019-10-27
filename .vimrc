@@ -27,10 +27,11 @@ NeoBundle 'postmodern/vim-yard'
 NeoBundle 'pangloss/vim-javascript'
 NeoBundle 'leafgarland/typescript-vim'
 NeoBundle 'plasticboy/vim-markdown'
-NeoBundle 'vim-scripts/smarty.vim'
 NeoBundle 'stephenway/postcss.vim'
 NeoBundle 'styled-components/vim-styled-components'
 NeoBundle 'mechatroner/rainbow_csv'
+NeoBundle 'hashivim/vim-terraform'
+NeoBundle 'fatih/vim-go'
 " check
 NeoBundle 'scrooloose/syntastic'
 " useful
