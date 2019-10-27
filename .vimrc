@@ -1,54 +1,68 @@
-if !1 | finish | endif
-
-if has('vim_starting')
-  if &compatible
-    set nocompatible
-  endif
-
-  set runtimepath+=~/.vim/bundle/neobundle.vim/
+if &compatible
+  set nocompatible               " Be iMproved
 endif
 
-call neobundle#begin(expand('~/.vim/bundle'))
-NeoBundleFetch 'Shougo/neobundle.vim'
-call neobundle#end()
+set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
 
-call neobundle#begin(expand('~/.vim/bundle'))
-" color
-NeoBundle 'sickill/vim-monokai'
-NeoBundle 'nathanaelkane/vim-indent-guides'
-NeoBundle 'januswel/html5.vim'
-NeoBundle 'slim-template/vim-slim'
-NeoBundle 'tpope/vim-haml'
-NeoBundle 'groenewege/vim-less'
-NeoBundle 'kchmck/vim-coffee-script'
-NeoBundle 'etdev/vim-hexcolor'
-NeoBundle 'vim-scripts/AnsiEsc.vim'
-NeoBundle 'postmodern/vim-yard'
-NeoBundle 'pangloss/vim-javascript'
-NeoBundle 'leafgarland/typescript-vim'
-NeoBundle 'plasticboy/vim-markdown'
-NeoBundle 'stephenway/postcss.vim'
-NeoBundle 'styled-components/vim-styled-components'
-NeoBundle 'mechatroner/rainbow_csv'
-NeoBundle 'hashivim/vim-terraform'
-NeoBundle 'fatih/vim-go'
-" check
-NeoBundle 'scrooloose/syntastic'
-" useful
-NeoBundle 'tpope/vim-endwise'
-NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'tpope/vim-rails'
-NeoBundle 'mattn/emmet-vim'
-NeoBundle 'godlygeek/tabular'
-NeoBundle 'jremmen/vim-ripgrep'
-NeoBundle 'junegunn/fzf.vim'
-NeoBundle 'vim-scripts/Align'
-NeoBundle 'vim-scripts/SQLUtilities'
-call neobundle#end()
+if dein#load_state('~/.cache/dein')
+  call dein#begin('~/.cache/dein')
+
+  call dein#add('~/.cache/dein/repos/github.com/Shougo/dein.vim')
+
+  call dein#add('Shougo/neosnippet.vim')
+  call dein#add('Shougo/neosnippet-snippets')
+  " color
+  call dein#add('sickill/vim-monokai')
+  call dein#add('januswel/html5.vim')
+  call dein#add('mattn/emmet-vim')
+  call dein#add('kchmck/vim-coffee-script')
+  call dein#add('pangloss/vim-javascript')
+  call dein#add('posva/vim-vue')
+  call dein#add('leafgarland/typescript-vim')
+  call dein#add('nathanaelkane/vim-indent-guides')
+  call dein#add('vim-scripts/AnsiEsc.vim')
+  call dein#add('rust-lang/rust.vim')
+  call dein#add('fatih/vim-go')
+  call dein#add('vim-ruby/vim-ruby')
+  call dein#add('hashivim/vim-terraform')
+  call dein#add('slim-template/vim-slim')
+  call dein#add('tpope/vim-haml')
+  call dein#add('groenewege/vim-less')
+  call dein#add('mechatroner/rainbow_csv')
+  call dein#add('etdev/vim-hexcolor')
+  call dein#add('postmodern/vim-yard')
+  call dein#add('plasticboy/vim-markdown')
+  call dein#add('stephenway/postcss.vim')
+  call dein#add('styled-components/vim-styled-components')
+  " check
+  call dein#add('scrooloose/syntastic')
+  " useful
+  call dein#add('tpope/vim-endwise')
+  call dein#add('tpope/vim-fugitive')
+  call dein#add('tpope/vim-rails')
+  call dein#add('vim-scripts/gtags.vim')
+  call dein#add('vim-jp/vimdoc-ja')
+  call dein#add('jremmen/vim-ripgrep')
+  call dein#add('junegunn/fzf.vim')
+  call dein#add('godlygeek/tabular')
+  call dein#add('vim-scripts/Align')
+  call dein#add('vim-scripts/SQLUtilities')
+
+  call dein#end()
+  call dein#save_state()
+endif
 
 filetype plugin indent on
 
-NeoBundleCheck
+if dein#check_install()
+  call dein#install()
+endif
+
+" help
+set helplang=ja,en
+
+" write
+set autowrite
 
 " syntax highlight
 colorscheme monokai
@@ -78,15 +92,8 @@ set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
-" remove trailing space
-" autocmd BufWritePre * :%s/\s\+$//ge
-
-" let g:syntastic_always_populate_loc_list = 1
 " let g:syntastic_auto_loc_list = 1
-" let g:syntastic_javascript_checkers = ['eslint']
-
-" let g:syntastic_mode_map = { 'mode': 'passive', 'active_filetypes': ['ruby'] }
-" let g:syntastic_ruby_checkers = ['rubocop']
+let g:syntastic_javascript_checkers = ['eslint']
 
 " vim-indent-guides
 let g:indent_guides_enable_on_vim_startup = 1
@@ -102,7 +109,7 @@ set statusline+=%{fugitive#statusline()}
 " vim-markdown
 let g:vim_markdown_folding_disabled=1
 
-" ripgrep 
+" ripgrep
 if executable('rg')
     set grepprg=rg\ --vimgrep\ --no-heading
     set grepformat=%f:%l:%c:%m,%f:%l:%m
@@ -117,7 +124,6 @@ command! -bang -nargs=* Rg
   \   <bang>0)
 
 " vim-local
-
 augroup vimrc-local
   autocmd!
   autocmd BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
@@ -129,3 +135,19 @@ function! s:vimrc_local(loc)
     source `=i`
   endfor
 endfunction
+
+" vim-ruby
+let ruby_fold = 1
+
+" vim-go
+let g:go_null_module_warning = 0
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_function_calls = 1
+let g:go_def_mode='gopls'
+let g:go_info_mode='gopls'
+let g:go_fmt_command = "goimports"
+au FileType go setlocal sw=4 ts=4 sts=4 noet
+filetype plugin indent on
