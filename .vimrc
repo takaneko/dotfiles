@@ -1,47 +1,50 @@
-if !1 | finish | endif
-
-if has('vim_starting')
-  if &compatible
-    set nocompatible
-  endif
-
-  set runtimepath+=~/.vim/bundle/neobundle.vim/
+if &compatible
+  set nocompatible               " Be iMproved
 endif
 
-call neobundle#begin(expand('~/.vim/bundle'))
-NeoBundleFetch 'Shougo/neobundle.vim'
-call neobundle#end()
+set runtimepath+=/Users/nirareba1969/.cache/dein/repos/github.com/Shougo/dein.vim
 
-call neobundle#begin(expand('~/.vim/bundle'))
-" color
-NeoBundle 'sickill/vim-monokai'
-NeoBundle 'januswel/html5.vim'
-NeoBundle 'mattn/emmet-vim'
-NeoBundle 'kchmck/vim-coffee-script'
-NeoBundle 'pangloss/vim-javascript'
-NeoBundle 'posva/vim-vue'
-NeoBundle 'leafgarland/typescript-vim'
-NeoBundle 'nathanaelkane/vim-indent-guides'
-NeoBundle 'vim-scripts/AnsiEsc.vim'
-NeoBundle 'rust-lang/rust.vim'
-NeoBundle 'fatih/vim-go'
-NeoBundle 'vim-ruby/vim-ruby'
-NeoBundle 'hashivim/vim-terraform'
-" check
-NeoBundle 'scrooloose/syntastic'
-" useful
-NeoBundle 'tpope/vim-endwise'
-NeoBundle 'tpope/vim-fugitive'
-NeoBundle 'tpope/vim-rails'
-NeoBundle 'vim-scripts/gtags.vim'
-NeoBundle 'vim-jp/vimdoc-ja'
-NeoBundle 'jremmen/vim-ripgrep'
-NeoBundle 'junegunn/fzf.vim'
-call neobundle#end()
+if dein#load_state('/Users/nirareba1969/.cache/dein')
+  call dein#begin('/Users/nirareba1969/.cache/dein')
+
+  call dein#add('/Users/nirareba1969/.cache/dein/repos/github.com/Shougo/dein.vim')
+
+  call dein#add('Shougo/neosnippet.vim')
+  call dein#add('Shougo/neosnippet-snippets')
+  " color
+  call dein#add('sickill/vim-monokai')
+  call dein#add('januswel/html5.vim')
+  call dein#add('mattn/emmet-vim')
+  call dein#add('kchmck/vim-coffee-script')
+  call dein#add('pangloss/vim-javascript')
+  call dein#add('posva/vim-vue')
+  call dein#add('leafgarland/typescript-vim')
+  call dein#add('nathanaelkane/vim-indent-guides')
+  call dein#add('vim-scripts/AnsiEsc.vim')
+  call dein#add('rust-lang/rust.vim')
+  call dein#add('fatih/vim-go')
+  call dein#add('vim-ruby/vim-ruby')
+  call dein#add('hashivim/vim-terraform')
+  " check
+  call dein#add('scrooloose/syntastic')
+  " useful
+  call dein#add('tpope/vim-endwise')
+  call dein#add('tpope/vim-fugitive')
+  call dein#add('tpope/vim-rails')
+  call dein#add('vim-scripts/gtags.vim')
+  call dein#add('vim-jp/vimdoc-ja')
+  call dein#add('jremmen/vim-ripgrep')
+  call dein#add('junegunn/fzf.vim')
+
+  call dein#end()
+  call dein#save_state()
+endif
 
 filetype plugin indent on
 
-NeoBundleCheck
+if dein#check_install()
+  call dein#install()
+endif
 
 " help
 set helplang=ja,en
