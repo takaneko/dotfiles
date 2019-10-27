@@ -3,9 +3,9 @@
 
 export PATH="$HOME/.anyenv/bin:$PATH"
 eval "$(anyenv init -)"
+export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 export PATH="~/Library/Python/3.7/bin:$PATH"
-export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="/usr/local/go/bin:$PATH"
 
 export JAVA_HOME=$(/usr/libexec/java_home)

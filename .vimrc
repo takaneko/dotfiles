@@ -2,12 +2,12 @@ if &compatible
   set nocompatible               " Be iMproved
 endif
 
-set runtimepath+=/Users/nirareba1969/.cache/dein/repos/github.com/Shougo/dein.vim
+set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
 
-if dein#load_state('/Users/nirareba1969/.cache/dein')
-  call dein#begin('/Users/nirareba1969/.cache/dein')
+if dein#load_state('~/.cache/dein')
+  call dein#begin('~/.cache/dein')
 
-  call dein#add('/Users/nirareba1969/.cache/dein/repos/github.com/Shougo/dein.vim')
+  call dein#add('~/.cache/dein/repos/github.com/Shougo/dein.vim')
 
   call dein#add('Shougo/neosnippet.vim')
   call dein#add('Shougo/neosnippet-snippets')
@@ -25,6 +25,15 @@ if dein#load_state('/Users/nirareba1969/.cache/dein')
   call dein#add('fatih/vim-go')
   call dein#add('vim-ruby/vim-ruby')
   call dein#add('hashivim/vim-terraform')
+  call dein#add('slim-template/vim-slim')
+  call dein#add('tpope/vim-haml')
+  call dein#add('groenewege/vim-less')
+  call dein#add('mechatroner/rainbow_csv')
+  call dein#add('etdev/vim-hexcolor')
+  call dein#add('postmodern/vim-yard')
+  call dein#add('plasticboy/vim-markdown')
+  call dein#add('stephenway/postcss.vim')
+  call dein#add('styled-components/vim-styled-components')
   " check
   call dein#add('scrooloose/syntastic')
   " useful
@@ -35,6 +44,9 @@ if dein#load_state('/Users/nirareba1969/.cache/dein')
   call dein#add('vim-jp/vimdoc-ja')
   call dein#add('jremmen/vim-ripgrep')
   call dein#add('junegunn/fzf.vim')
+  call dein#add('godlygeek/tabular')
+  call dein#add('vim-scripts/Align')
+  call dein#add('vim-scripts/SQLUtilities')
 
   call dein#end()
   call dein#save_state()
@@ -63,6 +75,7 @@ set expandtab
 set shiftwidth=2
 " encoding
 set encoding=utf-8
+set fileencodings=utf-8
 
 " statusline
 set laststatus=2
@@ -93,13 +106,35 @@ let indent_guides_color_change_percent = 10
 autocmd QuickFixCmdPost *grep* cwindow
 set statusline+=%{fugitive#statusline()}
 
+" vim-markdown
+let g:vim_markdown_folding_disabled=1
+
+" ripgrep
+if executable('rg')
+    set grepprg=rg\ --vimgrep\ --no-heading
+    set grepformat=%f:%l:%c:%m,%f:%l:%m
+endif
+
 " Similarly, we can apply it to fzf#vim#grep. To use ripgrep instead of ag:
-" command! -bang -nargs=* Rg
-"   \ call fzf#vim#grep(
-"   \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
-"   \   <bang>0 ? fzf#vim#with_preview('up:60%')
-"   \           : fzf#vim#with_preview('right:50%:hidden', '?'),
-"   \   <bang>0)
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
+
+" vim-local
+augroup vimrc-local
+  autocmd!
+  autocmd BufNewFile,BufReadPost * call s:vimrc_local(expand('<afile>:p:h'))
+augroup END
+
+function! s:vimrc_local(loc)
+  let files = findfile('.vimrc.local', escape(a:loc, ' ') . ';', -1)
+  for i in reverse(filter(files, 'filereadable(v:val)'))
+    source `=i`
+  endfor
+endfunction
 
 " vim-ruby
 let ruby_fold = 1

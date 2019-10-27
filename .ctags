@@ -4,6 +4,11 @@
 --exclude=*.min.js
 --exclude=*.min.css
 --exclude=tags
+--exclude=node_modules
+--exclude=gulp
+--exclude='.git*'
+--exclude=public/packs
+--exclude=public/packs-test
 
 --langmap=ruby:+.rake
 --regex-ruby=/(^|[:;])[ \t]*([A-Z][[:alnum:]_]+) *=/\2/c,class,constant/
@@ -98,6 +103,19 @@
 --regex-coffee=/^[ \t]*([ \t][a-z]+)[ \t]*=.*$/\1/v,var/
 --regex-coffee=/^[ \t]*(@[A-Za-z]+)[ \t]*=.*$/\1/i,ivar/
 
+--langdef=typescript
+--langmap=typescript:.ts
+--langmap=typescript:+.tsx
+--regex-typescript=/^[ \t]*(export)?[ \t]*class[ \t]+([a-zA-Z0-9_]+)/\2/c,classes/
+--regex-typescript=/^[ \t]*(export)?[ \t]*module[ \t]+([a-zA-Z0-9_]+)/\2/n,modules/
+--regex-typescript=/^[ \t]*(export)?[ \t]*function[ \t]+([a-zA-Z0-9_]+)/\2/f,functions/
+--regex-typescript=/^[ \t]*export[ \t]+var[ \t]+([a-zA-Z0-9_]+)/\1/v,variables/
+--regex-typescript=/^[ \t]*var[ \t]+([a-zA-Z0-9_]+)[ \t]*=[ \t]*function[ \t]*\(\)/\1/v,varlambdas/
+--regex-typescript=/^[ \t]*(export)?[ \t]*(public|private)[ \t]+(static)?[ \t]*([a-zA-Z0-9_]+)/\4/m,members/
+--regex-typescript=/^[ \t]*(export)?[ \t]*interface[ \t]+([a-zA-Z0-9_]+)/\2/i,interfaces/
+--regex-typescript=/^[ \t]*(export)?[ \t]*enum[ \t]+([a-zA-Z0-9_]+)/\2/e,enums/
+--regex-typescript=/^[ \t]*import[ \t]+([a-zA-Z0-9_]+)/\1/I,imports/
+
 --langdef=scss
 --langmap=scss:.scss.sass
 --regex-scss=/^[ \t]*@mixin ([A-Za-z0-9_-]+)/\1/m,mixin,mixins/
@@ -107,6 +125,29 @@
 --regex-scss=/^[ \t]*#([A-Za-z0-9_-]+)/#\1/i,id,ids/
 --regex-scss=/^[ \t]*(([A-Za-z0-9_-]+[ \t\n,]+)+)\{/\1/t,tag,tags/
 --regex-scss=/^[ \t]*@media\s+([A-Za-z0-9_-]+)/\1/m,media,medias/
+
+--langdef=css
+--langmap=css:.css
+--langmap=css:+.scss
+--langmap=css:+.sass
+--langmap=css:+.styl
+--langmap=css:+.less
+--regex-css=/^[ \t]*(([A-Za-z0-9_-]+[ \t\n,]+)+)\{/\1/t,tag,tags/
+--regex-css=/^[ \t]*#([A-Za-z0-9_-]+)/#\1/i,id,ids/
+--regex-css=/^[ \t]*\.([A-Za-z0-9_-]+)/.\1/c,class,classes/
+
+--langdef=less
+--langmap=less:.less
+--regex-less=/^[ t]*.([A-Za-z0-9_-]+)/1/c,class,classes/
+--regex-less=/^[ t]*#([A-Za-z0-9_-]+)/1/i,id,ids/
+--regex-less=/^[ t]*(([A-Za-z0-9_-]+[ tn,]+)+){/1/t,tag,tags/
+--regex-less=/^[ t]*@medias+([A-Za-z0-9_-]+)/1/m,media,medias/
+
+--langdef=markdown
+--langmap=markdown:.md.markdown.mdown.mkd.mkdn
+--regex-markdown=/^#[ \t]+(.*)/\1/h,heading1/
+--regex-markdown=/^##[ \t]+(.*)/\1/h,heading2/
+--regex-markdown=/^###[ \t]+(.*)/\1/h,heading3/
 
 --langdef=typescript
 --langmap=typescript:.ts

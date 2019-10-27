@@ -21,3 +21,6 @@ tags
 
 # ctags
 /tags
+
+# vimrc local
+.vimrc.local
