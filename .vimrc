@@ -8,6 +8,11 @@ if dein#load_state('~/.cache/dein')
   call dein#begin('~/.cache/dein')
 
   call dein#add('~/.cache/dein/repos/github.com/Shougo/dein.vim')
+  call dein#add('Shougo/deoplete.nvim')
+  if !has('nvim')
+    call dein#add('roxma/nvim-yarp')
+    call dein#add('roxma/vim-hug-neovim-rpc')
+  endif
 
   call dein#add('Shougo/neosnippet.vim')
   call dein#add('Shougo/neosnippet-snippets')
@@ -68,6 +73,9 @@ set autowrite
 colorscheme monokai
 syntax on
 
+highlight ExtraWhitespace ctermbg=red guibg=red
+match ExtraWhitespace /\s\+$/
+
 " tab
 set tabstop=2
 set autoindent
@@ -76,6 +84,14 @@ set shiftwidth=2
 " encoding
 set encoding=utf-8
 set fileencodings=utf-8
+
+" fold
+set foldenable
+set foldlevelstart=1
+set foldmethod=syntax
+
+set synmaxcol=256
+syntax sync minlines=256
 
 " statusline
 set laststatus=2
