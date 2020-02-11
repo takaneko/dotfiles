@@ -40,6 +40,7 @@ if dein#load_state('~/.cache/dein')
   call dein#add('plasticboy/vim-markdown')
   call dein#add('stephenway/postcss.vim')
   call dein#add('styled-components/vim-styled-components')
+  call dein#add('cespare/vim-toml')
   " check
   call dein#add('scrooloose/syntastic')
   " useful
@@ -163,6 +164,7 @@ let g:go_highlight_fields = 1
 let g:go_highlight_structs = 1
 let g:go_highlight_functions = 1
 let g:go_highlight_function_calls = 1
+let g:go_auto_type_info = 1
 let g:go_def_mode='gopls'
 let g:go_info_mode='gopls'
 let g:go_fmt_command = "goimports"
