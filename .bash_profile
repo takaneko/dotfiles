@@ -6,6 +6,7 @@ eval "$(anyenv init -)"
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 export PATH="~/Library/Python/3.7/bin:$PATH"
+export PATH="$HOME/.tfenv/bin:$PATH"
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
 
@@ -32,6 +33,8 @@ GIT_PS1_SHOWSTASHSTATE=1
 
 export PS1='\[\033[1;32m\]\u\[\033[00m\]:\[\033[1;34m\]\w\[\033[1;31m\]$(__git_ps1)\[\033[00m\] \$ '
 export XDG_CONFIG_HOME=$HOME/.config
+
+export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/nirareba1969/Downloads/google-cloud-sdk/path.bash.inc' ]; then . '/Users/nirareba1969/Downloads/google-cloud-sdk/path.bash.inc'; fi

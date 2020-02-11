@@ -31,6 +31,7 @@ if dein#load_state('~/.cache/dein')
   call dein#add('fatih/vim-go')
   call dein#add('vim-ruby/vim-ruby')
   call dein#add('hashivim/vim-terraform')
+  call dein#add('dart-lang/dart-vim-plugin')
   call dein#add('slim-template/vim-slim')
   call dein#add('tpope/vim-haml')
   call dein#add('groenewege/vim-less')
@@ -95,6 +96,12 @@ set foldmethod=syntax
 
 set synmaxcol=256
 syntax sync minlines=256
+
+" Don't screw up folds when inserting text that might affect them, until
+" leaving insert mode. Foldmethod is local to the window. Protect against
+" screwing up folding when switching between windows.
+autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
+autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
 
 " statusline
 set laststatus=2
