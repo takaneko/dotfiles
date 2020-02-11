@@ -8,6 +8,7 @@ if dein#load_state('~/.cache/dein')
   call dein#begin('~/.cache/dein')
 
   call dein#add('~/.cache/dein/repos/github.com/Shougo/dein.vim')
+
   call dein#add('Shougo/deoplete.nvim')
   if !has('nvim')
     call dein#add('roxma/nvim-yarp')
@@ -40,6 +41,7 @@ if dein#load_state('~/.cache/dein')
   call dein#add('plasticboy/vim-markdown')
   call dein#add('stephenway/postcss.vim')
   call dein#add('styled-components/vim-styled-components')
+  call dein#add('cespare/vim-toml')
   " check
   call dein#add('scrooloose/syntastic')
   " useful
@@ -49,6 +51,7 @@ if dein#load_state('~/.cache/dein')
   call dein#add('vim-scripts/gtags.vim')
   call dein#add('vim-jp/vimdoc-ja')
   call dein#add('jremmen/vim-ripgrep')
+  call dein#add('junegunn/fzf', {'build': './install --all'})
   call dein#add('junegunn/fzf.vim')
   call dein#add('godlygeek/tabular')
   call dein#add('vim-scripts/Align')
@@ -169,6 +172,7 @@ let g:go_highlight_fields = 1
 let g:go_highlight_structs = 1
 let g:go_highlight_functions = 1
 let g:go_highlight_function_calls = 1
+let g:go_auto_type_info = 1
 let g:go_def_mode='gopls'
 let g:go_info_mode='gopls'
 let g:go_fmt_command = "goimports"
