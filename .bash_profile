@@ -45,5 +45,4 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 # The next line enables shell command completion for gcloud.
 #if [ -f '/Users/nirareba1969/Downloads/google-cloud-sdk/completion.bash.inc' ]; then . '/Users/nirareba1969/Downloads/google-cloud-sdk/completion.bash.inc'; fi
 
-# Added by serverless binary installer
-export PATH="$HOME/.serverless/bin:$PATH"
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
