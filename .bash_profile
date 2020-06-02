@@ -1,12 +1,15 @@
 [[ -s "$HOME/.profile" ]] && source "$HOME/.profile" # Load the default .profile
 [[ -f "$HOME/.bashrc" ]] && source "$HOME/.bashrc" # Load .bashrc
 
-export PATH="$HOME/.anyenv/bin:$PATH"
-eval "$(anyenv init -)"
+#export PATH="$HOME/.anyenv/bin:$PATH"
+#eval "$(anyenv init -)"
+. $(brew --prefix asdf)/asdf.sh
+. $(brew --prefix asdf)/etc/bash_completion.d/asdf.bash
+
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
 export PATH="~/Library/Python/3.7/bin:$PATH"
-export PATH="$HOME/.tfenv/bin:$PATH"
+#export PATH="$HOME/.tfenv/bin:$PATH"
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
 
@@ -37,7 +40,10 @@ export XDG_CONFIG_HOME=$HOME/.config
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/nirareba1969/Downloads/google-cloud-sdk/path.bash.inc' ]; then . '/Users/nirareba1969/Downloads/google-cloud-sdk/path.bash.inc'; fi
+#if [ -f '/Users/nirareba1969/Downloads/google-cloud-sdk/path.bash.inc' ]; then . '/Users/nirareba1969/Downloads/google-cloud-sdk/path.bash.inc'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '/Users/nirareba1969/Downloads/google-cloud-sdk/completion.bash.inc' ]; then . '/Users/nirareba1969/Downloads/google-cloud-sdk/completion.bash.inc'; fi
+#if [ -f '/Users/nirareba1969/Downloads/google-cloud-sdk/completion.bash.inc' ]; then . '/Users/nirareba1969/Downloads/google-cloud-sdk/completion.bash.inc'; fi
+
+# Added by serverless binary installer
+export PATH="$HOME/.serverless/bin:$PATH"
