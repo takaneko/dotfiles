@@ -18,11 +18,11 @@ if dein#load_state('~/.cache/dein')
   call dein#add('Shougo/neosnippet.vim')
   call dein#add('Shougo/neosnippet-snippets')
   " color
-  call dein#add('sickill/vim-monokai')
-  call dein#add('januswel/html5.vim')
+  call dein#add('crusoexia/vim-monokai')
   call dein#add('mattn/emmet-vim')
-  call dein#add('kchmck/vim-coffee-script')
+  call dein#add('moll/vim-node')
   call dein#add('pangloss/vim-javascript')
+  call dein#add('maxmellon/vim-jsx-pretty')
   call dein#add('posva/vim-vue')
   call dein#add('leafgarland/typescript-vim')
   call dein#add('nathanaelkane/vim-indent-guides')
@@ -34,12 +34,9 @@ if dein#load_state('~/.cache/dein')
   call dein#add('dart-lang/dart-vim-plugin')
   call dein#add('slim-template/vim-slim')
   call dein#add('tpope/vim-haml')
-  call dein#add('groenewege/vim-less')
   call dein#add('mechatroner/rainbow_csv')
   call dein#add('etdev/vim-hexcolor')
-  call dein#add('postmodern/vim-yard')
   call dein#add('plasticboy/vim-markdown')
-  call dein#add('stephenway/postcss.vim')
   call dein#add('styled-components/vim-styled-components')
   call dein#add('cespare/vim-toml')
   " check
@@ -126,6 +123,7 @@ let g:indent_guides_enable_on_vim_startup = 1
 let indent_guides_auto_colors = 0
 autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=darkgrey   ctermbg=236
 autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=darkgrey   ctermbg=237
+autocmd VimEnter,Colorscheme * :hi StatusLine       ctermfg=231 ctermbg=241 cterm=bold guifg=#f8f8f2 guibg=#64645e gui=bold
 let indent_guides_color_change_percent = 10
 
 " fugitive
@@ -178,3 +176,6 @@ let g:go_info_mode='gopls'
 let g:go_fmt_command = "goimports"
 au FileType go setlocal sw=4 ts=4 sts=4 noet
 filetype plugin indent on
+
+" vim-jsx-pretty
+let g:vim_jsx_pretty_colorful_config=0
