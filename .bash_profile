@@ -13,9 +13,6 @@ export PATH="~/Library/Python/3.7/bin:$PATH"
 export GOPATH=$HOME/go
 export PATH="$PATH:$GOPATH/bin"
 
-export JAVA_HOME=$(/usr/libexec/java_home)
-export PATH=$PATH:$JAVA_HOME/bin
-
 function share_history {
   history -a
   history -c
