@@ -23,6 +23,7 @@ if dein#load_state('~/.cache/dein')
   call dein#add('moll/vim-node')
   call dein#add('pangloss/vim-javascript')
   call dein#add('maxmellon/vim-jsx-pretty')
+  call dein#add('prettier/vim-prettier')
   call dein#add('posva/vim-vue')
   call dein#add('leafgarland/typescript-vim')
   call dein#add('nathanaelkane/vim-indent-guides')
@@ -58,6 +59,7 @@ if dein#load_state('~/.cache/dein')
   call dein#save_state()
 endif
 
+packloadall
 filetype plugin indent on
 
 if dein#check_install()
@@ -106,6 +108,9 @@ set laststatus=2
 set statusline=%<%f\ %m%r%h%w
 set statusline+=%{'['.(&fenc!=''?&fenc:&enc).']['.&fileformat.']'}
 set statusline+=%=%l/%L,%c%V%8P
+
+" leader
+let mapleader = "\<Space>"
 
 " matchit
 source $VIMRUNTIME/macros/matchit.vim
@@ -178,4 +183,8 @@ au FileType go setlocal sw=4 ts=4 sts=4 noet
 filetype plugin indent on
 
 " vim-jsx-pretty
-let g:vim_jsx_pretty_colorful_config=0
+let g:vim_jsx_pretty_colorful_config=1
+
+" vim-prettier
+let g:prettier#autoformat = 1
+let g:prettier#autoformat_require_pragma = 0
