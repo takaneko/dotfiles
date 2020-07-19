@@ -1,70 +1,51 @@
 if &compatible
-  set nocompatible               " Be iMproved
+  set nocompatible " Be iMproved
 endif
 
-set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
+call plug#begin('~/.vim/plugged')
 
-if dein#load_state('~/.cache/dein')
-  call dein#begin('~/.cache/dein')
+" color
+Plug 'crusoexia/vim-monokai'
+Plug 'mattn/emmet-vim'
+Plug 'moll/vim-node'
+Plug 'pangloss/vim-javascript'
+Plug 'maxmellon/vim-jsx-pretty'
+Plug 'prettier/vim-prettier'
+Plug 'posva/vim-vue'
+Plug 'leafgarland/typescript-vim'
+Plug 'nathanaelkane/vim-indent-guides'
+Plug 'vim-scripts/AnsiEsc.vim'
+Plug 'rust-lang/rust.vim'
+Plug 'fatih/vim-go'
+Plug 'vim-ruby/vim-ruby'
+Plug 'hashivim/vim-terraform'
+Plug 'dart-lang/dart-vim-plugin'
+Plug 'slim-template/vim-slim'
+Plug 'tpope/vim-haml'
+Plug 'mechatroner/rainbow_csv'
+Plug 'etdev/vim-hexcolor'
+Plug 'plasticboy/vim-markdown'
+Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
+Plug 'cespare/vim-toml'
+" check
+Plug 'scrooloose/syntastic'
+" useful
+Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rails'
+Plug 'vim-scripts/gtags.vim'
+Plug 'vim-jp/vimdoc-ja'
+Plug 'jremmen/vim-ripgrep'
+Plug 'junegunn/fzf', {'build': './install --all'}
+Plug 'junegunn/fzf.vim'
+Plug 'godlygeek/tabular'
+Plug 'vim-scripts/Align'
+Plug 'vim-scripts/SQLUtilities'
 
-  call dein#add('~/.cache/dein/repos/github.com/Shougo/dein.vim')
-
-  call dein#add('Shougo/deoplete.nvim')
-  if !has('nvim')
-    call dein#add('roxma/nvim-yarp')
-    call dein#add('roxma/vim-hug-neovim-rpc')
-  endif
-
-  call dein#add('Shougo/neosnippet.vim')
-  call dein#add('Shougo/neosnippet-snippets')
-  " color
-  call dein#add('crusoexia/vim-monokai')
-  call dein#add('mattn/emmet-vim')
-  call dein#add('moll/vim-node')
-  call dein#add('pangloss/vim-javascript')
-  call dein#add('maxmellon/vim-jsx-pretty')
-  call dein#add('prettier/vim-prettier')
-  call dein#add('posva/vim-vue')
-  call dein#add('leafgarland/typescript-vim')
-  call dein#add('nathanaelkane/vim-indent-guides')
-  call dein#add('vim-scripts/AnsiEsc.vim')
-  call dein#add('rust-lang/rust.vim')
-  call dein#add('fatih/vim-go')
-  call dein#add('vim-ruby/vim-ruby')
-  call dein#add('hashivim/vim-terraform')
-  call dein#add('dart-lang/dart-vim-plugin')
-  call dein#add('slim-template/vim-slim')
-  call dein#add('tpope/vim-haml')
-  call dein#add('mechatroner/rainbow_csv')
-  call dein#add('etdev/vim-hexcolor')
-  call dein#add('plasticboy/vim-markdown')
-  call dein#add('styled-components/vim-styled-components')
-  call dein#add('cespare/vim-toml')
-  " check
-  call dein#add('scrooloose/syntastic')
-  " useful
-  call dein#add('tpope/vim-endwise')
-  call dein#add('tpope/vim-fugitive')
-  call dein#add('tpope/vim-rails')
-  call dein#add('vim-scripts/gtags.vim')
-  call dein#add('vim-jp/vimdoc-ja')
-  call dein#add('jremmen/vim-ripgrep')
-  call dein#add('junegunn/fzf', {'build': './install --all'})
-  call dein#add('junegunn/fzf.vim')
-  call dein#add('godlygeek/tabular')
-  call dein#add('vim-scripts/Align')
-  call dein#add('vim-scripts/SQLUtilities')
-
-  call dein#end()
-  call dein#save_state()
-endif
+call plug#end()
 
 packloadall
 filetype plugin indent on
-
-if dein#check_install()
-  call dein#install()
-endif
 
 " help
 set helplang=ja,en
