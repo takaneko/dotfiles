@@ -1,71 +1,55 @@
 if &compatible
-  set nocompatible               " Be iMproved
+  set nocompatible " Be iMproved
 endif
 
-set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
+call plug#begin('~/.vim/plugged')
 
-if dein#load_state('~/.cache/dein')
-  call dein#begin('~/.cache/dein')
+" color
+Plug 'crusoexia/vim-monokai'
+Plug 'mattn/emmet-vim'
+Plug 'moll/vim-node'
+Plug 'pangloss/vim-javascript'
+Plug 'maxmellon/vim-jsx-pretty'
+Plug 'prettier/vim-prettier'
+Plug 'posva/vim-vue'
+Plug 'leafgarland/typescript-vim'
+Plug 'nathanaelkane/vim-indent-guides'
+Plug 'vim-scripts/AnsiEsc.vim'
+Plug 'rust-lang/rust.vim'
+Plug 'fatih/vim-go'
+Plug 'vim-ruby/vim-ruby'
+Plug 'hashivim/vim-terraform'
+Plug 'dart-lang/dart-vim-plugin'
+Plug 'slim-template/vim-slim'
+Plug 'tpope/vim-haml'
+Plug 'mechatroner/rainbow_csv'
+Plug 'etdev/vim-hexcolor'
+Plug 'plasticboy/vim-markdown'
+Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
+Plug 'cespare/vim-toml'
+" check
+Plug 'scrooloose/syntastic'
+" useful
+Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-rails'
+Plug 'vim-scripts/gtags.vim'
+Plug 'vim-jp/vimdoc-ja'
+Plug 'jremmen/vim-ripgrep'
+Plug 'junegunn/fzf', {'build': './install --all'}
+Plug 'junegunn/fzf.vim'
+Plug 'godlygeek/tabular'
+Plug 'vim-scripts/Align'
+Plug 'vim-scripts/SQLUtilities'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
 
-  call dein#add('~/.cache/dein/repos/github.com/Shougo/dein.vim')
+call plug#end()
 
-  call dein#add('Shougo/deoplete.nvim')
-  if !has('nvim')
-    call dein#add('roxma/nvim-yarp')
-    call dein#add('roxma/vim-hug-neovim-rpc')
-  endif
-
-  call dein#add('Shougo/neosnippet.vim')
-  call dein#add('Shougo/neosnippet-snippets')
-  " color
-  call dein#add('sickill/vim-monokai')
-  call dein#add('januswel/html5.vim')
-  call dein#add('mattn/emmet-vim')
-  call dein#add('kchmck/vim-coffee-script')
-  call dein#add('pangloss/vim-javascript')
-  call dein#add('posva/vim-vue')
-  call dein#add('leafgarland/typescript-vim')
-  call dein#add('nathanaelkane/vim-indent-guides')
-  call dein#add('vim-scripts/AnsiEsc.vim')
-  call dein#add('rust-lang/rust.vim')
-  call dein#add('fatih/vim-go')
-  call dein#add('vim-ruby/vim-ruby')
-  call dein#add('hashivim/vim-terraform')
-  call dein#add('dart-lang/dart-vim-plugin')
-  call dein#add('slim-template/vim-slim')
-  call dein#add('tpope/vim-haml')
-  call dein#add('groenewege/vim-less')
-  call dein#add('mechatroner/rainbow_csv')
-  call dein#add('etdev/vim-hexcolor')
-  call dein#add('postmodern/vim-yard')
-  call dein#add('plasticboy/vim-markdown')
-  call dein#add('stephenway/postcss.vim')
-  call dein#add('styled-components/vim-styled-components')
-  call dein#add('cespare/vim-toml')
-  " check
-  call dein#add('scrooloose/syntastic')
-  " useful
-  call dein#add('tpope/vim-endwise')
-  call dein#add('tpope/vim-fugitive')
-  call dein#add('tpope/vim-rails')
-  call dein#add('vim-scripts/gtags.vim')
-  call dein#add('vim-jp/vimdoc-ja')
-  call dein#add('jremmen/vim-ripgrep')
-  call dein#add('junegunn/fzf', {'build': './install --all'})
-  call dein#add('junegunn/fzf.vim')
-  call dein#add('godlygeek/tabular')
-  call dein#add('vim-scripts/Align')
-  call dein#add('vim-scripts/SQLUtilities')
-
-  call dein#end()
-  call dein#save_state()
-endif
-
+packloadall
 filetype plugin indent on
-
-if dein#check_install()
-  call dein#install()
-endif
 
 " help
 set helplang=ja,en
@@ -110,6 +94,9 @@ set statusline=%<%f\ %m%r%h%w
 set statusline+=%{'['.(&fenc!=''?&fenc:&enc).']['.&fileformat.']'}
 set statusline+=%=%l/%L,%c%V%8P
 
+" leader
+let mapleader = "\<Space>"
+
 " matchit
 source $VIMRUNTIME/macros/matchit.vim
 
@@ -126,6 +113,7 @@ let g:indent_guides_enable_on_vim_startup = 1
 let indent_guides_auto_colors = 0
 autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=darkgrey   ctermbg=236
 autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=darkgrey   ctermbg=237
+autocmd VimEnter,Colorscheme * :hi StatusLine       ctermfg=231 ctermbg=241 cterm=bold guifg=#f8f8f2 guibg=#64645e gui=bold
 let indent_guides_color_change_percent = 10
 
 " fugitive
@@ -165,6 +153,29 @@ endfunction
 " vim-ruby
 let ruby_fold = 1
 
+" vim-lsp
+function! s:on_lsp_buffer_enabled() abort
+    setlocal omnifunc=lsp#complete
+    setlocal signcolumn=yes
+    if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+    nmap <buffer> gd <plug>(lsp-definition)
+    nmap <buffer> gr <plug>(lsp-references)
+    nmap <buffer> gi <plug>(lsp-implementation)
+    nmap <buffer> gt <plug>(lsp-type-definition)
+    nmap <buffer> <leader>rn <plug>(lsp-rename)
+    nmap <buffer> [g <Plug>(lsp-previous-diagnostic)
+    nmap <buffer> ]g <Plug>(lsp-next-diagnostic)
+    nmap <buffer> K <plug>(lsp-hover)
+
+    " refer to doc to add more commands
+endfunction
+
+augroup lsp_install
+    au!
+    " call s:on_lsp_buffer_enabled only for languages that has the server registered.
+    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
+
 " vim-go
 let g:go_null_module_warning = 0
 let g:go_highlight_types = 1
@@ -173,8 +184,13 @@ let g:go_highlight_structs = 1
 let g:go_highlight_functions = 1
 let g:go_highlight_function_calls = 1
 let g:go_auto_type_info = 1
-let g:go_def_mode='gopls'
-let g:go_info_mode='gopls'
 let g:go_fmt_command = "goimports"
 au FileType go setlocal sw=4 ts=4 sts=4 noet
 filetype plugin indent on
+
+" vim-jsx-pretty
+let g:vim_jsx_pretty_colorful_config=1
+
+" vim-prettier
+let g:prettier#autoformat = 1
+let g:prettier#autoformat_require_pragma = 0
