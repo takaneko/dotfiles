@@ -25,5 +25,8 @@ tags
 # vimrc local
 .vimrc.local
 
+# direnv
+.envrc
+
 # asdf
 .tool-versions
