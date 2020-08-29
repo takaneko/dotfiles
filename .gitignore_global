@@ -24,3 +24,6 @@ tags
 
 # vimrc local
 .vimrc.local
+
+# asdf
+.tool-versions
