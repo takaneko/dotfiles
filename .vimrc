@@ -10,7 +10,7 @@ Plug 'mattn/emmet-vim'
 Plug 'moll/vim-node'
 Plug 'pangloss/vim-javascript'
 Plug 'maxmellon/vim-jsx-pretty'
-Plug 'prettier/vim-prettier'
+Plug 'prettier/vim-prettier', { 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'markdown', 'vue', 'html', 'graphql'] }
 Plug 'posva/vim-vue'
 Plug 'leafgarland/typescript-vim'
 Plug 'nathanaelkane/vim-indent-guides'
@@ -51,6 +51,9 @@ call plug#end()
 packloadall
 filetype plugin indent on
 
+autocmd bufnewfile,bufread *.tsx set filetype=typescript.tsx
+autocmd bufnewfile,bufread *.jsx set filetype=javascript.jsx
+
 " help
 set helplang=ja,en
 
@@ -76,7 +79,7 @@ set fileencodings=utf-8
 " fold
 set foldenable
 set foldlevelstart=1
-set foldmethod=syntax
+set foldmethod=indent
 
 set synmaxcol=256
 syntax sync minlines=256
@@ -187,6 +190,10 @@ let g:go_auto_type_info = 1
 let g:go_fmt_command = "goimports"
 au FileType go setlocal sw=4 ts=4 sts=4 noet
 filetype plugin indent on
+
+" vim-lsp
+let g:lsp_log_verbose = 1
+let g:lsp_log_file = expand('~/vim-lsp.log')
 
 " vim-jsx-pretty
 let g:vim_jsx_pretty_colorful_config=1
