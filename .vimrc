@@ -181,6 +181,7 @@ augroup lsp_install
 augroup END
 
 " vim-go
+let g:go_gopls_enabled = 0
 let g:go_null_module_warning = 0
 let g:go_highlight_types = 1
 let g:go_highlight_fields = 1
