@@ -27,6 +27,7 @@ Plug 'etdev/vim-hexcolor'
 Plug 'plasticboy/vim-markdown'
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plug 'cespare/vim-toml'
+Plug 'jparise/vim-graphql'
 " check
 Plug 'scrooloose/syntastic'
 " useful
@@ -201,3 +202,4 @@ let g:vim_jsx_pretty_colorful_config=1
 " vim-prettier
 let g:prettier#autoformat = 1
 let g:prettier#autoformat_require_pragma = 0
+let g:prettier#config#end_of_line = get(g:, 'prettier#config#end_of_line', 'lf')
