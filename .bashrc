@@ -37,3 +37,8 @@ eval "$(direnv hook bash)"
 
 # navi
 eval "$(navi widget bash)"
+
+# navi for local project cheats
+_navi_widget_legacy() {
+   _navi_call --print --path .
+}
