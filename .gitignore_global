@@ -36,3 +36,6 @@ tags
 
 # asdf
 .tool-versions
+
+# navi for project
+.cheat
