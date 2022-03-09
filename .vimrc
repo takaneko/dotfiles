@@ -161,7 +161,6 @@ let ruby_fold = 1
 function! s:on_lsp_buffer_enabled() abort
     setlocal omnifunc=lsp#complete
     setlocal signcolumn=yes
-    if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
     nmap <buffer> gd <plug>(lsp-definition)
     nmap <buffer> gr <plug>(lsp-references)
     nmap <buffer> gi <plug>(lsp-implementation)
@@ -194,7 +193,7 @@ au FileType go setlocal sw=4 ts=4 sts=4 noet
 filetype plugin indent on
 
 " vim-lsp
-let g:lsp_log_verbose = 1
+let g:lsp_log_verbose = 0
 let g:lsp_log_file = expand('~/vim-lsp.log')
 
 " vim-jsx-pretty
