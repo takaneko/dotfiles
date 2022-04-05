@@ -18,6 +18,7 @@ Plug 'vim-scripts/AnsiEsc.vim'
 Plug 'rust-lang/rust.vim'
 Plug 'fatih/vim-go'
 Plug 'vim-ruby/vim-ruby'
+Plug 'pocke/rbs.vim'
 Plug 'hashivim/vim-terraform'
 Plug 'dart-lang/dart-vim-plugin'
 Plug 'slim-template/vim-slim'
@@ -54,6 +55,7 @@ filetype plugin indent on
 
 autocmd bufnewfile,bufread *.tsx set filetype=typescript.tsx
 autocmd bufnewfile,bufread *.jsx set filetype=javascript.jsx
+autocmd bufnewfile,bufread Steepfile set filetype=ruby
 
 " help
 set helplang=ja,en
@@ -195,6 +197,15 @@ filetype plugin indent on
 " vim-lsp
 let g:lsp_log_verbose = 0
 let g:lsp_log_file = expand('~/vim-lsp.log')
+
+let g:lsp_settings_filetype_ruby = ['steep', 'solargraph']
+
+" vim-lsp-settings
+let g:lsp_settings = {
+      \ 'tailwindcss-intellisense': {
+        \ 'allowlist': ['html', 'css', 'eruby']
+        \ }
+\ }
 
 " vim-jsx-pretty
 let g:vim_jsx_pretty_colorful_config=1
