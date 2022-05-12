@@ -43,10 +43,10 @@ Plug 'junegunn/fzf.vim'
 Plug 'godlygeek/tabular'
 Plug 'vim-scripts/Align'
 Plug 'vim-scripts/SQLUtilities'
-Plug 'prabirshrestha/asyncomplete.vim'
-Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'prabirshrestha/vim-lsp'
 Plug 'mattn/vim-lsp-settings'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
 
 call plug#end()
 
@@ -156,9 +156,6 @@ function! s:vimrc_local(loc)
   endfor
 endfunction
 
-" vim-ruby
-let ruby_fold = 1
-
 " vim-lsp
 function! s:on_lsp_buffer_enabled() abort
     setlocal omnifunc=lsp#complete
@@ -181,6 +178,23 @@ augroup lsp_install
     autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
 augroup END
 
+let g:lsp_log_verbose = 1
+let g:lsp_log_file = expand('~/vim-lsp.log')
+
+" vim-lsp-settings
+let g:lsp_settings_filetype_ruby = ['solargraph', 'steep']
+
+" vim-ruby
+let ruby_fold = 1
+
+" vim-jsx-pretty
+let g:vim_jsx_pretty_colorful_config=1
+
+" vim-prettier
+let g:prettier#autoformat = 1
+let g:prettier#autoformat_require_pragma = 0
+let g:prettier#config#end_of_line = get(g:, 'prettier#config#end_of_line', 'lf')
+
 " vim-go
 let g:go_gopls_enabled = 0
 let g:go_null_module_warning = 0
@@ -191,26 +205,6 @@ let g:go_highlight_functions = 1
 let g:go_highlight_function_calls = 1
 let g:go_auto_type_info = 1
 let g:go_fmt_command = "goimports"
+let g:go_def_mapping_enabled=0
 au FileType go setlocal sw=4 ts=4 sts=4 noet
 filetype plugin indent on
-
-" vim-lsp
-let g:lsp_log_verbose = 0
-let g:lsp_log_file = expand('~/vim-lsp.log')
-
-let g:lsp_settings_filetype_ruby = ['steep', 'solargraph']
-
-" vim-lsp-settings
-let g:lsp_settings = {
-      \ 'tailwindcss-intellisense': {
-        \ 'allowlist': ['html', 'css', 'eruby']
-        \ }
-\ }
-
-" vim-jsx-pretty
-let g:vim_jsx_pretty_colorful_config=1
-
-" vim-prettier
-let g:prettier#autoformat = 1
-let g:prettier#autoformat_require_pragma = 0
-let g:prettier#config#end_of_line = get(g:, 'prettier#config#end_of_line', 'lf')
