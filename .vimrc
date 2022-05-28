@@ -29,6 +29,7 @@ Plug 'plasticboy/vim-markdown'
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 Plug 'cespare/vim-toml'
 Plug 'jparise/vim-graphql'
+Plug 'pantharshit00/vim-prisma'
 " check
 Plug 'scrooloose/syntastic'
 " useful
