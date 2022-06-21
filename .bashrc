@@ -1,6 +1,6 @@
 #shellcheck disable=SC1090,SC1091
 
-export PATH="/usr/local/sbin:$PATH"
+export PATH="/usr/local/sbin:/usr/local/google-cloud-sdk/bin:/opt/homebrew/bin:$PATH"
 
 export PS1='\[\033[1;32m\]\u\[\033[00m\]:\[\033[1;34m\]\w\[\033[1;31m\]$(__git_ps1)\[\033[00m\] \$ '
 
@@ -16,9 +16,12 @@ shopt -u histappend
 
 bind "\C-r":reverse-search-history
 
+# homebrew
+eval $(brew shellenv)
+
 # git
-source /usr/local/etc/bash_completion.d/git-completion.bash
-source /usr/local/etc/bash_completion.d/git-prompt.sh
+source ~/.git-completion.bash
+source ~/.git-prompt.sh
 
 export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWUPSTREAM=1
