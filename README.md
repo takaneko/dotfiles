@@ -9,7 +9,7 @@ dotfiles for me.
 ```
 
 ```bash
-brew install vim tmux git git-secrets ripgrep fzf asdf navi direnv ctags wget jq
+brew install vim tmux git git-secrets ripgrep fzf asdf navi direnv ctags wget jq fd
 ```
 
 ```bash
