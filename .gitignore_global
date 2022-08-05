@@ -39,3 +39,10 @@ tags
 
 # navi for project
 .cheats
+
+# docker-compose.override.yml
+docker-compose.override.yml
+compose.override.yml
+
+# solargraph
+.solargraph.yml
