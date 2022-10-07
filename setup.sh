@@ -6,3 +6,5 @@ for file in "${DOT_FILES[@]}"
 do
   ln -sf "$HOME/dotfiles/$file" "$HOME/$file"
 done
+
+ln -sf "$HOME/dotfiles/init.vim" "$HOME/.config/nvim/init.vim"

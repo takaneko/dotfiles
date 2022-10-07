@@ -1,6 +1,6 @@
 set runtimepath+=$HOME/dotfiles
 
-call plug#begin('~/.vim/plugged')
+call plug#begin('~/.nvim/plugged')
 runtime! vim/plugin.vim
 call plug#end()
 
