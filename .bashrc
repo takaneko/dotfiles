@@ -33,7 +33,7 @@ export GIT_PS1_SHOWSTASHSTATE=1
 
 # asdf
 export ASDF_DIR="$(brew --prefix asdf)/libexec"
-source "$(brew --prefix asdf)"/asdf.sh
+source "$(brew --prefix asdf)"/libexec/asdf.sh
 source "$(brew --prefix asdf)"/etc/bash_completion.d/asdf.bash
 
 # direnv

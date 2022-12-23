@@ -93,7 +93,7 @@ let g:lsp_log_verbose = 1
 let g:lsp_log_file = expand('~/vim-lsp.log')
 
 " vim-lsp-settings
-let g:lsp_settings_filetype_ruby = ['solargraph', 'steep']
+let g:lsp_settings_filetype_ruby = ['solargraph']
 
 " vim-ruby
 let ruby_fold = 1
