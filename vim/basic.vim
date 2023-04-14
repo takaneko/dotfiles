@@ -1,8 +1,6 @@
 packloadall
 filetype plugin indent on
 
-autocmd bufnewfile,bufread *.tsx set filetype=typescript.tsx
-autocmd bufnewfile,bufread *.jsx set filetype=javascript.jsx
 autocmd bufnewfile,bufread Steepfile set filetype=ruby
 
 " Don't screw up folds when inserting text that might affect them, until
@@ -18,7 +16,7 @@ set helplang=ja,en
 set autowrite
 
 " syntax highlight
-colorscheme monokai
+colorscheme tokyonight
 syntax on
 
 highlight ExtraWhitespace ctermbg=red guibg=red
@@ -53,9 +51,9 @@ let indent_guides_color_change_percent = 10
 " statusline
 set laststatus=2
 
-set statusline=%<%f\ %m%r%h%w
-set statusline+=%{'['.(&fenc!=''?&fenc:&enc).']['.&fileformat.']'}
-set statusline+=%=%l/%L,%c%V%8P
+"set statusline=%<%f\ %m%r%h%w
+"set statusline+=%{'['.(&fenc!=''?&fenc:&enc).']['.&fileformat.']'}
+"set statusline+=%=%l/%L,%c%V%8P
 
 " leader
 let mapleader = "\<Space>"
