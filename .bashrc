@@ -43,4 +43,4 @@ eval "$(direnv hook bash)"
 eval "$(navi widget bash)"
 
 export NAVI_PATH="$(navi info cheats-path)"
-export NAVI_PATH="~/.cheats:.cheats:cheats:$NAVI_PATH"
+export NAVI_PATH="~/.cheats:.cheats:cheats:../.cheats:../cheats:$NAVI_PATH"
