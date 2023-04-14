@@ -1,15 +1,6 @@
 " matchit
 source $VIMRUNTIME/macros/matchit.vim
 
-" syntastic
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-" let g:syntastic_auto_loc_list = 1
-let g:syntastic_javascript_checkers = ['eslint']
-set statusline+=%{fugitive#statusline()}
-
 " fugitive
 autocmd QuickFixCmdPost *grep* cwindow
 
@@ -72,11 +63,6 @@ let ruby_fold = 1
 " vim-jsx-pretty
 let g:vim_jsx_pretty_colorful_config=1
 
-" vim-prettier
-let g:prettier#autoformat = 1
-let g:prettier#autoformat_require_pragma = 0
-let g:prettier#config#end_of_line = get(g:, 'prettier#config#end_of_line', 'lf')
-
 " vim-go
 let g:go_gopls_enabled = 0
 let g:go_null_module_warning = 0
@@ -90,6 +76,23 @@ let g:go_fmt_command = "goimports"
 let g:go_def_mapping_enabled=0
 au FileType go setlocal sw=4 ts=4 sts=4 noet
 filetype plugin indent on
+
+" ale
+let g:ale_fixers = {
+  \   'ruby': ['rubocop'],
+  \}
+let g:ale_fixers = {
+  \   '*': ['remove_trailing_lines', 'trim_whitespace'],
+  \   'typescript': ['prettier'],
+  \   'typescriptreact': ['prettier'],
+  \   'javascript': ['prettier'],
+  \   'javascriptreact': ['prettier'],
+  \   'css': ['prettier'],
+  \}
+let g:ale_linters_explicit = 1
+let g:airline#extensions#ale#enabled = 1
+let g:ale_fix_on_save = 1
+let g:ale_javascript_prettier_use_local_config = 1
 
 " coc-nvim
 " Some servers have issues with backup files, see #649
@@ -230,7 +233,7 @@ command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.org
 " Add (Neo)Vim's native statusline support
 " NOTE: Please see `:h coc-status` for integrations with external plugins that
 " provide custom statusline: lightline.vim, vim-airline
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+" set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 " Mappings for CoCList
 " Show all diagnostics
