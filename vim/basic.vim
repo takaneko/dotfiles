@@ -19,6 +19,7 @@ set autowrite
 colorscheme tokyonight
 syntax on
 
+highlight LineNr guifg=white
 highlight ExtraWhitespace ctermbg=red guibg=red
 match ExtraWhitespace /\s\+$/
 
