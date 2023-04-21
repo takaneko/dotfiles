@@ -64,16 +64,21 @@ let ruby_fold = 1
 let g:vim_jsx_pretty_colorful_config=1
 
 " vim-go
-let g:go_gopls_enabled = 0
-let g:go_null_module_warning = 0
-let g:go_highlight_types = 1
-let g:go_highlight_fields = 1
-let g:go_highlight_structs = 1
-let g:go_highlight_functions = 1
-let g:go_highlight_function_calls = 1
-let g:go_auto_type_info = 1
-let g:go_fmt_command = "goimports"
-let g:go_def_mapping_enabled=0
+"let g:go_gopls_enabled = 0
+"let g:go_null_module_warning = 0
+"let g:go_highlight_types = 1
+"let g:go_highlight_fields = 1
+"let g:go_highlight_structs = 1
+"let g:go_highlight_functions = 1
+"let g:go_highlight_function_calls = 1
+"let g:go_auto_type_info = 0
+"let g:go_fmt_command = "goimports"
+"let g:go_def_mapping_enabled=0
+" coc-go
+autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
+autocmd FileType go nmap gtj :CocCommand go.tags.add json<cr>
+autocmd FileType go nmap gty :CocCommand go.tags.add yaml<cr>
+autocmd FileType go nmap gtx :CocCommand go.tags.clear<cr>
 au FileType go setlocal sw=4 ts=4 sts=4 noet
 filetype plugin indent on
 
