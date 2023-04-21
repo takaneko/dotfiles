@@ -4,7 +4,7 @@ Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 Plug 'posva/vim-vue'
 Plug 'leafgarland/typescript-vim'
 Plug 'rust-lang/rust.vim'
-Plug 'fatih/vim-go'
+" Plug 'fatih/vim-go'
 Plug 'sebdah/vim-delve'
 Plug 'vim-ruby/vim-ruby'
 Plug 'pocke/rbs.vim'
