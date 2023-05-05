@@ -1,0 +1,7 @@
+{
+  "coc.preferences.formatOnSaveFiletypes": [ "go" ],
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.includeLanguages": {
+    "eruby": "html"
+  }
+}
