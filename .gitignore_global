@@ -46,3 +46,6 @@ compose.override.yml
 
 # solargraph
 .solargraph.yml
+
+# prettier
+.prettierrc.toml
