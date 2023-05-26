@@ -1,5 +1,6 @@
 {
   "coc.preferences.formatOnSaveFiletypes": [ "go" ],
+  "typescript.preferences.importModuleSpecifier": "non-relative",
   "tailwindCSS.emmetCompletions": true,
   "tailwindCSS.includeLanguages": {
     "eruby": "html"
