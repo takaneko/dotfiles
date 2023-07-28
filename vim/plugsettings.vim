@@ -84,15 +84,13 @@ filetype plugin indent on
 
 " ale
 let g:ale_fixers = {
-  \   'ruby': ['rubocop'],
-  \}
-let g:ale_fixers = {
   \   '*': ['remove_trailing_lines', 'trim_whitespace'],
-  \   'typescript': ['prettier'],
-  \   'typescriptreact': ['prettier'],
-  \   'javascript': ['prettier'],
-  \   'javascriptreact': ['prettier'],
-  \   'css': ['prettier'],
+  \   'ruby': ['rubocop'],
+  \   'typescript': ['prettier', 'eslint'],
+  \   'typescriptreact': ['prettier', 'eslint'],
+  \   'javascript': ['prettier', 'eslint'],
+  \   'javascriptreact': ['prettier', 'eslint'],
+  \   'css': ['prettier', 'eslint'],
   \}
 let g:ale_linters_explicit = 1
 let g:airline#extensions#ale#enabled = 1
