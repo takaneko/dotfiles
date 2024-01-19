@@ -30,6 +30,7 @@ tags
 
 # vimrc local
 .vimrc.local
+.vim
 
 # direnv
 .envrc
@@ -49,3 +50,6 @@ compose.override.yml
 
 # prettier
 .prettierrc.toml
+
+# mytodo
+MYTODO.md
