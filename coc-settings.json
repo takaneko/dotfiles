@@ -1,6 +1,7 @@
 {
   "coc.preferences.formatOnSaveFiletypes": [ "go" ],
   "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
   "tsserver.useLocalTsdk": true,
   "tailwindCSS.emmetCompletions": true,
   "tailwindCSS.includeLanguages": {
