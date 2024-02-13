@@ -18,15 +18,12 @@ Session.vim
 .netrwhist
 *~
 # Auto-generated tag files
-tags
+/tags
 # Persistent undo
 [._]*.un~
 
 # byebug
 .byebug_history
-
-# ctags
-/tags
 
 # vimrc local
 .vimrc.local
