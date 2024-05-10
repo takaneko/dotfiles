@@ -86,8 +86,8 @@ filetype plugin indent on
 let g:ale_fixers = {
   \   '*': ['remove_trailing_lines', 'trim_whitespace'],
   \   'ruby': ['rubocop'],
-  \   'typescript': ['prettier', 'eslint'],
-  \   'typescriptreact': ['prettier', 'eslint'],
+  \   'typescript': ['prettier', 'eslint', 'biome'],
+  \   'typescriptreact': ['prettier', 'eslint', 'biome'],
   \   'javascript': ['prettier', 'eslint'],
   \   'javascriptreact': ['prettier', 'eslint'],
   \   'css': ['prettier', 'eslint'],
