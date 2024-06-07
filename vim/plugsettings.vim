@@ -44,6 +44,12 @@ inoremap <expr> <c-x><c-l> fzf#vim#complete(fzf#wrap({
 " fzf-tags
 noreabbrev <expr> ts getcmdtype() == ":" && getcmdline() == 'ts' ? 'FZFTselect' : 'ts'
 
+" vim-ruby
+let ruby_fold = 1
+
+" vim-jsx-pretty
+let g:vim_jsx_pretty_colorful_config=1
+
 " vim-local
 augroup vimrc-local
   autocmd!
@@ -56,47 +62,6 @@ function! s:vimrc_local(loc)
     source `=i`
   endfor
 endfunction
-
-" vim-ruby
-let ruby_fold = 1
-
-" vim-jsx-pretty
-let g:vim_jsx_pretty_colorful_config=1
-
-" vim-go
-"let g:go_gopls_enabled = 0
-"let g:go_null_module_warning = 0
-"let g:go_highlight_types = 1
-"let g:go_highlight_fields = 1
-"let g:go_highlight_structs = 1
-"let g:go_highlight_functions = 1
-"let g:go_highlight_function_calls = 1
-"let g:go_auto_type_info = 0
-"let g:go_fmt_command = "goimports"
-"let g:go_def_mapping_enabled=0
-" coc-go
-autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
-autocmd FileType go nmap gtj :CocCommand go.tags.add json<cr>
-autocmd FileType go nmap gty :CocCommand go.tags.add yaml<cr>
-autocmd FileType go nmap gtx :CocCommand go.tags.clear<cr>
-au FileType go setlocal sw=4 ts=4 sts=4 noet
-filetype plugin indent on
-
-" ale
-let g:ale_fixers = {
-  \   '*': ['remove_trailing_lines', 'trim_whitespace'],
-  \   'ruby': ['rubocop'],
-  \   'typescript': ['prettier', 'eslint', 'biome'],
-  \   'typescriptreact': ['prettier', 'eslint', 'biome'],
-  \   'javascript': ['prettier', 'eslint'],
-  \   'javascriptreact': ['prettier', 'eslint'],
-  \   'css': ['prettier', 'eslint'],
-  \}
-let g:ale_linters_explicit = 1
-let g:airline#extensions#ale#enabled = 1
-let g:ale_fix_on_save = 1
-let g:ale_javascript_prettier_use_local_config = 1
-command! ALEToggleFixer execute "let g:ale_fix_on_save = get(g:, 'ale_fix_on_save', 0) ? 0 : 1"
 
 " coc-nvim
 " Some servers have issues with backup files, see #649
@@ -261,3 +226,27 @@ nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 autocmd InsertEnter * setlocal concealcursor=
 autocmd InsertLeave * setlocal concealcursor=inc
 au FileType markdown let g:indentLine_setConceal= 0
+"
+" coc-go
+autocmd BufWritePre *.go :OR
+autocmd FileType go nmap gtj :CocCommand go.tags.add json<cr>
+autocmd FileType go nmap gty :CocCommand go.tags.add yaml<cr>
+autocmd FileType go nmap gtx :CocCommand go.tags.clear<cr>
+au FileType go setlocal sw=4 ts=4 sts=4 noet
+filetype plugin indent on
+
+" ale
+let g:ale_fixers = {
+  \   '*': ['remove_trailing_lines', 'trim_whitespace'],
+  \   'ruby': ['rubocop'],
+  \   'typescript': ['prettier', 'eslint', 'biome'],
+  \   'typescriptreact': ['prettier', 'eslint', 'biome'],
+  \   'javascript': ['prettier', 'eslint'],
+  \   'javascriptreact': ['prettier', 'eslint'],
+  \   'css': ['prettier', 'eslint'],
+  \}
+let g:ale_linters_explicit = 1
+let g:airline#extensions#ale#enabled = 1
+let g:ale_fix_on_save = 1
+let g:ale_javascript_prettier_use_local_config = 1
+command! ALEToggleFixer execute "let g:ale_fix_on_save = get(g:, 'ale_fix_on_save', 0) ? 0 : 1"
