@@ -235,6 +235,9 @@ autocmd FileType go nmap gtx :CocCommand go.tags.clear<cr>
 au FileType go setlocal sw=4 ts=4 sts=4 noet
 filetype plugin indent on
 
+" mdx
+autocmd BufNewFile,BufRead *.mdx setfiletype markdown.mdx
+
 " ale
 let g:ale_fixers = {
   \   '*': ['remove_trailing_lines', 'trim_whitespace'],
