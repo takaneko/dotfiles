@@ -130,7 +130,13 @@ keyset('n', 'K', show_documentation, { silent = true })
 -- coc-nvim highlights and actions
 vim.api.nvim_create_autocmd('CursorHold', {
   callback = function()
-    vim.fn['CocActionAsync']('highlight')
+    local ok, _ = pcall(function()
+      vim.fn.CocActionAsync('highlight')
+    end)
+    if not ok then
+      -- エラーが発生した場合の処理（必要な場合）
+      -- vim.notify('CocActionAsync not available', vim.log.levels.DEBUG)
+    end
   end,
   pattern = '*'
 })
