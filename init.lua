@@ -12,4 +12,5 @@ vim.call('plug#end')
 -- 他の設定ファイルの読み込み
 -- vim.cmd('runtime! vim/basic.vim')
 require('basic')
-vim.cmd('runtime! vim/plugsettings.vim')
+-- vim.cmd('runtime! vim/plugsettings.vim')
+require('plugsettings')
