@@ -238,6 +238,9 @@ filetype plugin indent on
 " mdx
 autocmd BufNewFile,BufRead *.mdx setfiletype markdown.mdx
 
+" inky
+au BufNewFile,BufRead *.inky setfiletype eruby
+
 " ale
 let g:ale_fixers = {
   \   '*': ['remove_trailing_lines', 'trim_whitespace'],

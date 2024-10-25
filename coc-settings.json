@@ -53,7 +53,7 @@
         "linters": [],
         "experimentalFeaturesEnabled": false
       },
-      "filetypes": ["ruby"]
+      "filetypes": ["ruby", "eruby"]
     }
   }
 }
