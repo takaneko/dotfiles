@@ -8,5 +8,7 @@ do
 done
 
 # ln -sf "$HOME/dotfiles/init.vim" "$HOME/.config/nvim/init.vim"
+# rm $HOME/.config/nvim/init.lua
 ln -sf "$HOME/dotfiles/init.lua" "$HOME/.config/nvim/init.lua"
+rm $HOME/.config/nvim/init.vim
 ln -sf "$HOME/dotfiles/coc-settings.json" "$HOME/.config/nvim/coc-settings.json"
