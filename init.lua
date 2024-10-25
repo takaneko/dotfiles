@@ -41,8 +41,6 @@ require("lazy").setup({
     -- import your plugins
     { import = "plugins" },
   },
-  -- automatically check for plugin updates
-  checker = { enabled = true },
 })
 
 -- 他の設定ファイルの読み込み
