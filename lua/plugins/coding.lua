@@ -3,7 +3,6 @@ return {
   {
     "neoclide/coc.nvim",
     branch = "release",
-    event = { "BufReadPre", "BufNewFile" },
   },
   {
     "github/copilot.vim",
