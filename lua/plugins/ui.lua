@@ -11,7 +11,10 @@ return {
     ft = "csv",
   },
   {
-    "Yggdroot/indentLine",
-    event = { "BufReadPre", "BufNewFile" },
-  },
+    "lukas-reineke/indent-blankline.nvim",
+    main = "ibl",
+    ---@module "ibl"
+    ---@type ibl.config
+    opts = {},
+  }
 }
