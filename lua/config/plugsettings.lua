@@ -263,18 +263,18 @@ keyset("n", "<space>k", ":<C-u>CocPrev<cr>", opts)
 keyset("n", "<space>p", ":<C-u>CocListResume<cr>", opts)
 
 -- indentLine
-vim.api.nvim_create_autocmd('InsertEnter', {
-  command = 'setlocal concealcursor='
-})
-vim.api.nvim_create_autocmd('InsertLeave', {
-  command = 'setlocal concealcursor=inc'
-})
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'markdown',
-  callback = function()
-    vim.g.indentLine_setConceal = 0
-  end
-})
+-- vim.api.nvim_create_autocmd('InsertEnter', {
+--   command = 'setlocal concealcursor='
+-- })
+-- vim.api.nvim_create_autocmd('InsertLeave', {
+--   command = 'setlocal concealcursor=inc'
+-- })
+-- vim.api.nvim_create_autocmd('FileType', {
+--   pattern = 'markdown',
+--   callback = function()
+--     vim.g.indentLine_setConceal = 0
+--   end
+-- })
 
 -- coc-go
 vim.api.nvim_create_autocmd('BufWritePre', {
@@ -323,4 +323,12 @@ vim.g.ale_javascript_prettier_use_local_config = 1
 
 vim.api.nvim_create_user_command('ALEToggleFixer', function()
   vim.g.ale_fix_on_save = not vim.g.ale_fix_on_save
+end, {})
+
+-- indent-blankline
+require("ibl").setup()
+vim.api.nvim_create_user_command('IndentBlanklineToggle', function()
+  require('ibl').setup_buffer(0, {
+    enabled = not require("ibl.config").get_config(0).enabled,
+  })
 end, {})
