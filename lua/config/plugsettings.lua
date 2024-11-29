@@ -15,7 +15,7 @@ if vim.fn.executable('rg') == 1 then
   vim.opt.grepprg = 'rg --vimgrep --no-heading'
   vim.opt.grepformat = '%f:%l:%c:%m,%f:%l:%m'
 end
-vim.keymap.set('n', '<leader>g', ':Rg <c-r><c-w><cr>')
+-- vim.keymap.set('n', '<leader>g', ':Rg <c-r><c-w><cr>')
 
 -- fzf
 vim.keymap.set('n', '<leader>t', ':Tags <c-r><c-w><cr>')
@@ -336,6 +336,7 @@ end, {})
 -- telescope
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Telescope find files' })
+vim.keymap.set('n', '<leader>g',  builtin.grep_string, { desc = 'Telescope grep string' })
 vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Telescope live grep' })
 vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Telescope buffers' })
 vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Telescope help tags' })
