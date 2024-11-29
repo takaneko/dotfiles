@@ -29,6 +29,10 @@ return {
     "vim-scripts/gtags.vim",
     cmd = { "Gtags" },
   },
+  {
+    'nvim-telescope/telescope.nvim',
+    tag = '0.1.8',
+  },
 
   -- Code helpers
   {
