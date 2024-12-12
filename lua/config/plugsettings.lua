@@ -15,7 +15,6 @@ if vim.fn.executable('rg') == 1 then
   vim.opt.grepprg = 'rg --vimgrep --no-heading'
   vim.opt.grepformat = '%f:%l:%c:%m,%f:%l:%m'
 end
--- vim.keymap.set('n', '<leader>g', ':Rg <c-r><c-w><cr>')
 
 -- fzf
 vim.keymap.set('n', '<leader>t', ':Tags <c-r><c-w><cr>')
