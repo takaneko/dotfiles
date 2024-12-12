@@ -262,20 +262,6 @@ keyset("n", "<space>k", ":<C-u>CocPrev<cr>", opts)
 -- Resume latest coc list
 keyset("n", "<space>p", ":<C-u>CocListResume<cr>", opts)
 
--- indentLine
--- vim.api.nvim_create_autocmd('InsertEnter', {
---   command = 'setlocal concealcursor='
--- })
--- vim.api.nvim_create_autocmd('InsertLeave', {
---   command = 'setlocal concealcursor=inc'
--- })
--- vim.api.nvim_create_autocmd('FileType', {
---   pattern = 'markdown',
---   callback = function()
---     vim.g.indentLine_setConceal = 0
---   end
--- })
-
 -- coc-go
 vim.api.nvim_create_autocmd('BufWritePre', {
   pattern = '*.go',

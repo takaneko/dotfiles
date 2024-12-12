@@ -61,10 +61,6 @@ vim.opt.foldmethod = 'indent'
 vim.opt.synmaxcol = 256
 vim.cmd('syntax sync minlines=256')
 
--- vim-indent-guides設定
-vim.g.indent_guides_enable_on_vim_startup = 1
-vim.g.indent_guides_auto_colors = 0
-
 -- インデントガイドとステータスラインの色設定
 vim.api.nvim_create_autocmd({"VimEnter", "Colorscheme"}, {
   callback = function()
@@ -79,8 +75,6 @@ vim.api.nvim_create_autocmd({"VimEnter", "Colorscheme"}, {
     })
   end
 })
-
-vim.g.indent_guides_color_change_percent = 10
 
 -- ステータスライン設定
 vim.opt.laststatus = 2
