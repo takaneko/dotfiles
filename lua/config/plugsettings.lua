@@ -55,9 +55,6 @@ vim.cmd("noreabbrev <expr> ts getcmdtype() == ':' && getcmdline() == 'ts' ? 'FZF
 -- vim-ruby
 vim.g.ruby_fold = 1
 
--- vim-jsx-pretty
-vim.g.vim_jsx_pretty_colorful_config = 1
-
 -- vim-local
 vim.api.nvim_create_augroup('vimrc-local', { clear = true })
 vim.api.nvim_create_autocmd({'BufNewFile', 'BufReadPost'}, {

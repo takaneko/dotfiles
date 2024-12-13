@@ -15,10 +15,6 @@ return {
 
   -- Language specific
   {
-    "maxmellon/vim-jsx-pretty",
-    ft = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
-  },
-  {
     "tpope/vim-rails",
     ft = { "ruby", "eruby", "haml", "slim" },
   },
