@@ -1,9 +1,3 @@
--- fugitive
-vim.api.nvim_create_autocmd('QuickFixCmdPost', {
-  pattern = '*grep*',
-  command = 'cwindow'
-})
-
 -- vim-markdown
 vim.g.vim_markdown_folding_disabled = 1
 
