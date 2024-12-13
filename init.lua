@@ -36,5 +36,4 @@ require("lazy").setup({
 })
 
 -- 他の設定ファイルの読み込み
-require('config.basic')
-require('config.plugsettings')
+require('config.init')
