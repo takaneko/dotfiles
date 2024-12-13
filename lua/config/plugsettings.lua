@@ -104,11 +104,3 @@ vim.g.ale_javascript_prettier_use_local_config = 1
 vim.api.nvim_create_user_command('ALEToggleFixer', function()
   vim.g.ale_fix_on_save = not vim.g.ale_fix_on_save
 end, {})
-
--- indent-blankline
-require("ibl").setup()
-vim.api.nvim_create_user_command('IndentBlanklineToggle', function()
-  require('ibl').setup_buffer(0, {
-    enabled = not require("ibl.config").get_config(0).enabled,
-  })
-end, {})
