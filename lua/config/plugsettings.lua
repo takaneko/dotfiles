@@ -4,9 +4,6 @@ if vim.fn.executable('rg') == 1 then
   vim.opt.grepformat = '%f:%l:%c:%m,%f:%l:%m'
 end
 
--- vim-ruby
-vim.g.ruby_fold = 1
-
 -- vim-local
 vim.api.nvim_create_augroup('vimrc-local', { clear = true })
 vim.api.nvim_create_autocmd({'BufNewFile', 'BufReadPost'}, {
