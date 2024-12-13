@@ -11,6 +11,9 @@ return {
       require('nvim-treesitter.configs').setup {
         -- インストールする言語パーサー
         ensure_installed = {
+          -- FE
+          "typescript",  -- TypeScript
+          "tsx",         -- TSX
           -- Go関連
           "go",          -- Go言語
           "gomod",       -- Go modules
