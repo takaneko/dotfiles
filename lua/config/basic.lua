@@ -2,11 +2,51 @@
 vim.cmd('packloadall')
 vim.cmd('filetype plugin indent on')
 
--- Steepfileのファイルタイプ設定
-vim.api.nvim_create_autocmd({"BufNewFile", "BufRead"}, {
-  pattern = "Steepfile",
-  command = "set filetype=ruby"
-})
+-- ヘルプ言語設定
+vim.opt.helplang = "ja,en"
+
+-- シンタックスハイライトとカラースキーム
+vim.cmd('colorscheme tokyonight')
+vim.cmd('syntax on')
+
+-- シンタックス設定
+vim.opt.synmaxcol = 256
+vim.cmd('syntax sync minlines=256')
+
+-- 行番号とスペースのハイライト設定
+vim.api.nvim_set_hl(0, 'LineNr', { fg = 'white' })
+vim.api.nvim_set_hl(0, 'ExtraWhitespace', { bg = 'red' })
+vim.cmd('match ExtraWhitespace /\\s\\+$/')
+
+-- インデントガイドとステータスラインの色設定
+-- vim.api.nvim_create_autocmd({"VimEnter", "Colorscheme"}, {
+--   callback = function()
+--     vim.api.nvim_set_hl(0, 'IndentGuidesOdd', { bg = 'darkgrey', ctermbg = 236 })
+--     vim.api.nvim_set_hl(0, 'IndentGuidesEven', { bg = 'darkgrey', ctermbg = 237 })
+--     vim.api.nvim_set_hl(0, 'StatusLine', {
+--       ctermfg = 231,
+--       ctermbg = 241,
+--       bold = true,
+--       fg = '#f8f8f2',
+--       bg = '#64645e'
+--     })
+--   end
+-- })
+
+-- タブとインデント設定
+vim.opt.tabstop = 2
+vim.opt.autoindent = true
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 2
+
+-- エンコーディング設定
+vim.opt.encoding = 'utf-8'
+vim.opt.fileencodings = 'utf-8'
+
+-- フォールディング設定
+vim.opt.foldenable = true
+vim.opt.foldlevelstart = 1
+vim.opt.foldmethod = 'indent'
 
 -- フォールディングの保護設定
 vim.api.nvim_create_autocmd("InsertEnter", {
@@ -27,57 +67,52 @@ vim.api.nvim_create_autocmd({"InsertLeave", "WinLeave"}, {
   end
 })
 
--- ヘルプ言語設定
-vim.opt.helplang = "ja,en"
-
 -- 自動保存設定
 vim.opt.autowrite = true
-
--- シンタックスハイライトとカラースキーム
-vim.cmd('colorscheme tokyonight')
-vim.cmd('syntax on')
-
--- 行番号とスペースのハイライト設定
-vim.api.nvim_set_hl(0, 'LineNr', { fg = 'white' })
-vim.api.nvim_set_hl(0, 'ExtraWhitespace', { bg = 'red' })
-vim.cmd('match ExtraWhitespace /\\s\\+$/')
-
--- タブとインデント設定
-vim.opt.tabstop = 2
-vim.opt.autoindent = true
-vim.opt.expandtab = true
-vim.opt.shiftwidth = 2
-
--- エンコーディング設定
-vim.opt.encoding = 'utf-8'
-vim.opt.fileencodings = 'utf-8'
-
--- フォールディング設定
-vim.opt.foldenable = true
-vim.opt.foldlevelstart = 1
-vim.opt.foldmethod = 'indent'
-
--- シンタックス設定
-vim.opt.synmaxcol = 256
-vim.cmd('syntax sync minlines=256')
-
--- インデントガイドとステータスラインの色設定
-vim.api.nvim_create_autocmd({"VimEnter", "Colorscheme"}, {
-  callback = function()
-    vim.api.nvim_set_hl(0, 'IndentGuidesOdd', { bg = 'darkgrey', ctermbg = 236 })
-    vim.api.nvim_set_hl(0, 'IndentGuidesEven', { bg = 'darkgrey', ctermbg = 237 })
-    vim.api.nvim_set_hl(0, 'StatusLine', {
-      ctermfg = 231,
-      ctermbg = 241,
-      bold = true,
-      fg = '#f8f8f2',
-      bg = '#64645e'
-    })
-  end
-})
 
 -- ステータスライン設定
 vim.opt.laststatus = 2
 
 -- リーダーキー設定
 vim.g.mapleader = " "
+
+-- ripgrep
+if vim.fn.executable('rg') == 1 then
+  vim.opt.grepprg = 'rg --vimgrep --no-heading'
+  vim.opt.grepformat = '%f:%l:%c:%m,%f:%l:%m'
+end
+
+-- vim-local
+vim.api.nvim_create_augroup('vimrc-local', { clear = true })
+vim.api.nvim_create_autocmd({'BufNewFile', 'BufReadPost'}, {
+  group = 'vimrc-local',
+  callback = function()
+    local function vimrc_local(loc)
+      local files = vim.fn.findfile('.vimrc.local', vim.fn.escape(loc, ' ') .. ';', -1)
+      for _, file in ipairs(vim.fn.reverse(vim.tbl_filter(function(f)
+        return vim.fn.filereadable(f) == 1
+      end, files))) do
+        vim.cmd('source ' .. file)
+      end
+    end
+    vimrc_local(vim.fn.expand('<afile>:p:h'))
+  end
+})
+
+-- Steepfileのファイルタイプ設定
+vim.api.nvim_create_autocmd({"BufNewFile", "BufRead"}, {
+  pattern = "Steepfile",
+  command = "set filetype=ruby"
+})
+
+-- mdx
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+  pattern = '*.mdx',
+  command = 'setfiletype markdown.mdx'
+})
+
+-- inky
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+  pattern = '*.inky',
+  command = 'setfiletype eruby'
+})

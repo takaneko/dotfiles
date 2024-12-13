@@ -1,5 +1,4 @@
 require('config.basic')
-require('config.plugsettings')
 require('config.plugins_matchit')
 require('config.plugins_vim-markdown')
 require('config.plugins_vim-ruby')
