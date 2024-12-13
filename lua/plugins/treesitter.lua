@@ -18,6 +18,14 @@ return {
           "go",          -- Go言語
           "gomod",       -- Go modules
           "gowork",      -- Go workspace
+          -- GraphQL
+          "graphql",
+          -- Ruby
+          "rbs",         -- RBS
+          -- Dart
+          "dart",
+          -- Terraform
+          "terraform",
 
           -- 設定ファイル関連
           "lua",         -- Neovim設定用
@@ -29,6 +37,7 @@ return {
           "css",         -- CSS
           "json",        -- JSON
           "yaml",        -- YAML
+          "toml",        -- TOML
         },
 
         -- 自動インストール
