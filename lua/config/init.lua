@@ -1,5 +1,6 @@
 require('config.basic')
 require('config.plugsettings')
+require('config.plugins_matchit')
 require('config.plugins_fzf')
 require('config.plugins_coc')
 require('config.plugins_ale')

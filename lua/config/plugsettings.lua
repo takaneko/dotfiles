@@ -1,6 +1,3 @@
--- matchit
-vim.cmd('source $VIMRUNTIME/macros/matchit.vim')
-
 -- fugitive
 vim.api.nvim_create_autocmd('QuickFixCmdPost', {
   pattern = '*grep*',
