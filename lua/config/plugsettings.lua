@@ -1,6 +1,3 @@
--- vim-markdown
-vim.g.vim_markdown_folding_disabled = 1
-
 -- ripgrep
 if vim.fn.executable('rg') == 1 then
   vim.opt.grepprg = 'rg --vimgrep --no-heading'
