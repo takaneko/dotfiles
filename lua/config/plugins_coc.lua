@@ -188,16 +188,3 @@ vim.api.nvim_create_autocmd('BufWritePre', {
   pattern = '*.go',
   command = 'OR'
 })
-
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'go',
-  callback = function()
-    vim.keymap.set('n', 'gtj', ':CocCommand go.tags.add json<cr>')
-    vim.keymap.set('n', 'gty', ':CocCommand go.tags.add yaml<cr>')
-    vim.keymap.set('n', 'gtx', ':CocCommand go.tags.clear<cr>')
-    vim.opt_local.sw = 4
-    vim.opt_local.ts = 4
-    vim.opt_local.sts = 4
-    vim.opt_local.expandtab = false
-  end
-})
