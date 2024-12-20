@@ -5,6 +5,14 @@ return {
     branch = "release",
   },
   {
+    "neovim/nvim-lspconfig",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/nvim-cmp",
+    },
+  },
+  {
     "github/copilot.vim",
     event = "InsertEnter",
   },

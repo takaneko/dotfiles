@@ -186,12 +186,6 @@ vim.api.nvim_create_autocmd("FileType", {
       keyset("n", "<space>k", ":<C-u>CocPrev<cr>", opts)
       -- Resume latest coc list
       keyset("n", "<space>p", ":<C-u>CocListResume<cr>", opts)
-      
-      -- coc-go
-      --vim.api.nvim_create_autocmd('BufWritePre', {
-      --  pattern = '*.go',
-      --  command = 'OR'
-      --})
     end
   end,
 })

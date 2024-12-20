@@ -54,10 +54,6 @@
         "experimentalFeaturesEnabled": false
       },
       "filetypes": ["ruby"]
-    },
-    "go": {
-      "command": "gopls",
-      "filetypes": ["go"]
     }
   }
 }
