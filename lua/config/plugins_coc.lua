@@ -10,7 +10,7 @@ vim.opt.updatetime = 300
 -- diagnostics appeared/became resolved
 vim.opt.signcolumn = "yes"
 
-local excluded_filetypes = { "go", "ruby", "eruby", "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" }
+local excluded_filetypes = { "go", "ruby", "eruby", "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx", "astro" }
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "*",
   callback = function()

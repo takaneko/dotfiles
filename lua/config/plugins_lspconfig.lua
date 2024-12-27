@@ -102,3 +102,8 @@ lspconfig.tailwindcss.setup({
     },
   },
 })
+
+-- astroの設定
+lspconfig.astro.setup({
+  capabilities = capabilities,
+})
