@@ -86,3 +86,8 @@ lspconfig.ruby_lsp.setup({
     })
   end,
 })
+
+-- tsserverの設定
+lspconfig.ts_ls.setup({
+  capabilities = capabilities,
+})
