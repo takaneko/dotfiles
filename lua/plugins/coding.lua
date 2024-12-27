@@ -50,6 +50,15 @@ return {
     "mattn/emmet-vim",
     ft = { "html", "css", "javascript", "javascriptreact", "typescript", "typescriptreact" },
   },
+  -- CSS
+  {
+    'brenoprata10/nvim-highlight-colors',
+    config = function()
+      require('nvim-highlight-colors').setup({
+        enable_tailwind = true,
+      })
+    end,
+  },
   -- CSV
   {
     "mechatroner/rainbow_csv",
