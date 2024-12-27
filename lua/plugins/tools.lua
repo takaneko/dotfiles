@@ -40,10 +40,6 @@ return {
 
   -- Code helpers
   {
-    "tpope/vim-endwise",
-    event = "InsertEnter",
-  },
-  {
     "godlygeek/tabular",
     cmd = { "Tabularize" },
   },
