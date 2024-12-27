@@ -26,6 +26,11 @@ return {
     ---@type ibl.config
     opts = {},
   },
+  -- Endwise
+  {
+    "tpope/vim-endwise",
+    event = "InsertEnter",
+  },
 
   -- Golang
   {
