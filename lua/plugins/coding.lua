@@ -12,11 +12,12 @@ return {
     "github/copilot.vim",
     event = "InsertEnter",
   },
+
+  -- Lint
   {
     "dense-analysis/ale",
     event = { "BufReadPre", "BufNewFile" },
   },
-
   -- Indent
   {
     "lukas-reineke/indent-blankline.nvim",
