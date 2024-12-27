@@ -22,14 +22,6 @@ return {
     cmd = { "Files", "GFiles", "Buffers", "Rg" },
   },
   {
-    "zackhsi/fzf-tags",
-    dependencies = { "junegunn/fzf.vim" },
-  },
-  {
-    "vim-scripts/gtags.vim",
-    cmd = { "Gtags" },
-  },
-  {
     'nvim-telescope/telescope.nvim',
     tag = '0.1.8',
   },
@@ -46,5 +38,15 @@ return {
   {
     "vim-scripts/Align",
     cmd = { "Align" },
+  },
+
+  -- Tags(Deprecated)
+  {
+    "zackhsi/fzf-tags",
+    dependencies = { "junegunn/fzf.vim" },
+  },
+  {
+    "vim-scripts/gtags.vim",
+    cmd = { "Gtags" },
   },
 }
