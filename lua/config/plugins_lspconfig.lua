@@ -47,9 +47,6 @@ local capabilities = cmp_nvim_lsp.default_capabilities()
 -- goplsの設定
 lspconfig.gopls.setup({
   capabilities = capabilities,
-  cmd = {"gopls"},
-  filetypes = {"go", "gomod", "gowork", "gotmpl"},
-  root_dir = lspconfig.util.root_pattern("go.work", "go.mod", ".git"),
   settings = {
     gopls = {
       analyses = {
@@ -76,13 +73,9 @@ lspconfig.gopls.setup({
 -- ruby-lspの設定
 lspconfig.ruby_lsp.setup({
   capabilities = capabilities,
-  cmd = { "ruby-lsp" },
-  filetypes = { "ruby", "eruby" },
-  root_dir = lspconfig.util.root_pattern("Gemfile", ".git"),
   init_options = {
     formatter = 'auto'
   },
-  single_file_support = true,
   on_attach = function(client, bufnr)
     -- 保存時に自動修正を適用する
     vim.api.nvim_create_autocmd("BufWritePre", {
