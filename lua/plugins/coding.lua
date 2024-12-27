@@ -31,6 +31,10 @@ return {
     "tpope/vim-endwise",
     event = "InsertEnter",
   },
+  -- Align
+  {
+    "junegunn/vim-easy-align"
+  },
 
   -- Golang
   {

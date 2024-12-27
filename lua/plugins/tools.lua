@@ -30,16 +30,6 @@ return {
     build = 'make'
   },
 
-  -- Code helpers
-  {
-    "godlygeek/tabular",
-    cmd = { "Tabularize" },
-  },
-  {
-    "vim-scripts/Align",
-    cmd = { "Align" },
-  },
-
   -- Tags(Deprecated)
   {
     "zackhsi/fzf-tags",
