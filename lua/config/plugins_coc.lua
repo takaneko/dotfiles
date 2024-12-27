@@ -10,10 +10,11 @@ vim.opt.updatetime = 300
 -- diagnostics appeared/became resolved
 vim.opt.signcolumn = "yes"
 
+local excluded_filetypes = { "go", "ruby", "eruby" }
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "*",
   callback = function()
-    if vim.bo.filetype ~= "go" then
+    if vim.tbl_contains(excluded_filetypes, vim.bo.filetype) then
       local keyset = vim.keymap.set
       -- Autocomplete
       function _G.check_back_space()
