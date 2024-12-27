@@ -73,6 +73,7 @@ lspconfig.gopls.setup({
 -- ruby-lspの設定
 lspconfig.ruby_lsp.setup({
   capabilities = capabilities,
+  filetypes = { 'ruby' },
   init_options = {
     formatter = 'auto'
   },
