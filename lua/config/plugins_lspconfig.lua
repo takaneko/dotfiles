@@ -91,3 +91,13 @@ lspconfig.ruby_lsp.setup({
 lspconfig.ts_ls.setup({
   capabilities = capabilities,
 })
+
+-- tailwindcssの設定
+lspconfig.tailwindcss.setup({
+  capabilities = capabilities,
+  settings = {
+    tailwindCSS = {
+      emmetCompletions = true,
+    },
+  },
+})
