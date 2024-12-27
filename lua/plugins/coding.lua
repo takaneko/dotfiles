@@ -1,10 +1,6 @@
 return {
   -- LSP and Completion
   {
-    "neoclide/coc.nvim",
-    branch = "release",
-  },
-  {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
