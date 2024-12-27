@@ -108,7 +108,7 @@ vim.api.nvim_create_autocmd({"BufNewFile", "BufRead"}, {
 -- mdx
 vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
   pattern = '*.mdx',
-  command = 'setfiletype markdown.mdx'
+  command = 'setfiletype mdx'
 })
 
 -- inky

@@ -107,3 +107,8 @@ lspconfig.tailwindcss.setup({
 lspconfig.astro.setup({
   capabilities = capabilities,
 })
+
+-- mdxの設定
+lspconfig.mdx_analyzer.setup({
+  capabilities = capabilities,
+})

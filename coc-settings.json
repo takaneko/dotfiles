@@ -8,16 +8,5 @@
     "eruby": "html"
   },
   "languageserver": {
-    "mdx-language-server": {
-      "command": "mdx-language-server",
-      "args": ["--stdio"],
-      "filetypes": ["markdown", "markdown.mdx", "mdx"],
-      "initializationOptions": {
-        "typescript": {
-          "enabled": true,
-          "tsdk": "./node_modules/typescript/lib"
-        }
-      }
-    }
   }
 }
