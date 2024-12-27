@@ -1,5 +1,4 @@
 vim.g.ale_fixers = {
-  ruby = { 'rubocop' },
   typescript = { 'prettier', 'eslint', 'biome' },
   typescriptreact = { 'prettier', 'eslint', 'biome' },
   javascript = { 'prettier', 'eslint' },
