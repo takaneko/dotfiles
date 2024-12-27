@@ -51,8 +51,4 @@ return {
     "vim-scripts/Align",
     cmd = { "Align" },
   },
-  {
-    "vim-scripts/SQLUtilities",
-    ft = "sql",
-  },
 }
