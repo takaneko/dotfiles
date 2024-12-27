@@ -58,16 +58,18 @@ lspconfig.gopls.setup({
       staticcheck = true,
     },
   },
-})
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-  pattern = "*.go",
-  callback = function(args)
-    -- 自動フォーマット（オプション）
-    vim.lsp.buf.format()
-    -- インポートの自動整理（オプション）
-    vim.lsp.buf.code_action { context = { only = { 'source.organizeImports' } }, apply = true }
-    vim.lsp.buf.code_action { context = { only = { 'source.fixAll' } }, apply = true }
+  on_attach = function(client, bufnr)
+    -- 保存時に自動修正を適用する
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      buffer = bufnr,
+      callback = function()
+        -- 自動フォーマット（オプション）
+        vim.lsp.buf.format()
+        -- インポートの自動整理（オプション）
+        vim.lsp.buf.code_action { context = { only = { 'source.organizeImports' } }, apply = true }
+        vim.lsp.buf.code_action { context = { only = { 'source.fixAll' } }, apply = true }
+      end,
+    })
   end,
 })
 
