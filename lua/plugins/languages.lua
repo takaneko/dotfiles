@@ -14,9 +14,5 @@ return {
   -- Other languages
   {
     "etdev/vim-hexcolor",
-  },
-  {
-    "plasticboy/vim-markdown",
-    ft = "markdown",
-  },
+  }
 }

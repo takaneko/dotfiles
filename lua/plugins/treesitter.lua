@@ -38,6 +38,7 @@ return {
           "json",        -- JSON
           "yaml",        -- YAML
           "toml",        -- TOML
+          "markdown",    -- Markdown
         },
 
         -- 自動インストール
@@ -70,6 +71,9 @@ return {
           enable = true,
         },
       }
+
+      -- mdx
+      vim.treesitter.language.register('markdown', 'mdx')
     end,
   },
 }
