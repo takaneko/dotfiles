@@ -18,21 +18,6 @@ vim.api.nvim_set_hl(0, 'LineNr', { fg = 'white' })
 vim.api.nvim_set_hl(0, 'ExtraWhitespace', { bg = 'red' })
 vim.cmd('match ExtraWhitespace /\\s\\+$/')
 
--- インデントガイドとステータスラインの色設定
--- vim.api.nvim_create_autocmd({"VimEnter", "Colorscheme"}, {
---   callback = function()
---     vim.api.nvim_set_hl(0, 'IndentGuidesOdd', { bg = 'darkgrey', ctermbg = 236 })
---     vim.api.nvim_set_hl(0, 'IndentGuidesEven', { bg = 'darkgrey', ctermbg = 237 })
---     vim.api.nvim_set_hl(0, 'StatusLine', {
---       ctermfg = 231,
---       ctermbg = 241,
---       bold = true,
---       fg = '#f8f8f2',
---       bg = '#64645e'
---     })
---   end
--- })
-
 -- タブとインデント設定
 vim.opt.tabstop = 2
 vim.opt.autoindent = true
@@ -75,6 +60,9 @@ vim.opt.laststatus = 2
 
 -- リーダーキー設定
 vim.g.mapleader = " "
+
+-- keymap
+vim.keymap.set('n', '<leader>di', vim.diagnostic.open_float, {noremap=true, silent=true})
 
 -- ripgrep
 if vim.fn.executable('rg') == 1 then
