@@ -11,6 +11,7 @@ require('nvim-treesitter.configs').setup {
     -- GraphQL
     "graphql",
     -- Ruby
+    "ruby",        -- Ruby
     "rbs",         -- RBS
     -- Dart
     "dart",
@@ -37,12 +38,13 @@ require('nvim-treesitter.configs').setup {
   -- ハイライトの設定
   highlight = {
     enable = true,
-    additional_vim_regex_highlighting = false,
+    additional_vim_regex_highlighting = { 'ruby' },
   },
 
   -- インデントの設定
   indent = {
     enable = true,
+    disable = { 'ruby' }
   },
 
   -- インクリメンタルな選択機能
