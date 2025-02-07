@@ -32,9 +32,8 @@ export GIT_PS1_SHOWSTASHSTATE=1
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
 # asdf
-export ASDF_DIR="$(brew --prefix asdf)/libexec"
-source "$(brew --prefix asdf)"/libexec/asdf.sh
-source "$(brew --prefix asdf)"/etc/bash_completion.d/asdf.bash
+export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+. <(asdf completion bash)
 
 # direnv
 eval "$(direnv hook bash)"
