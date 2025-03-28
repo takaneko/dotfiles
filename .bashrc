@@ -35,6 +35,9 @@ export GIT_PS1_SHOWSTASHSTATE=1
 export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 . <(asdf completion bash)
 
+# mise
+eval "$(mise activate bash --shims)"
+
 # direnv
 eval "$(direnv hook bash)"
 
