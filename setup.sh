@@ -8,4 +8,3 @@ do
 done
 
 ln -sf "$HOME/dotfiles/init.lua" "$HOME/.config/nvim/init.lua"
-ln -sf "$HOME/dotfiles/coc-settings.json" "$HOME/.config/nvim/coc-settings.json"
