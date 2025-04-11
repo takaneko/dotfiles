@@ -34,6 +34,7 @@ export GIT_PS1_SHOWSTASHSTATE=1
 # mise または asdf のどちらかを有効にする
 if [ "$USE_MISE" = "true" ]; then
     # mise の設定
+    export PATH="$HOME/.local/share/mise/shims:$PATH"
     eval "$(mise activate bash --shims)"
 else
     # asdf の設定
