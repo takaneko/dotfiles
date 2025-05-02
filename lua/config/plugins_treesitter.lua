@@ -35,6 +35,15 @@ require('nvim-treesitter.configs').setup {
   -- 自動インストール
   auto_install = false,
 
+  -- 同期インストール
+  sync_install = false,
+
+  -- インストールをスキップする言語
+  ignore_install = {},
+
+  -- モジュール設定
+  modules = {},
+
   -- ハイライトの設定
   highlight = {
     enable = true,
