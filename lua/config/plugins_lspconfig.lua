@@ -63,8 +63,8 @@ lspconfig.gopls.setup({
         -- 自動フォーマット（オプション）
         vim.lsp.buf.format()
         -- インポートの自動整理（オプション）
-        vim.lsp.buf.code_action { context = { only = { 'source.organizeImports' } }, apply = true }
-        vim.lsp.buf.code_action { context = { only = { 'source.fixAll' } }, apply = true }
+        vim.lsp.buf.code_action { context = { only = { 'source.organizeImports' }, diagnostics = {} }, apply = true }
+        vim.lsp.buf.code_action { context = { only = { 'source.fixAll' }, diagnostics = {} }, apply = true }
       end,
     })
   end,
