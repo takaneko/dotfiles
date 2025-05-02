@@ -1,3 +1,5 @@
+local select = require('CopilotChat.select')
+
 require("CopilotChat").setup({
   prompts = {
     Explain = {
@@ -34,4 +36,8 @@ require("CopilotChat").setup({
       prompt = "typoはありますか？",
     },
   },
+  -- Uses visual selection or falls back to buffer
+  selection = function(source)
+      return select.visual(source) or select.buffer(source)
+  end
 })
