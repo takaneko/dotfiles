@@ -28,6 +28,3 @@ inoremap <expr> <c-x><c-l> fzf#vim#complete(fzf#wrap({
   \ 'options': '--ansi --delimiter : --nth 3..',
   \ 'reducer': { lines -> join(split(lines[0], ':\zs')[2:], '') }}))
 ]])
-
--- fzf-tags
-vim.cmd("noreabbrev <expr> ts getcmdtype() == ':' && getcmdline() == 'ts' ? 'FZFTselect' : 'ts'")
