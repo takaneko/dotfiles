@@ -1,0 +1,4 @@
+% npm, install, global
+
+# npm i -g global-tools
+npm i -g npm-check-updates typescript-language-server typescript @tailwindcss/language-server @anthropic-ai/claude-code @google/gemini-cli
