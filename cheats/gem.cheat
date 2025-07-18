@@ -1,0 +1,4 @@
+% gem, install, global
+
+# gem install global-tools
+gem install ruby-lsp
