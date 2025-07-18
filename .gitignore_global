@@ -32,9 +32,6 @@ Session.vim
 # direnv
 .envrc
 
-# asdf
-.tool-versions
-
 # navi for project
 .cheats
 
