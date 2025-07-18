@@ -8,3 +8,14 @@ do
 done
 
 ln -sf "$HOME/dotfiles/init.lua" "$HOME/.config/nvim/init.lua"
+
+mkdir -p "$HOME/.cheats"
+
+if [ -d "$HOME/dotfiles/cheats" ]; then
+  for file in "$HOME/dotfiles/cheats"/*; do
+    if [ -f "$file" ]; then
+      filename=$(basename "$file")
+      ln -sf "$file" "$HOME/.cheats/$filename"
+    fi
+  done
+fi
