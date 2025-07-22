@@ -1,9 +1,9 @@
 % git, fetch, develop
 
 # git fetch & branch -f develop
-git fetch & git branch -f develop origin/develop
+git fetch && git branch -f develop origin/develop
 
 % git, fetch, main
 
 # git fetch & branch -f main
-git fetch & git branch -f main origin/main
+git fetch && git branch -f main origin/main
