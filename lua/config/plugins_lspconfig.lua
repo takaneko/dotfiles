@@ -1,4 +1,3 @@
-local lspconfig = require("lspconfig")
 local cmp_nvim_lsp = require("cmp_nvim_lsp")
 local builtin = require("telescope.builtin")
 
@@ -45,7 +44,7 @@ cmp.setup({
 local capabilities = cmp_nvim_lsp.default_capabilities()
 
 -- goplsの設定
-lspconfig.gopls.setup({
+vim.lsp.config('gopls', {
   capabilities = capabilities,
   settings = {
     gopls = {
@@ -69,9 +68,10 @@ lspconfig.gopls.setup({
     })
   end,
 })
+vim.lsp.enable('gopls')
 
 -- ruby-lspの設定
-lspconfig.ruby_lsp.setup({
+vim.lsp.config('ruby_lsp', {
   capabilities = capabilities,
   filetypes = { 'ruby' },
   init_options = {
@@ -87,14 +87,16 @@ lspconfig.ruby_lsp.setup({
     })
   end,
 })
+vim.lsp.enable('ruby_lsp')
 
 -- tsserverの設定
-lspconfig.ts_ls.setup({
+vim.lsp.config('ts_ls', {
   capabilities = capabilities,
 })
+vim.lsp.enable('ts_ls')
 
 -- tailwindcssの設定
-lspconfig.tailwindcss.setup({
+vim.lsp.config('tailwindcss', {
   capabilities = capabilities,
   settings = {
     tailwindCSS = {
@@ -102,19 +104,22 @@ lspconfig.tailwindcss.setup({
     },
   },
 })
+vim.lsp.enable('tailwindcss')
 
 -- astroの設定
-lspconfig.astro.setup({
+vim.lsp.config('astro', {
   capabilities = capabilities,
 })
+vim.lsp.enable('astro')
 
 -- mdxの設定
-lspconfig.mdx_analyzer.setup({
+vim.lsp.config('mdx_analyzer', {
   capabilities = capabilities,
 })
+vim.lsp.enable('mdx_analyzer')
 
 -- luaの設定
-lspconfig.lua_ls.setup({
+vim.lsp.config('lua_ls', {
   settings = {
     Lua = {
       runtime = {
@@ -133,3 +138,4 @@ lspconfig.lua_ls.setup({
     },
   },
 })
+vim.lsp.enable('lua_ls')
