@@ -46,6 +46,7 @@ local capabilities = cmp_nvim_lsp.default_capabilities()
 -- goplsの設定
 vim.lsp.config('gopls', {
   capabilities = capabilities,
+  filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
   settings = {
     gopls = {
       analyses = {
@@ -100,6 +101,7 @@ vim.lsp.enable('ts_ls')
 -- tailwindcssの設定
 vim.lsp.config('tailwindcss', {
   capabilities = capabilities,
+  filetypes = { 'html', 'css', 'scss', 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue', 'svelte', 'astro' },
   settings = {
     tailwindCSS = {
       emmetCompletions = true,
@@ -111,17 +113,20 @@ vim.lsp.enable('tailwindcss')
 -- astroの設定
 vim.lsp.config('astro', {
   capabilities = capabilities,
+  filetypes = { 'astro' },
 })
 vim.lsp.enable('astro')
 
 -- mdxの設定
 vim.lsp.config('mdx_analyzer', {
   capabilities = capabilities,
+  filetypes = { 'mdx' },
 })
 vim.lsp.enable('mdx_analyzer')
 
 -- luaの設定
 vim.lsp.config('lua_ls', {
+  filetypes = { 'lua' },
   settings = {
     Lua = {
       runtime = {
