@@ -47,3 +47,6 @@ compose.override.yml
 
 # mytodo
 MYTODO.md
+
+# claude code
+.claude/settings.local.json
