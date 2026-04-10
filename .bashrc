@@ -51,12 +51,12 @@ eval "$(navi widget bash)"
 export NAVI_PATH="$(navi info cheats-path)"
 export NAVI_PATH="~/.cheats:.cheats:cheats:../.cheats:../cheats:$NAVI_PATH"
 
+# 1password
 [ -f ~/.config/op/plugins.sh ] && source ~/.config/op/plugins.sh
 
-# npm
+# pnpm
 export PNPM_HOME="/Users/takaneko/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
-# pnpm end
