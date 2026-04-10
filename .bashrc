@@ -31,16 +31,9 @@ export GIT_PS1_SHOWSTASHSTATE=1
 # fzf
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-# mise または asdf のどちらかを有効にする
-if [ "$USE_MISE" = "true" ]; then
-    # mise の設定
-    export PATH="$HOME/.local/share/mise/shims:$PATH"
-    eval "$(mise activate bash --shims)"
-else
-    # asdf の設定
-    export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
-    . <(asdf completion bash)
-fi
+# mise
+export PATH="$HOME/.local/bin:$PATH"
+eval "$(mise activate bash --shims)"
 
 # direnv
 eval "$(direnv hook bash)"
