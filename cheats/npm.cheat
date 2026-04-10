@@ -1,9 +1,9 @@
 % npm, install, global
 
 # npm i -g global-tools
-npm i -g npm-check-updates typescript-language-server typescript @tailwindcss/language-server @google/gemini-cli
+npm i -g npm-check-updates typescript-language-server typescript @tailwindcss/language-server @openai/codex
 
 % pnpm, install, global
 
 # pnpm add -g global-tools
-pnpm add -g npm-check-updates typescript-language-server typescript @tailwindcss/language-server @google/gemini-cli
+pnpm add -g npm-check-updates typescript-language-server typescript @tailwindcss/language-server @openai/codex
