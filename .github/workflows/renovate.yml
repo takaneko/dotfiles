@@ -1,0 +1,33 @@
+name: Renovate
+
+on:
+  schedule:
+    # 毎週金曜 00:00 JST (木曜 15:00 UTC)
+    - cron: '0 15 * * 4'
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: Log level
+        type: choice
+        default: info
+        options:
+          - info
+          - debug
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: renovate
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: renovatebot/github-action@eb932558ad942cccfd8211cf535f17ff183a9f74 # v46.1.9
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          configurationFile: renovate.json
+        env:
+          LOG_LEVEL: ${{ inputs.logLevel || 'info' }}
