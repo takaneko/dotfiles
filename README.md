@@ -22,6 +22,6 @@ git secrets --register-aws --global
 
 ```bash
 cd ~
-git clone https://github.com/nirareba1969/dotfiles.git
+git clone https://github.com/takaneko/dotfiles.git
 bash dotfiles/setup.sh
 ```
