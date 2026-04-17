@@ -1,0 +1,4 @@
+% nvim, renovate, generate
+
+# regenerate renovate.json customManagers from lazy.nvim plugin spec
+nvim --headless -c "luafile ~/dotfiles/scripts/gen-renovate-managers.lua" -c "qa"
