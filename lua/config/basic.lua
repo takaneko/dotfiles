@@ -2,6 +2,12 @@
 vim.cmd('packloadall')
 vim.cmd('filetype plugin indent on')
 
+-- セキュリティ設定: modeline を無効化（攻撃者が仕込んだファイルを開いただけで
+-- option が書き換わるのを防ぐ）。modelineexpr は Neovim のデフォルトだが
+-- プラグイン等による上書きを防ぐため明示的に pin。
+vim.opt.modeline = false
+vim.opt.modelineexpr = false
+
 -- ヘルプ言語設定
 vim.opt.helplang = "ja,en"
 
@@ -70,20 +76,15 @@ if vim.fn.executable('rg') == 1 then
   vim.opt.grepformat = '%f:%l:%c:%m,%f:%l:%m'
 end
 
--- vim-local
+-- vim-local (cwd の .vimrc.local のみ、vim.secure.read で信頼確認)
 vim.api.nvim_create_augroup('vimrc-local', { clear = true })
 vim.api.nvim_create_autocmd({'BufNewFile', 'BufReadPost'}, {
   group = 'vimrc-local',
   callback = function()
-    local function vimrc_local(loc)
-      local files = vim.fn.findfile('.vimrc.local', vim.fn.escape(loc, ' ') .. ';', -1)
-      for _, file in ipairs(vim.fn.reverse(vim.tbl_filter(function(f)
-        return vim.fn.filereadable(f) == 1
-      end, files))) do
-        vim.cmd('source ' .. file)
-      end
-    end
-    vimrc_local(vim.fn.expand('<afile>:p:h'))
+    local file = vim.fn.getcwd() .. '/.vimrc.local'
+    if vim.fn.filereadable(file) ~= 1 then return end
+    if vim.secure.read(file) == nil then return end
+    vim.cmd('source ' .. vim.fn.fnameescape(file))
   end
 })
 
