@@ -111,6 +111,11 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/zizmorcore/zizmor/v1.24.1/zizmor-aarch64-apple-darwin.tar.gz",
+      "checksum": "FC4EA59E18BC028DDDB5F710B16DBC361B01FF1E7A20C03B8E5778366CA9F4E1",
+      "algorithm": "sha256"
+    },
+    {
       "id": "http/cache.agilebits.com/dist/1P/op2/pkg/v2.33.1/op_darwin_arm64_v2.33.1.zip",
       "checksum": "8106127624BF55F0BF5AE6F8E2C56398E01DB75D64C3088EFACE33885C854351",
       "algorithm": "sha256"

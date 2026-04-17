@@ -36,3 +36,4 @@ packages:
   - name: astral-sh/uv@0.11.7
   - name: 1password/cli@v2.33.1
   - name: 99designs/aws-vault@v7.2.0
+  - name: zizmorcore/zizmor@v1.24.1
