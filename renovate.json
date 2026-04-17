@@ -1,0 +1,15 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "local>takaneko/dotfiles:renovate-lazy"
+  ],
+  "dependencyDashboard": false,
+  "minimumReleaseAge": "10 days",
+  "osvVulnerabilityAlerts": true,
+  "vulnerabilityAlerts": {
+    "minimumReleaseAge": "0 days",
+    "labels": ["security"],
+    "schedule": ["at any time"]
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"SQLUtilities\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "SQLUtilities",
+      "packageNameTemplate": "https://github.com/vim-scripts/SQLUtilities",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"ale\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "ale",
+      "packageNameTemplate": "https://github.com/dense-analysis/ale",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"cmp-nvim-lsp\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "cmp-nvim-lsp",
+      "packageNameTemplate": "https://github.com/hrsh7th/cmp-nvim-lsp",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"copilot\\.vim\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "copilot.vim",
+      "packageNameTemplate": "https://github.com/github/copilot.vim",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"emmet-vim\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "emmet-vim",
+      "packageNameTemplate": "https://github.com/mattn/emmet-vim",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"fzf\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "fzf",
+      "packageNameTemplate": "https://github.com/junegunn/fzf",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"fzf\\.vim\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "fzf.vim",
+      "packageNameTemplate": "https://github.com/junegunn/fzf.vim",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"indent-blankline\\.nvim\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "indent-blankline.nvim",
+      "packageNameTemplate": "https://github.com/lukas-reineke/indent-blankline.nvim",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"lazy\\.nvim\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "lazy.nvim",
+      "packageNameTemplate": "https://github.com/folke/lazy.nvim",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"nvim-cmp\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "nvim-cmp",
+      "packageNameTemplate": "https://github.com/hrsh7th/nvim-cmp",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"nvim-highlight-colors\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "nvim-highlight-colors",
+      "packageNameTemplate": "https://github.com/brenoprata10/nvim-highlight-colors",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"nvim-lspconfig\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "nvim-lspconfig",
+      "packageNameTemplate": "https://github.com/neovim/nvim-lspconfig",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"nvim-treesitter\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "nvim-treesitter",
+      "packageNameTemplate": "https://github.com/nvim-treesitter/nvim-treesitter",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"nvim-treesitter-context\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "nvim-treesitter-context",
+      "packageNameTemplate": "https://github.com/nvim-treesitter/nvim-treesitter-context",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"nvim-treesitter-textobjects\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "nvim-treesitter-textobjects",
+      "packageNameTemplate": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"plenary\\.nvim\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "plenary.nvim",
+      "packageNameTemplate": "https://github.com/nvim-lua/plenary.nvim",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"rainbow_csv\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "rainbow_csv",
+      "packageNameTemplate": "https://github.com/mechatroner/rainbow_csv",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"telescope-fzf-native\\.nvim\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "telescope-fzf-native.nvim",
+      "packageNameTemplate": "https://github.com/nvim-telescope/telescope-fzf-native.nvim",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"telescope\\.nvim\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "telescope.nvim",
+      "packageNameTemplate": "https://github.com/nvim-telescope/telescope.nvim",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"tokyonight\\.nvim\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "tokyonight.nvim",
+      "packageNameTemplate": "https://github.com/folke/tokyonight.nvim",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"vim-airline\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "vim-airline",
+      "packageNameTemplate": "https://github.com/vim-airline/vim-airline",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"vim-airline-themes\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "vim-airline-themes",
+      "packageNameTemplate": "https://github.com/vim-airline/vim-airline-themes",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"vim-delve\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "vim-delve",
+      "packageNameTemplate": "https://github.com/sebdah/vim-delve",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"vim-easy-align\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "vim-easy-align",
+      "packageNameTemplate": "https://github.com/junegunn/vim-easy-align",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"vim-endwise\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "vim-endwise",
+      "packageNameTemplate": "https://github.com/tpope/vim-endwise",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"vim-fugitive\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "vim-fugitive",
+      "packageNameTemplate": "https://github.com/tpope/vim-fugitive",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"vim-rails\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "vim-rails",
+      "packageNameTemplate": "https://github.com/tpope/vim-rails",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"vim-ruby\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "vim-ruby",
+      "packageNameTemplate": "https://github.com/vim-ruby/vim-ruby",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "matchStrings": ["\"vimdoc-ja\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "vimdoc-ja",
+      "packageNameTemplate": "https://github.com/vim-jp/vimdoc-ja",
+      "datasourceTemplate": "git-refs"
+    }
+  ]
+}
