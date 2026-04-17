@@ -8,6 +8,7 @@ do
 done
 
 ln -sf "$HOME/dotfiles/init.lua" "$HOME/.config/nvim/init.lua"
+ln -sf "$HOME/dotfiles/lazy-lock.json" "$HOME/.config/nvim/lazy-lock.json"
 
 mkdir -p "$HOME/.cheats"
 
