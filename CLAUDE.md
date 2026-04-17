@@ -21,6 +21,50 @@ Symlink layout created by `setup.sh`:
 
 After editing a dotfile tracked by `setup.sh`, no re-run is needed (symlinks point to the working tree); after *adding* a new dotfile, update `DOT_FILES` in `setup.sh` and re-run it.
 
+## aqua bootstrap
+
+`scripts/bootstrap-aqua.sh` is a standalone installer for **aqua** — it is NOT invoked from `setup.sh`. Run it manually on a fresh machine, or re-run after bumping `AQUA_VERSION` in the script. It downloads the official aqua tarball, verifies the pinned SHA256, generates `aqua-checksums.json` on first run (TOFU), then runs `aqua install -a` against `aqua.yaml`.
+
+```bash
+bash ~/dotfiles/scripts/bootstrap-aqua.sh
+```
+
+## CLI tooling via aqua
+
+Most CLI tools (gh, jq, helm, kubectl, ripgrep, fd, direnv, navi, neovim, …) are installed by **aqua** rather than Homebrew, with version + SHA256 pinning for supply-chain hardening.
+
+- `aqua.yaml` — single source of truth for installed tools. Lists the aqua-registry ref, packages with pinned tags, and `checksum: { enabled: true, require_checksum: true, supported_envs: [darwin/arm64] }`.
+- `aqua-checksums.json` — SHA256 of every fetched asset. Auto-generated on first run by `scripts/bootstrap-aqua.sh` (Trust on First Use), then committed. Once committed, any drift in upstream binary content makes install fail.
+- `AQUA_GLOBAL_CONFIG=$HOME/dotfiles/aqua.yaml` is exported in `.bashrc`, so `aqua` commands work from any cwd.
+- aqua's `bin` directory is prepended to PATH **before** the `direnv hook` / `navi widget` evals so those evals resolve to the aqua-managed binaries, not the brew-managed ones.
+
+Homebrew is intentionally retained only for things aqua can't manage: macOS GUI casks, shared libraries, build tools, language runtimes (`python@3.10`, `perl`, `lua`, …), GNU userland (`gnu-sed`, `gnu-getopt`, `coreutils`), and daemons (`mysql`, `postgresql@15`, `redis`).
+
+### Adding / removing a package
+
+1. Edit `aqua.yaml` (add or remove a `- name: owner/repo@vX.Y.Z` entry).
+2. Run `aqua update-checksum -a` to refresh `aqua-checksums.json` so the new asset's SHA is recorded.
+3. Run `aqua install -a` to apply.
+4. Commit both `aqua.yaml` and `aqua-checksums.json` in the same commit.
+
+### aqua updates via Renovate
+
+`renovate.json5` extends `github>aquaproj/aqua-renovate-config#2.9.0`, which configures:
+- The built-in `aqua` manager: opens a per-package PR when a new tag is released for any entry in `aqua.yaml`.
+- Updates for the `registries: ref:` (aqua-registry version).
+- Updates for `aqua-installer` and the `aquaproj/aqua-renovate-config` preset itself.
+- `postUpgradeTasks` to re-run `aqua update-checksum` so `aqua-checksums.json` stays in sync with each version bump.
+
+`minimumReleaseAge: "10 days"` (set globally) applies to aqua PRs as well, matching the lazy-lock.json policy. The `/review-renovate-pr` skill should be extended to cover `aqua.yaml` PRs in the same style as the lazy plugin reviews.
+
+### Bumping aqua itself
+
+`AQUA_VERSION` and the darwin-arm64 SHA256 are pinned at the top of `scripts/bootstrap-aqua.sh`. To upgrade:
+1. Pick the target tag from <https://github.com/aquaproj/aqua/releases>.
+2. Download `aqua_<tag>_checksums.txt` and (ideally) verify its Cosign signature once.
+3. Update `AQUA_VERSION` and `AQUA_DARWIN_ARM64_SHA256` in `scripts/bootstrap-aqua.sh`.
+4. Re-run `bash ~/dotfiles/scripts/bootstrap-aqua.sh` to verify bootstrap succeeds.
+
 ## Neovim architecture
 
 - `init.lua` bootstraps `lazy.nvim`, then `require("lazy").setup({ spec = { { import = "plugins" } } })` followed by `require('config.init')`.
@@ -33,7 +77,7 @@ After editing a dotfile tracked by `setup.sh`, no re-run is needed (symlinks poi
 
 Plugin updates in this repo do **not** come from `:Lazy update` → commit. They come from Renovate PRs that bump individual commit SHAs in `lazy-lock.json`.
 
-- `renovate.json` extends `local>takaneko/dotfiles:renovate-lazy` → the presets live in `renovate-lazy.json`.
+- `renovate.json5` extends `local>takaneko/dotfiles:renovate-lazy` → the presets live in `renovate-lazy.json`. JSON5 is used for the top-level config so that rules (e.g. the navi disable) can carry inline comments explaining rationale.
 - `renovate-lazy.json` contains one `customManagers` entry per plugin, each a regex that targets `"<plugin>": { "branch": "...", "commit": "..." }` in `lazy-lock.json`. Without an entry, a plugin is invisible to Renovate.
 - **After adding, renaming, or removing a plugin in `lua/plugins/*.lua`, regenerate `renovate-lazy.json`:**
 

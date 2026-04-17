@@ -1,0 +1,26 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [
+    "config:recommended",
+    "local>takaneko/dotfiles:renovate-lazy",
+    "github>aquaproj/aqua-renovate-config#2.9.0",
+  ],
+  dependencyDashboard: false,
+  minimumReleaseAge: "10 days",
+  osvVulnerabilityAlerts: true,
+  vulnerabilityAlerts: {
+    minimumReleaseAge: "0 days",
+    labels: ["security"],
+    schedule: ["at any time"],
+  },
+  packageRules: [
+    {
+      // denisidoro/navi stopped publishing darwin binaries from v2.24.0 onwards
+      // (releases only ship linux/android tarballs). aqua can't install without
+      // a prebuilt darwin asset, so pin to v2.23.0 and ignore updates until
+      // upstream resumes darwin releases.
+      matchPackageNames: ["denisidoro/navi"],
+      enabled: false,
+    },
+  ],
+}

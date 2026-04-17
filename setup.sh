@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 DOT_FILES=(.tmux.conf .bash_aliases .bash_profile .bashrc .gemrc .gitignore_global)
 
 for file in "${DOT_FILES[@]}"

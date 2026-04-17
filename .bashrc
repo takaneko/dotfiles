@@ -19,6 +19,15 @@ bind "\C-r":reverse-search-history
 # homebrew
 eval $(brew shellenv)
 
+# aqua (PATH must be set before evals below that resolve direnv/navi binaries)
+export AQUA_GLOBAL_CONFIG="$HOME/dotfiles/aqua.yaml"
+AQUA_BIN="${AQUA_ROOT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/aquaproj-aqua}/bin"
+case ":$PATH:" in
+  *":$AQUA_BIN:"*) ;;
+  *) export PATH="$AQUA_BIN:$PATH" ;;
+esac
+unset AQUA_BIN
+
 # git
 source ~/.git-completion.bash
 source ~/.git-prompt.sh
