@@ -92,3 +92,7 @@ Plugin updates in this repo do **not** come from `:Lazy update` → commit. They
 ## Reviewing Renovate PRs
 
 The `/review-renovate-pr` skill (defined in `.claude/skills/review-renovate-pr/SKILL.md`) handles triage of open Renovate PRs: it enforces the 10-day age gate, scans upstream diffs for supply-chain red flags, and posts a review comment per PR. Use it instead of reviewing Renovate PRs by hand. It must be run from `~/dotfiles` because it reads `renovate-lazy.json` via a relative path.
+
+## Reviewing Homebrew updates
+
+Homebrew is not under Renovate's control (the `brew` manager is intentionally not enabled), so `brew outdated` accumulates between manual triages. The `/review-brew-outdated` skill (defined in `.claude/skills/review-brew-outdated/SKILL.md`) runs a CVE scan (`syft /opt/homebrew/Cellar | grype`) against installed formulae, enforces the same 10-day age gate, analyzes upstream GitHub diffs, and prints a paste-able `brew upgrade` command covering only the approved formulae. The skill never runs `brew upgrade` itself. Requires `syft` and `grype` (both installed via `aqua.yaml`).

@@ -31,6 +31,16 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/anchore/grype/v0.111.0/grype_0.111.0_darwin_arm64.tar.gz",
+      "checksum": "62D005A1E36AC7EC0B7BE801EBC8EAB0053FD831A227E1DC8EA9C356D38FA361",
+      "algorithm": "sha256"
+    },
+    {
+      "id": "github_release/github.com/anchore/syft/v1.42.4/syft_1.42.4_darwin_arm64.tar.gz",
+      "checksum": "0797B64CF8841C904682E6007A695F9CD3E72103F064DD286723C0A56A2273E2",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/astral-sh/uv/0.11.7/uv-aarch64-apple-darwin.tar.gz",
       "checksum": "66E37D91F839E12481D7B932A1ECCBFE732560F42C1CFB89FADDFA2454534BA8",
       "algorithm": "sha256"
