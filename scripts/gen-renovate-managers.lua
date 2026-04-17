@@ -27,7 +27,7 @@ for _, p in ipairs(plugins) do
     entries[#entries + 1] = string.format(
       [[    {
       "customType": "regex",
-      "managerFilePatterns": ["(^|/)lazy-lock\\.json$"],
+      "managerFilePatterns": ["**/lazy-lock.json"],
       "matchStrings": ["\"%s\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
       "depNameTemplate": "%s",
       "packageNameTemplate": "%s",
