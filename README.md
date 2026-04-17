@@ -8,10 +8,10 @@ dotfiles for me.
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-Homebrew はアクア管理外のもの（tmux / fzf / git / wget / 言語ランタイム等）だけに絞る。CLI ツール本体は aqua 経由で入れる。
+Homebrew はアクア管理外のもの（tmux / git / wget / 言語ランタイム等）だけに絞る。CLI ツール本体は aqua 経由で入れる。
 
 ```bash
-brew install tmux fzf git wget
+brew install tmux git wget
 ```
 
 mise は Homebrew ではなく公式インストーラで入れる（`~/.local/bin/mise` に入る）。
@@ -31,6 +31,6 @@ bash dotfiles/scripts/bootstrap-aqua.sh
 cd
 wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -O ~/.git-completion.bash
 wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-prompt.sh -O ~/.git-prompt.sh
-$(brew --prefix)/opt/fzf/install
+echo 'eval "$(fzf --bash)"' > ~/.fzf.bash
 git secrets --register-aws --global
 ```
