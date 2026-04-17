@@ -16,6 +16,11 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/ByteNess/aws-vault/v7.9.15/aws-vault-darwin-arm64",
+      "checksum": "040FC5A86A9648B52D373F7793F0DE311B5871E04DABA788E1E271DAFC54077F",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/CircleCI-Public/circleci-cli/v0.1.34950/circleci-cli_0.1.34950_darwin_amd64.tar.gz",
       "checksum": "A715C72780C91B4226E16D32F5715DD568C1675A09942B4E4941266FB8E0564C",
       "algorithm": "sha256"
