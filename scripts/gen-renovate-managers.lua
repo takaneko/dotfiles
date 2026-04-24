@@ -22,10 +22,30 @@ table.sort(plugins, function(a, b) return a.name < b.name end)
 local entries = {}
 for _, p in ipairs(plugins) do
   if p.url and p.name then
-    local key = regex_escape(p.name)
     local url = p.url:gsub("%.git$", "")
-    entries[#entries + 1] = string.format(
-      [[    {
+    if p.tag then
+      -- Tag-pinned plugin: Renovate should track GitHub tags by editing the
+      -- plugin spec file's `tag = '...'` line, not lazy-lock.json (which lazy
+      -- regenerates from the tag). Exclude this plugin from the lock-file
+      -- regex manager to avoid dual management / master-branch chasing.
+      local pkg = url:gsub("^https://github%.com/", "")
+      local pkg_escaped = regex_escape(pkg)
+      entries[#entries + 1] = string.format(
+        [[    {
+      "customType": "regex",
+      "managerFilePatterns": ["lua/plugins/**/*.lua"],
+      "matchStrings": ["'%s',\\s+tag\\s*=\\s*'(?<currentValue>[^']+)'"],
+      "depNameTemplate": "%s",
+      "packageNameTemplate": "%s",
+      "datasourceTemplate": "github-tags",
+      "versioningTemplate": "semver-coerced"
+    }]],
+        pkg_escaped, p.name, pkg
+      )
+    else
+      local key = regex_escape(p.name)
+      entries[#entries + 1] = string.format(
+        [[    {
       "customType": "regex",
       "managerFilePatterns": ["**/lazy-lock.json"],
       "matchStrings": ["\"%s\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
@@ -33,8 +53,9 @@ for _, p in ipairs(plugins) do
       "packageNameTemplate": "%s",
       "datasourceTemplate": "git-refs"
     }]],
-      key, p.name, url
-    )
+        key, p.name, url
+      )
+    end
   end
 end
 

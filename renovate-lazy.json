@@ -147,11 +147,12 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["**/lazy-lock.json"],
-      "matchStrings": ["\"telescope\\.nvim\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "managerFilePatterns": ["lua/plugins/**/*.lua"],
+      "matchStrings": ["'nvim-telescope/telescope\\.nvim',\\s+tag\\s*=\\s*'(?<currentValue>[^']+)'"],
       "depNameTemplate": "telescope.nvim",
-      "packageNameTemplate": "https://github.com/nvim-telescope/telescope.nvim",
-      "datasourceTemplate": "git-refs"
+      "packageNameTemplate": "nvim-telescope/telescope.nvim",
+      "datasourceTemplate": "github-tags",
+      "versioningTemplate": "semver-coerced"
     },
     {
       "customType": "regex",
