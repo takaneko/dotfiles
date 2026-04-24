@@ -3,6 +3,11 @@ return {
   {
     "vim-jp/vimdoc-ja",
     lazy = false,
+    -- :helptags regenerates doc/tags-ja without upstream's !_TAG_FILE_ENCODING
+    -- header, leaving the working tree dirty and blocking future :Lazy
+    -- restore/update. Re-check out the file after lazy's plugin.docs step so
+    -- the tree stays clean.
+    build = "git checkout -- doc/tags-ja",
   },
 
   -- Git

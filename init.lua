@@ -33,6 +33,14 @@ require("lazy").setup({
     -- import your plugins
     { import = "plugins" },
   },
+  -- Keep ~/dotfiles on rtp so that `{ import = "plugins" }` still resolves
+  -- after lazy's internal rtp reset (notably during :Lazy restore / :Lazy
+  -- update, which call Plugin.load() a second time).
+  performance = {
+    rtp = {
+      paths = { dotfiles },
+    },
+  },
 })
 
 -- 他の設定ファイルの読み込み
