@@ -27,5 +27,5 @@
   "vim-fugitive": { "branch": "master", "commit": "3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0" },
   "vim-rails": { "branch": "master", "commit": "b0a5c76f86ea214ade36ab0b811e730c3f0add67" },
   "vim-ruby": { "branch": "master", "commit": "bf3a5994ce63796db7b1b04aea92772271f387aa" },
-  "vimdoc-ja": { "branch": "master", "commit": "4dbf3f44ddc71c41f4f075970ce07e7c873b551b" }
+  "vimdoc-ja": { "branch": "master", "commit": "b1bd7b6549b254f50fc4f459e2f267f727b95c5b" }
 }
