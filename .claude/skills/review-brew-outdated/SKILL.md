@@ -210,6 +210,12 @@ Upgrade command (SECURITY + UPDATE only):
 
 Omit sections that are empty. If there are no approved upgrades, omit the final command block entirely and say so explicitly.
 
+### 8. Persist the report
+
+After printing the chat summary, also save it as Markdown to `$HOME/dotfiles/.local/brew-review-$(date +%F).md` so the user has a durable record. `.local/` is gitignored at the dotfiles repo root, so the file is kept alongside the repo without being committed. Run `mkdir -p "$HOME/dotfiles/.local"` first — the directory does not exist on a fresh checkout.
+
+Format the file as proper Markdown (tables for each classification, fenced code block for the upgrade command) rather than the compact monospace block printed to chat. The file is written even if there are no approved upgrades, so the user can see what was deferred and why. If a same-day file already exists, overwrite it — the latest run is canonical.
+
 ## Failure modes
 
 - **grype DB download fails** (first run, or when the cached DB on the machine is stale / offline): report "CVE scan unavailable — falling back to no security classification", then process every formula through the age gate only. Still useful, just less informative. To preempt this on a fresh machine, run `grype db update` once before the first `/review-brew-outdated` invocation.
@@ -229,3 +235,4 @@ Omit sections that are empty. If there are no approved upgrades, omit the final 
 - **Cellar-wide syft scan.** Per-formula scans would duplicate work; one pass is O(minutes) and feeds every downstream decision.
 - **Host adapters instead of github-only.** Many Homebrew formulae (every GNU project, VideoLAN libs, x265, inria libs) live outside GitHub. Leaving them MANUAL was pushing ~30% of `brew outdated` into untriaged territory. GitLab and Bitbucket both expose a compare-equivalent API; cgit/Savannah doesn't, but a shallow bare clone at `/tmp/brew-review-cache/` works everywhere and gives local `git diff` access — the same heuristic grep then applies uniformly.
 - **Patch-file + meta-file split.** Each adapter produces different JSON shapes, but the HIGH heuristics are purely patch-text regexes. Normalizing to `/tmp/brew-diff-<name>.patch` (one unified diff) + `/tmp/brew-diff-<name>-meta.json` (commits + files) lets the scan logic stay adapter-agnostic.
+- **Reports saved under `.local/`, not `/tmp/`.** Chat summaries scroll away and `/tmp/` is cleared by macOS's periodic cleanup (and on reboot). `.local/` is gitignored at the dotfiles repo root, so reports persist with the repo (visible to `ls -A`, easy to grep across runs) without entering version control.
