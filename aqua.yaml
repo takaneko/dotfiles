@@ -29,7 +29,7 @@ packages:
   - name: denisidoro/navi@v2.23.0 # v2.24.0+ dropped darwin prebuilt binaries
   - name: neovim/neovim@v0.12.1
   - name: google/osv-scanner@v2.3.5
-  - name: oven-sh/bun@bun-v1.3.12
+  - name: oven-sh/bun@bun-v1.3.13
   - name: suzuki-shunsuke/pinact@v3.9.0
   - name: BurntSushi/ripgrep@15.1.0
   - name: koalaman/shellcheck@v0.11.0
