@@ -1,0 +1,29 @@
+name: update-aqua-checksums
+
+on: pull_request
+
+permissions: {}
+
+concurrency:
+  group: update-aqua-checksums-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  update:
+    name: update-aqua-checksums
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # commit-action pushes the regenerated aqua-checksums.json to the PR branch via REST API
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
+        with:
+          aqua_version: v2.57.1
+
+      - uses: aquaproj/update-checksum-action@c5df5a5c2a897a9b807068f062140506d092e7ac # v0.2.7
+        with:
+          prune: "true"
