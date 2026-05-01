@@ -53,7 +53,6 @@ Homebrew is intentionally retained only for things aqua can't manage: macOS GUI 
 - The built-in `aqua` manager: opens a per-package PR when a new tag is released for any entry in `aqua.yaml`.
 - Updates for the `registries: ref:` (aqua-registry version).
 - Updates for `aqua-installer` and the `aquaproj/aqua-renovate-config` preset itself.
-- `postUpgradeTasks` to re-run `aqua update-checksum` so `aqua-checksums.json` stays in sync with each version bump.
 
 `minimumReleaseAge: "10 days"` (set globally) applies to aqua PRs as well, matching the lazy-lock.json policy. The `/review-renovate-pr` skill should be extended to cover `aqua.yaml` PRs in the same style as the lazy plugin reviews.
 
