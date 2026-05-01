@@ -1,6 +1,6 @@
 ---
 name: review-renovate-pr
-description: Review open Renovate-generated PRs on this dotfiles repo that update vim plugins in lazy-lock.json. For each unreviewed PR, checks that the upstream commit is >= 10 days old, analyzes the upstream diff for supply-chain red flags (remote script exec, credential access, obfuscation, maintainer changes), posts a review comment automatically, then prints a chat summary with a merge recommendation per PR. Triggered by requests like "review the Renovate PRs", "check lazy plugin updates", "triage Renovate PRs", or explicit /review-renovate-pr invocation.
+description: Review open Renovate-generated PRs on this dotfiles repo that update vim plugins in lazy-lock.json. For each unreviewed PR, checks that the upstream commit is >= 10 days old, analyzes the upstream diff for supply-chain red flags (remote script exec, credential access, obfuscation, maintainer changes), posts a review comment automatically, then prints a chat summary with a merge recommendation per PR. When the tip SHA is too recent, falls back to reviewing the newest intermediate commit >=10d old and surfaces it as a hand-pin candidate (without editing files or closing PRs). Triggered by requests like "review the Renovate PRs", "check lazy plugin updates", "triage Renovate PRs", or explicit /review-renovate-pr invocation.
 ---
 
 # review-renovate-pr
@@ -27,13 +27,13 @@ cd ~/dotfiles
 
 ### 1. Determine the PR list
 
-If the user passed a PR number, use it directly. Otherwise, enumerate open PRs whose branch starts with `renovate/` and that don't carry a `reviewed*` label:
+If the user passed a PR number, use it directly. Otherwise, enumerate open PRs whose branch starts with `renovate/` and that don't carry a `reviewed*` label or a `wait` label (the latter lets the user suppress repeat intermediate-fallback proposals — see step 7.3):
 
 ```bash
 gh pr list --state open --json number,headRefName,labels \
   --jq '.[]
     | select(.headRefName | startswith("renovate/"))
-    | select([.labels[].name] | map(startswith("reviewed")) | any | not)
+    | select([.labels[].name] | map(startswith("reviewed") or . == "wait") | any | not)
     | .number'
 ```
 
@@ -81,7 +81,7 @@ age_days=$(jq -n --arg d "$committer_date" '($d | fromdate) as $t | ((now - $t) 
 
 `jq fromdate` parses ISO 8601 portably (avoids BSD vs GNU `date` incompatibility). Threshold: **10 days**. Record PASS if `age_days >= 10`, else FAIL.
 
-**If FAIL (< 10 days): skip steps 4 and 5 for this PR.** Do not run the diff review, do not post a comment. Record only the age/WAIT state for the chat summary in step 6.
+**If FAIL (< 10 days): skip steps 4 and 5 for this PR.** Do not run the diff review on the tip SHA, do not post a comment. Then run the **Intermediate-SHA fallback** (step 7 below) to look for a reviewable intermediate commit. Record the age/WAIT state plus any fallback findings for the chat summary in step 6.
 
 ### 4. Fetch and analyze the diff (age PASS only)
 
@@ -172,26 +172,93 @@ Processed N Renovate PR(s):
 
 #<N> <plugin> (<old7>..<new7>)
   Age: <X>d ✗  → WAIT (comment skipped)
+  Intermediate: (none ≥ threshold in <total> commits)
+
+#<N> <plugin> (<old7>..<new7>)
+  Age: <X>d ✗  → WAIT (comment skipped)
+  Intermediate <int7> (<Y>d, <ahead> commits): clean → APPLIABLE
+
+#<N> <plugin> (<old7>..<new7>)
+  Age: <X>d ✗  → WAIT (comment skipped)
+  Intermediate <int7> (<Y>d, <ahead> commits): <N> flags → DO NOT APPLY
 
 ...
 ```
 
-Do NOT merge any PR. The skill's job ends at the comment + summary.
+(`<new7>` = the PR's tip SHA, i.e. the value on the `+` line of the lazy-lock.json diff hunk; `<int7>` = the chosen intermediate SHA from step 7.1.)
+
+Do NOT merge any PR. Do NOT edit `lazy-lock.json` or close any PR. The skill's job ends at the comment + summary + (for fallback) presenting the appliable candidate to the user.
+
+### 7. Intermediate-SHA fallback (age FAIL only)
+
+When step 3 reports FAIL, the PR's tip SHA is too recent — but an *earlier* commit in the same compare range may already satisfy the age threshold from step 3. In active repos (e.g. nvim-lspconfig, vimdoc-ja), waiting for the tip to age out is a moving target because Renovate force-pushes the PR to the latest HEAD on each weekly run. The fallback finds the newest intermediate commit that has aged out, runs the same red-flag diff review against `OLD_SHA..INTERMEDIATE_SHA`, and surfaces it as a candidate for hand-pinning.
+
+**Scope**: only run for digest-tracking PRs (`lazy-lock.json` `branch + commit` pins). Tag-pinned updates (e.g. `aqua.yaml` `bun-v1.3.13`) have no concept of "intermediate" — skip the fallback there.
+
+#### 7.1 Find the newest qualifying intermediate commit
+
+GitHub's compare API lists commits oldest-first. Iterate from newest backward; the first commit whose age clears the step 3 threshold (currently 10 days — keep the `-ge 10` literal below in sync if step 3 changes) wins:
+
+```bash
+gh api "repos/<owner>/<repo>/compare/<OLD_SHA>...<NEW_SHA>" \
+  --jq '[.commits[] | "\(.commit.committer.date)\t\(.sha)"] | reverse | .[]' \
+| while IFS=$'\t' read -r d sha; do
+    age=$(jq -n --arg d "$d" '($d|fromdate) as $t | ((now - $t)/86400) | floor')
+    if [ "$age" -ge 10 ]; then echo "$sha $d ${age}d"; break; fi
+  done
+```
+
+If the loop produces no output, no qualifying intermediate exists — record the WAIT state with `Intermediate: (none ≥ threshold in <total> commits)` and stop the fallback for this PR.
+
+#### 7.2 Diff-review the intermediate range
+
+Run the **same** patch-scan as step 4, but against `OLD_SHA..INTERMEDIATE_SHA`. Use the same jq spec as step 4 so the on-disk shape matches and the same red-flag heuristics apply:
+
+```bash
+gh api "repos/<owner>/<repo>/compare/<OLD_SHA>...<INTERMEDIATE_SHA>" \
+  --jq '{
+    ahead: .ahead_by,
+    commits: [.commits[] | {sha: .sha[0:7], author: .commit.author.name, date: .commit.author.date, message: (.commit.message | split("\n")[0])}],
+    files: [.files[] | {filename, status, additions, deletions, patch}]
+  }' > /tmp/rr-<N>-int.json
+```
+
+Apply the same HIGH/MEDIUM/LOW classification from step 4. Do **not** post a PR comment — the open PR still tracks the unreviewed tip SHA, and a comment claiming approval would be misleading.
+
+#### 7.3 Surface the candidate in chat
+
+Include the intermediate result in the step 6 chat summary line for that PR. If the intermediate diff is **clean (APPLIABLE)**, also print the exact opt-in commands the user can authorize, plus a hint for suppressing repeat proposals:
+
+```
+To apply PR #<N> via intermediate pin:
+  1. Edit lazy-lock.json: "<plugin>": commit "<OLD>" → "<INTERMEDIATE>"
+  2. gh pr close <N> --comment "Superseded by direct pin to reviewed intermediate SHA <int7>."
+
+To skip this proposal on future skill runs (without applying):
+  gh pr edit <N> --add-label wait
+```
+
+The `wait` label is honored by step 1's PR enumeration filter, so subsequent invocations will not re-propose the same intermediate until the label is removed (or Renovate force-pushes the PR, which usually drops the label).
+
+**Hard rule**: do not auto-edit `lazy-lock.json` and do not auto-close any PR. Wait for the user to explicitly say "apply" / "yes" / equivalent before performing either action.
 
 ## Recommendation table
 
-| Age check | Diff review | Action |
-|---|---|---|
-| FAIL (<10d) | (not performed) | No comment posted. Chat summary reports WAIT. |
-| PASS (>=10d) | clean | Comment posted → MERGE OK |
-| PASS | MEDIUM flags | Comment posted → REVIEW MANUALLY |
-| PASS | HIGH flags | Comment posted → DO NOT MERGE |
+| Age check (tip) | Intermediate fallback | Diff review | Action |
+|---|---|---|---|
+| PASS (>=10d) | — | clean | Comment posted → MERGE OK |
+| PASS | — | MEDIUM flags | Comment posted → REVIEW MANUALLY |
+| PASS | — | HIGH flags | Comment posted → DO NOT MERGE |
+| FAIL (<10d) | none qualifies | (not performed) | No comment. Chat summary reports WAIT. |
+| FAIL | intermediate found | clean | No comment. Chat surfaces APPLIABLE intermediate + opt-in commands; user authorizes. |
+| FAIL | intermediate found | MEDIUM/HIGH flags | No comment. Chat surfaces DO NOT APPLY; WAIT. |
 
 ## Force re-review
 
-To re-review a PR that was already reviewed:
-- Delete the comment containing `<!-- review-renovate-pr -->`, or
-- Remove the `reviewed` label (if one was added manually)
+To re-review a PR that was already reviewed or suppressed:
+- Delete the comment containing `<!-- review-renovate-pr -->` (added by step 5 on age PASS reviews), or
+- Remove the `reviewed*` label (if one was added manually), or
+- Remove the `wait` label (added via the step 7.3 hint to suppress repeat intermediate-fallback proposals): `gh pr edit <N> --remove-label wait`
 
 ## Failure modes
 
