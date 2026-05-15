@@ -131,6 +131,11 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/tree-sitter/tree-sitter/v0.26.8/tree-sitter-macos-arm64.gz",
+      "checksum": "024E2CEE34723524D62D41BDE4D2B4AF23C8BBE0236E116C79C0B37D9575889E",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/zizmorcore/zizmor/v1.24.1/zizmor-aarch64-apple-darwin.tar.gz",
       "checksum": "FC4EA59E18BC028DDDB5F710B16DBC361B01FF1E7A20C03B8E5778366CA9F4E1",
       "algorithm": "sha256"

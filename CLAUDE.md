@@ -72,6 +72,31 @@ Homebrew is intentionally retained only for things aqua can't manage: macOS GUI 
 - `lua/config/basic.lua` — non-plugin editor setup: tab/indent/encoding/folding options, colorscheme, filetype autocmds, disabled modelines, and a `vim.secure.read`-gated `.vimrc.local` loader.
 - `lazy-lock.json` — commit pins for every plugin; committed to git. Do **not** hand-edit. It is owned by Renovate in this repo; avoid running `:Lazy update` and committing the result locally, as it will conflict with open Renovate PRs.
 
+### Lazy commands: what to use and what to avoid
+
+Renovate-managed lock file means **bulk lazy commands are off-limits**. They drift every plugin past its Renovate pin in one shot.
+
+- ❌ `:Lazy sync` — install + update + clean. Bumps every plugin to tip. Never run unscoped.
+- ❌ `:Lazy update` (no args) — bumps every plugin.
+- ✅ Just restarting `nvim` — lazy auto-installs missing plugins on startup, touching only their new lock entries.
+- ✅ `:Lazy install <name>` — install one missing plugin and add its lock entry.
+- ✅ `:Lazy update <name>` — update one plugin to tip (use only when you genuinely need to bump it outside Renovate; e.g. to record a branch switch in the lock).
+- ✅ `:Lazy clean` — remove orphan plugins (installed but no longer in spec). Drops their lock entries too.
+
+If a bulk command got run accidentally and the lock drifted, the recovery is `git checkout HEAD -- lazy-lock.json` followed by the scoped commands above to re-record only the intended deltas.
+
+## nvim-treesitter is on the archived `main` branch
+
+The upstream `nvim-treesitter/nvim-treesitter` repository was archived in April 2026. We pin to the `main` branch (the v1.0 rewrite, nvim 0.12+ only) rather than `master` (nvim ≤0.11). Implications:
+
+- `lua/plugins/treesitter.lua` sets `branch = "main"` and `lazy = false` — **main does not support lazy-loading** (see upstream README). Do not add `event = ...` / `cmd = ...` / etc. to the spec.
+- The `configs.setup{}` form is gone. `lua/config/plugins_treesitter.lua` uses the new API: `require('nvim-treesitter').install({...})` to declare parsers, plus a `FileType` autocmd that calls `vim.treesitter.start()` and sets `foldexpr` / `indentexpr` per buffer.
+- The `tree-sitter` CLI is required: some parsers (e.g. `terraform`, which lives in a `dialects/` subdir of `tree-sitter-hcl`) lack a pre-generated `parser.c` and have nvim-treesitter invoke `tree-sitter build` at install time. The CLI is pinned in `aqua.yaml` as `tree-sitter/tree-sitter`.
+- The repo being archived means no future fixes. Renovate will stop receiving updates for `nvim-treesitter` once `main` stops moving; this is acceptable as long as nvim 0.12 remains the active line. Reassess if nvim 0.13 breaks the treesitter API.
+- `nvim-treesitter-context` is kept because it talks to `vim.treesitter` directly and does not depend on nvim-treesitter's `configs` API. It also ships its own per-language context queries.
+- `windwp/nvim-ts-autotag` replaces the old in-tree `autotag` module (removed in main) for TSX/JSX/HTML tag auto-close.
+- The incremental-selection feature (gnn/grn/grc/grm) was likewise removed; `lua/config/plugins_treesitter.lua` hand-rolls equivalent keymaps on top of `vim.treesitter.get_node()`.
+
 ## Plugin updates via Renovate (non-obvious)
 
 Plugin updates in this repo do **not** come from `:Lazy update` → commit. They come from Renovate PRs that bump individual commit SHAs in `lazy-lock.json`.

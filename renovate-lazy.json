@@ -116,9 +116,9 @@
     {
       "customType": "regex",
       "managerFilePatterns": ["**/lazy-lock.json"],
-      "matchStrings": ["\"nvim-treesitter-textobjects\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
-      "depNameTemplate": "nvim-treesitter-textobjects",
-      "packageNameTemplate": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
+      "matchStrings": ["\"nvim-ts-autotag\":\\s*\\{\\s*\"branch\":\\s*\"(?<currentValue>[^\"]+)\",\\s*\"commit\":\\s*\"(?<currentDigest>[a-f0-9]+)\"\\s*\\}"],
+      "depNameTemplate": "nvim-ts-autotag",
+      "packageNameTemplate": "https://github.com/windwp/nvim-ts-autotag",
       "datasourceTemplate": "git-refs"
     },
     {
