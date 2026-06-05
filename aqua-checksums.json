@@ -6,11 +6,6 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/99designs/aws-vault/v7.2.0/aws-vault-darwin-arm64.dmg",
-      "checksum": "9887EB8F6C2BD431E814B32B9EC8A6BD394DBEB0C60822D76ED9BE3C84CA1CC5",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/BurntSushi/ripgrep/15.1.0/ripgrep-15.1.0-aarch64-apple-darwin.tar.gz",
       "checksum": "378E973289176CA0C6054054EE7F631A065874A352BF43F0FA60EF079B6BA715",
       "algorithm": "sha256"
@@ -41,8 +36,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/astral-sh/uv/0.11.7/uv-aarch64-apple-darwin.tar.gz",
-      "checksum": "66E37D91F839E12481D7B932A1ECCBFE732560F42C1CFB89FADDFA2454534BA8",
+      "id": "github_release/github.com/astral-sh/uv/0.11.16/uv-aarch64-apple-darwin.tar.gz",
+      "checksum": "2B25BE1AF546BE330B340B0A76B99F989DAA6D92678FDFFB87438E661E9D88FB",
       "algorithm": "sha256"
     },
     {
@@ -103,11 +98,6 @@
     {
       "id": "github_release/github.com/neovim/neovim/v0.12.1/nvim-macos-arm64.tar.gz",
       "checksum": "B77E01C5421AC1BAC593EED5C2EA1B950439306DD4C32371AC2473792DA9A9D5",
-      "algorithm": "sha256"
-    },
-    {
-      "id": "github_release/github.com/oven-sh/bun/bun-v1.3.12/bun-darwin-aarch64.zip",
-      "checksum": "6C4BB87DD013ED1A8D6A16E357A3D094959FD5530B4D7061F7F3680C3C7CEA1C",
       "algorithm": "sha256"
     },
     {
