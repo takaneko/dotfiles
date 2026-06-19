@@ -48,6 +48,14 @@
       // Renovate's default ignoreUnstable drops the betas.
       matchDatasources: ["custom.1password-cli"],
       extractVersion: "v(?<version>\\d+\\.\\d+\\.\\d+(?:-[\\w.]+)?)",
+      // The html datasource yields no releaseTimestamp, and current Renovate
+      // (minimumReleaseAgeBehaviour=timestamp-required) marks any update that
+      // lacks a timestamp as permanently "pending" when a global
+      // minimumReleaseAge is set — so without this override op updates resolve
+      // correctly but never open a PR. Drop the age gate for op only (0ms ->
+      // the `if (minimumReleaseAgeMs)` pending check is skipped); the PR is
+      // still human-reviewed and aqua re-verifies the SHA256 on install.
+      minimumReleaseAge: "0 days",
     },
   ],
   // EXPERIMENTAL: 1password/cli and awslabs/git-secrets have no usable GitHub
