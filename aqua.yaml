@@ -12,7 +12,7 @@ registries:
 
 packages:
   - name: rhysd/actionlint@v1.7.12
-  - name: caddyserver/caddy@v2.11.2
+  - name: caddyserver/caddy@v2.11.4
   - name: CircleCI-Public/circleci-cli@v0.1.34950
   - name: direnv/direnv@v2.37.1
   - name: sharkdp/fd@v10.4.2
