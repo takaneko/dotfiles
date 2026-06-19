@@ -57,6 +57,21 @@
       // still human-reviewed and aqua re-verifies the SHA256 on install.
       minimumReleaseAge: "0 days",
     },
+    {
+      // aqua-renovate-config cannot update aqua-checksums.json, so regenerate it
+      // in the same PR that bumps aqua.yaml via `aqua upc` (aqua's official
+      // Renovate guidance). Without this, merging an aqua bump would fail
+      // `aqua install` because require_checksum is on and the new asset's SHA is
+      // unrecorded. Scoped to aqua.yaml so lazy-lock.json / workflow branches
+      // don't run it. The command is allow-listed in .github/workflows/
+      // renovate.yml (RENOVATE_ALLOWED_COMMANDS); aqua must be on PATH there.
+      matchFileNames: ["aqua.yaml"],
+      postUpgradeTasks: {
+        commands: ["aqua upc -a --prune"],
+        fileFilters: ["aqua-checksums.json"],
+        executionMode: "branch",
+      },
+    },
   ],
   // EXPERIMENTAL: 1password/cli and awslabs/git-secrets have no usable GitHub
   // Releases, so aqua-renovate-config can't track them. Re-track each via the
@@ -79,6 +94,17 @@
       matchStrings: ["name:\\s*(?<depName>1password/cli)@v(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
       datasourceTemplate: "custom.1password-cli",
       versioningTemplate: "semver",
+    },
+    {
+      // Keep the `npx renovate@X.Y.Z` pin in the workflow current. Switching
+      // off the container action (to expose aqua to postUpgradeTasks) means the
+      // renovate version is no longer bumped by renovatebot/github-action's own
+      // Renovate updates, so track it here via the npm datasource.
+      customType: "regex",
+      managerFilePatterns: ["/(^|/)\\.github/workflows/renovate\\.yml$/"],
+      matchStrings: ["renovate@(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      datasourceTemplate: "npm",
+      depNameTemplate: "renovate",
     },
   ],
   customDatasources: {
