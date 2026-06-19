@@ -6,6 +6,13 @@
     "github>aquaproj/aqua-renovate-config#2.9.0",
   ],
   dependencyDashboard: false,
+  // The Renovate workflow runs only weekly. With the default prHourlyLimit of
+  // 2, each run spends its whole budget on the most frequently-updating deps
+  // (the lazy plugin digests), so aqua tag updates were chronically starved and
+  // almost never reached a PR. Lift the hourly cap (weekly cadence makes a
+  // burst harmless) and raise the concurrent-open cap so the backlog can drain.
+  prHourlyLimit: 0,
+  prConcurrentLimit: 20,
   minimumReleaseAge: "10 days",
   osvVulnerabilityAlerts: true,
   vulnerabilityAlerts: {
@@ -22,5 +29,54 @@
       matchPackageNames: ["denisidoro/navi"],
       enabled: false,
     },
+    {
+      // aqua-renovate-config maps these to the github-releases datasource, but
+      // neither publishes GitHub Releases (1password/cli ships via 1Password's
+      // own CDN, awslabs/git-secrets is tag-only), so that lookup always returns
+      // no-result. Disable only the mis-mapped datasource; the customManagers
+      // below re-track both via datasources that actually resolve.
+      matchDatasources: ["github-releases"],
+      matchPackageNames: ["1password/cli", "awslabs/git-secrets"],
+      enabled: false,
+    },
+    {
+      // The 1Password product-history page exposes versions only inside the
+      // download-link hrefs (…/pkg/v2.34.1/op_darwin_arm64_v2.34.1.zip); pull
+      // the version out so semver comparison works. The pre-release suffix MUST
+      // be captured too (…-beta.03) — otherwise a beta build collapses to its
+      // bare X.Y.Z and masquerades as a stable release. With the suffix kept,
+      // Renovate's default ignoreUnstable drops the betas.
+      matchDatasources: ["custom.1password-cli"],
+      extractVersion: "v(?<version>\\d+\\.\\d+\\.\\d+(?:-[\\w.]+)?)",
+    },
   ],
+  // EXPERIMENTAL: 1password/cli and awslabs/git-secrets have no usable GitHub
+  // Releases, so aqua-renovate-config can't track them. Re-track each via the
+  // correct source. Verify on the next Renovate run before trusting these.
+  customManagers: [
+    {
+      // git-secrets publishes git tags (1.0.0 … 1.3.0) but no Releases.
+      customType: "regex",
+      managerFilePatterns: ["/(^|/)aqua\\.yaml$/"],
+      matchStrings: ["name:\\s*(?<depName>awslabs/git-secrets)@(?<currentValue>\\S+)"],
+      datasourceTemplate: "github-tags",
+    },
+    {
+      // 1password/cli has no public GitHub repo; aqua fetches it over HTTP and
+      // the canonical version list lives on the product-history page (scraped by
+      // the custom datasource below). Keep the literal `v` outside the capture
+      // so the bumped value stays `@vX.Y.Z`.
+      customType: "regex",
+      managerFilePatterns: ["/(^|/)aqua\\.yaml$/"],
+      matchStrings: ["name:\\s*(?<depName>1password/cli)@v(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      datasourceTemplate: "custom.1password-cli",
+      versioningTemplate: "semver",
+    },
+  ],
+  customDatasources: {
+    "1password-cli": {
+      defaultRegistryUrlTemplate: "https://app-updates.agilebits.com/product_history/CLI2",
+      format: "html",
+    },
+  },
 }
