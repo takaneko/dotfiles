@@ -64,10 +64,10 @@ gh pr diff <N> --name-only   # which files changed → classify
 gh pr diff <N>               # the hunks
 ```
 
-Classify by the changed file:
+Classify by the changed file **and** hunk shape:
 - contains `lazy-lock.json` → **lazy** PR → step 2.1
-- contains `aqua.yaml` → **aqua** PR → step 2.2
-- neither → out of scope; record in summary as `SKIP (not a lazy/aqua PR)` and move on.
+- contains `aqua.yaml` **and** the diff includes a `- name: <pkg>@<tag>` package-entry change → **aqua** PR → step 2.2
+- anything else → out of scope; record in summary as `SKIP (not a lazy/aqua PR)` and move on. Note in particular that `aqua.yaml` also holds the `registries[].ref` pin (aqua-registry version): a PR that only bumps that line touches `aqua.yaml` but has **no** `- name: …@…` hunk, so it is out of scope here — don't try to force it through step 2.2.
 
 #### 2.1 lazy PR extraction
 
@@ -116,11 +116,20 @@ PRs created after the `postUpgradeTasks`/`aqua upc` hook landed include `aqua-ch
 
 ### 3. Check age
 
-Works for both PR types — `OLD_REF`/`NEW_REF` is a commit SHA (lazy) or a tag (aqua); `gh api .../commits/<ref>` resolves either.
+The gate mirrors Renovate's `minimumReleaseAge`, which measures **how long ago the artifact was published** — so the date source differs by PR type:
+
+- **lazy** (digest pin): the new ref *is* the commit, so commit date = release date.
+  ```bash
+  ref_date=$(gh api repos/<owner>/<repo>/commits/<NEW_REF> --jq '.commit.committer.date')
+  ```
+- **aqua** (tag pin): use the **tag/release publish date**, not the underlying commit date. A tag cut today on top of an old commit is a 0-day-old release even though its commit is old — using commit date would wrongly PASS it. Prefer the GitHub Release `published_at`; fall back to the tag's commit date only when there is no Release (lightweight/annotated tag, which is what Renovate's `github-tags` datasource also falls back to):
+  ```bash
+  ref_date=$(gh api "repos/<owner>/<repo>/releases/tags/<NEW_REF>" --jq '.published_at' 2>/dev/null)
+  [ -z "$ref_date" ] && ref_date=$(gh api "repos/<owner>/<repo>/commits/<NEW_REF>" --jq '.commit.committer.date')
+  ```
 
 ```bash
-committer_date=$(gh api repos/<owner>/<repo>/commits/<NEW_REF> --jq '.commit.committer.date')
-age_days=$(jq -n --arg d "$committer_date" '($d | fromdate) as $t | ((now - $t) / 86400) | floor')
+age_days=$(jq -n --arg d "$ref_date" '($d | fromdate) as $t | ((now - $t) / 86400) | floor')
 ```
 
 `jq fromdate` parses ISO 8601 portably (avoids BSD vs GNU `date` incompatibility). Threshold: **10 days**. Record PASS if `age_days >= 10`, else FAIL.
@@ -133,7 +142,9 @@ Record the age/WAIT state (plus any fallback findings) for the chat summary in s
 
 ### 4. Fetch and analyze the diff (age PASS only)
 
-Skip this step if age check in step 3 failed, or (aqua) if the package is non-GitHub-backed.
+Skip this step if age check in step 3 failed, or (aqua) if the package's **source** is not on GitHub.
+
+**What the aqua source diff does and does not cover:** a GitHub repo existing for the package only means its *source* is reviewable — it does **not** mean aqua downloads the *binary* from GitHub. Several packages here ship their artifact from a vendor host (e.g. `helm/helm` → `get.helm.sh`, `kubernetes/kubernetes/kubectl` → `dl.k8s.io`) while their source lives on GitHub. The source compare below is therefore **supplementary** (it surfaces suspicious source-side changes); it never proves the distributed binary is safe. The artifact-integrity control is **always** the `aqua-checksums.json` SHA256 pin, regardless of which host aqua fetches from. So a clean source scan → `MERGE OK` still rests on the checksum being present/regenerated, never on the scan alone. When you know the artifact is distributed off-GitHub, say so in the comment (`source reviewed; binary integrity rests on the checksum pin`).
 
 ```bash
 gh api "repos/<owner>/<repo>/compare/<OLD_REF>...<NEW_REF>" \
