@@ -6,6 +6,13 @@
     "github>aquaproj/aqua-renovate-config#2.9.0",
   ],
   dependencyDashboard: false,
+  // The Renovate workflow runs only weekly. With the default prHourlyLimit of
+  // 2, each run spends its whole budget on the most frequently-updating deps
+  // (the lazy plugin digests), so aqua tag updates were chronically starved and
+  // almost never reached a PR. Lift the hourly cap (weekly cadence makes a
+  // burst harmless) and raise the concurrent-open cap so the backlog can drain.
+  prHourlyLimit: 0,
+  prConcurrentLimit: 20,
   minimumReleaseAge: "10 days",
   osvVulnerabilityAlerts: true,
   vulnerabilityAlerts: {
@@ -20,6 +27,15 @@
       // a prebuilt darwin asset, so pin to v2.23.0 and ignore updates until
       // upstream resumes darwin releases.
       matchPackageNames: ["denisidoro/navi"],
+      enabled: false,
+    },
+    {
+      // aqua-renovate-config maps these to the github-releases datasource, but
+      // neither publishes GitHub Releases: 1password/cli ships via 1Password's
+      // own CDN, and awslabs/git-secrets is tag-only. The lookups return
+      // no-result on every run (noise in the logs) and can never produce an
+      // update, so disable them rather than let the failed lookups linger.
+      matchPackageNames: ["1password/cli", "awslabs/git-secrets"],
       enabled: false,
     },
   ],
