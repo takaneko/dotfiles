@@ -86,8 +86,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/kubernetes-sigs/kind/v0.31.0/kind-darwin-arm64",
-      "checksum": "88BF554FE9DA6311C9F8C2D082613C002911A476F6B5090E9420B35D84E70C5C",
+      "id": "github_release/github.com/kubernetes-sigs/kind/v0.32.0/kind-darwin-arm64",
+      "checksum": "DCA67911095A110C2B5C36E26DF6CAC860C602033E456C0DB47BE498CDEF1EBB",
       "algorithm": "sha256"
     },
     {
