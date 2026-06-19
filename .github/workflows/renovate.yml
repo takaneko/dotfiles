@@ -26,9 +26,26 @@ jobs:
   renovate:
     runs-on: ubuntu-latest
     steps:
-      - uses: renovatebot/github-action@eb932558ad942cccfd8211cf535f17ff183a9f74 # v46.1.9
+      # aqua must be on PATH so Renovate's postUpgradeTasks (see renovate.json5)
+      # can run `aqua upc` to regenerate aqua-checksums.json inside the same PR
+      # that bumps aqua.yaml. This is the reason Renovate runs via npx below
+      # instead of renovatebot/github-action: the action's container would not
+      # carry the aqua binary, so the post-upgrade command could not run.
+      - uses: aquaproj/aqua-installer@11dd79b4e498d471a9385aa9fb7f62bb5f52a73c # v4.0.4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          aqua_version: v2.57.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "24" # renovate's engines require Node ^24.11.0
+      # The renovate version is pinned and kept current by the `renovate`
+      # customManager in renovate.json5 (npm datasource on this file).
+      - run: npx --yes renovate@43.232.0
         env:
-          LOG_LEVEL: ${{ inputs.logLevel || 'info' }}
+          RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RENOVATE_PLATFORM: github
           RENOVATE_REPOSITORIES: ${{ github.repository }}
+          # Permit ONLY the exact checksum command the post-upgrade task runs.
+          # Command templating is left at its default (off), so no dependency
+          # metadata can be interpolated into the command string.
+          RENOVATE_ALLOWED_COMMANDS: '["^aqua upc -a --prune$"]'
+          LOG_LEVEL: ${{ inputs.logLevel || 'info' }}
