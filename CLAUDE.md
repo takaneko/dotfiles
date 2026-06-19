@@ -58,7 +58,7 @@ Step 2 is **mandatory for manual edits**: CI only regenerates `aqua-checksums.js
 
 `aqua-renovate-config` can't update `aqua-checksums.json`, so `renovate.json5` adds a `postUpgradeTasks` hook that runs `aqua upc -a --prune` on any branch touching `aqua.yaml`, committing the regenerated checksums into the same Renovate PR. This is why `.github/workflows/renovate.yml` runs Renovate via `npx` (not the container action) with `aqua` on `PATH`, and allow-lists exactly that one command via `RENOVATE_ALLOWED_COMMANDS`. It covers **Renovate PRs only** — manual `aqua.yaml` edits still need step 2 above. (There is intentionally no `on: pull_request` checksum workflow: it can't auto-run on bot-authored PRs because GitHub gates `github-actions[bot]` PR workflows as `action_required`.)
 
-`minimumReleaseAge: "10 days"` (set globally) applies to aqua PRs as well, matching the lazy-lock.json policy. The `/review-renovate-pr` skill should be extended to cover `aqua.yaml` PRs in the same style as the lazy plugin reviews.
+`minimumReleaseAge: "10 days"` (set globally) applies to aqua PRs as well, matching the lazy-lock.json policy. The `/review-renovate-pr` skill covers `aqua.yaml` tag PRs in the same style as the lazy plugin reviews (age gate + upstream-diff red-flag scan against the old→new tag, plus a check that the PR carries the regenerated `aqua-checksums.json`).
 
 ### Bumping aqua itself
 
@@ -119,7 +119,7 @@ Plugin updates in this repo do **not** come from `:Lazy update` → commit. They
 
 ## Reviewing Renovate PRs
 
-The `/review-renovate-pr` skill (defined in `.claude/skills/review-renovate-pr/SKILL.md`) handles triage of open Renovate PRs: it enforces the 10-day age gate, scans upstream diffs for supply-chain red flags, and posts a review comment per PR. Use it instead of reviewing Renovate PRs by hand. It must be run from `~/dotfiles` because it reads `renovate-lazy.json` via a relative path.
+The `/review-renovate-pr` skill (defined in `.claude/skills/review-renovate-pr/SKILL.md`) handles triage of open Renovate PRs of both kinds — `lazy-lock.json` plugin digest bumps and `aqua.yaml` CLI tool tag bumps. It enforces the 10-day age gate, scans the upstream diff (commit range for lazy, old→new tag for aqua) for supply-chain red flags, flags aqua PRs that lack the regenerated `aqua-checksums.json`, and posts a review comment per PR. Preset/action bumps (`renovate.json5`, `.github/workflows/*`) are out of scope and skipped. Use it instead of reviewing Renovate PRs by hand. It must be run from `~/dotfiles` because it reads `renovate-lazy.json` via a relative path.
 
 ## Reviewing Homebrew updates
 
