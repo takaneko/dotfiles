@@ -27,7 +27,7 @@ packages:
   - name: LuaLS/lua-language-server@3.18.2
   - name: mutagen-io/mutagen@v0.18.1
   - name: denisidoro/navi@v2.23.0 # v2.24.0+ dropped darwin prebuilt binaries
-  - name: neovim/neovim@v0.12.1
+  - name: neovim/neovim@v0.12.2
   - name: google/osv-scanner@v2.3.5
   - name: oven-sh/bun@bun-v1.3.13
   - name: suzuki-shunsuke/pinact@v3.9.0
