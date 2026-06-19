@@ -47,12 +47,16 @@ Homebrew is intentionally retained only for things aqua can't manage: macOS GUI 
 3. Run `aqua install -a` to apply.
 4. Commit both `aqua.yaml` and `aqua-checksums.json` in the same commit.
 
+Step 2 is **mandatory for manual edits**: CI only regenerates `aqua-checksums.json` automatically for Renovate-authored PRs (via the `postUpgradeTasks` `aqua upc` hook — see below). A human PR that edits `aqua.yaml` without running `aqua update-checksum -a` will merge with a missing SHA and fail the next `aqua install` (`require_checksum: true`).
+
 ### aqua updates via Renovate
 
 `renovate.json5` extends `github>aquaproj/aqua-renovate-config#2.9.0`, which configures:
 - The built-in `aqua` manager: opens a per-package PR when a new tag is released for any entry in `aqua.yaml`.
 - Updates for the `registries: ref:` (aqua-registry version).
 - Updates for `aqua-installer` and the `aquaproj/aqua-renovate-config` preset itself.
+
+`aqua-renovate-config` can't update `aqua-checksums.json`, so `renovate.json5` adds a `postUpgradeTasks` hook that runs `aqua upc -a --prune` on any branch touching `aqua.yaml`, committing the regenerated checksums into the same Renovate PR. This is why `.github/workflows/renovate.yml` runs Renovate via `npx` (not the container action) with `aqua` on `PATH`, and allow-lists exactly that one command via `RENOVATE_ALLOWED_COMMANDS`. It covers **Renovate PRs only** — manual `aqua.yaml` edits still need step 2 above. (There is intentionally no `on: pull_request` checksum workflow: it can't auto-run on bot-authored PRs because GitHub gates `github-actions[bot]` PR workflows as `action_required`.)
 
 `minimumReleaseAge: "10 days"` (set globally) applies to aqua PRs as well, matching the lazy-lock.json policy. The `/review-renovate-pr` skill should be extended to cover `aqua.yaml` PRs in the same style as the lazy plugin reviews.
 
