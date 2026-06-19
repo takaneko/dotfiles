@@ -34,7 +34,7 @@ packages:
   - name: BurntSushi/ripgrep@15.1.0
   # nvim-treesitter main の :TSInstall が一部パーサ(terraform 等の dialect 系)で
   # 内部的に `tree-sitter build` を呼ぶため必須。
-  - name: tree-sitter/tree-sitter@v0.26.8
+  - name: tree-sitter/tree-sitter@v0.26.9
   - name: koalaman/shellcheck@v0.11.0
   - name: astral-sh/uv@0.11.16
   - name: 1password/cli@v2.33.1

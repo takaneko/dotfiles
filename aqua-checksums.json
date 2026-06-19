@@ -121,8 +121,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/tree-sitter/tree-sitter/v0.26.8/tree-sitter-macos-arm64.gz",
-      "checksum": "024E2CEE34723524D62D41BDE4D2B4AF23C8BBE0236E116C79C0B37D9575889E",
+      "id": "github_release/github.com/tree-sitter/tree-sitter/v0.26.9/tree-sitter-macos-arm64.gz",
+      "checksum": "E46725B2417C085B0761948ABC0CC240BFF6A3AB5D2128E3AD0DE467DED3388D",
       "algorithm": "sha256"
     },
     {
