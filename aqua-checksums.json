@@ -51,6 +51,11 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/cli/cli/v2.94.0/gh_2.94.0_macOS_arm64.zip",
+      "checksum": "4F9BC1A5E77500737290A307B40B4C396A4D23729F55340F2A83F414410165A1",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/denisidoro/navi/v2.23.0/navi-v2.23.0-aarch64-apple-darwin.tar.gz",
       "checksum": "D177D9E04B2E72C9534DB3B32496C0DEDC6B139A70E985F4793D06C0401B36A6",
       "algorithm": "sha256"
