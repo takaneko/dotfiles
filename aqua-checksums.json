@@ -46,11 +46,6 @@
       "algorithm": "sha512"
     },
     {
-      "id": "github_release/github.com/cli/cli/v2.93.0/gh_2.93.0_macOS_arm64.zip",
-      "checksum": "A86BE4E0A86C26456CF71177D6572D6F1165CF1679E532B72F7F15918EE51FD2",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/cli/cli/v2.94.0/gh_2.94.0_macOS_arm64.zip",
       "checksum": "4F9BC1A5E77500737290A307B40B4C396A4D23729F55340F2A83F414410165A1",
       "algorithm": "sha256"
@@ -131,8 +126,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/zizmorcore/zizmor/v1.24.1/zizmor-aarch64-apple-darwin.tar.gz",
-      "checksum": "FC4EA59E18BC028DDDB5F710B16DBC361B01FF1E7A20C03B8E5778366CA9F4E1",
+      "id": "github_release/github.com/zizmorcore/zizmor/v1.25.2/zizmor-aarch64-apple-darwin.tar.gz",
+      "checksum": "624EF0E09521AECD862126BE0F6D7754669AF2646750D68AC48A114BE33C3146",
       "algorithm": "sha256"
     },
     {
