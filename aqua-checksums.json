@@ -46,11 +46,6 @@
       "algorithm": "sha512"
     },
     {
-      "id": "github_release/github.com/cli/cli/v2.93.0/gh_2.93.0_macOS_arm64.zip",
-      "checksum": "A86BE4E0A86C26456CF71177D6572D6F1165CF1679E532B72F7F15918EE51FD2",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/cli/cli/v2.94.0/gh_2.94.0_macOS_arm64.zip",
       "checksum": "4F9BC1A5E77500737290A307B40B4C396A4D23729F55340F2A83F414410165A1",
       "algorithm": "sha256"
@@ -101,8 +96,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/neovim/neovim/v0.12.2/nvim-macos-arm64.tar.gz",
-      "checksum": "EEDDEE1009734F9071266E6B1B8A70308CB60CBCC45F5E1C1023ADC471450FEE",
+      "id": "github_release/github.com/neovim/neovim/v0.12.3/nvim-macos-arm64.tar.gz",
+      "checksum": "532DA1D00E465A660FA01C3D4991333D09C52107DCE7DF937368545DACA0A14E",
       "algorithm": "sha256"
     },
     {
