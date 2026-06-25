@@ -3,7 +3,7 @@
   extends: [
     "config:recommended",
     "local>takaneko/dotfiles:renovate-lazy",
-    "github>aquaproj/aqua-renovate-config#2.9.0",
+    "github>aquaproj/aqua-renovate-config#2.13.0",
   ],
   dependencyDashboard: false,
   // The Renovate workflow runs only weekly. With the default prHourlyLimit of
