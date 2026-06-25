@@ -46,11 +46,6 @@
       "algorithm": "sha512"
     },
     {
-      "id": "github_release/github.com/cli/cli/v2.93.0/gh_2.93.0_macOS_arm64.zip",
-      "checksum": "A86BE4E0A86C26456CF71177D6572D6F1165CF1679E532B72F7F15918EE51FD2",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/cli/cli/v2.94.0/gh_2.94.0_macOS_arm64.zip",
       "checksum": "4F9BC1A5E77500737290A307B40B4C396A4D23729F55340F2A83F414410165A1",
       "algorithm": "sha256"
@@ -146,8 +141,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "http/get.helm.sh/helm-v4.2.0-darwin-arm64.tar.gz",
-      "checksum": "F13F959015447B6BC309F9FD506509926543988A39035C088B52522EC95E2ACB",
+      "id": "http/get.helm.sh/helm-v4.2.1-darwin-arm64.tar.gz",
+      "checksum": "896472D2EC0740C60F64A9DF0FC30D478BEEE38A1A2A6ED91AA6E6EE177C1575",
       "algorithm": "sha256"
     },
     {
