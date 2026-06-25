@@ -46,11 +46,6 @@
       "algorithm": "sha512"
     },
     {
-      "id": "github_release/github.com/cli/cli/v2.93.0/gh_2.93.0_macOS_arm64.zip",
-      "checksum": "A86BE4E0A86C26456CF71177D6572D6F1165CF1679E532B72F7F15918EE51FD2",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/cli/cli/v2.94.0/gh_2.94.0_macOS_arm64.zip",
       "checksum": "4F9BC1A5E77500737290A307B40B4C396A4D23729F55340F2A83F414410165A1",
       "algorithm": "sha256"
@@ -121,8 +116,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.9.0/pinact_darwin_arm64.tar.gz",
-      "checksum": "23C8A4EDA8FD7949C8CBB1CFE6F3D01279402FE6201E9CB0A90447A5ECFDEF89",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v3.10.1/pinact_darwin_arm64.tar.gz",
+      "checksum": "BA7FFD6A63E3C96458A582CCE7753FB450A4EBC75099B885B2B6C6F57E5620B0",
       "algorithm": "sha256"
     },
     {

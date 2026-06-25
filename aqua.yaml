@@ -30,7 +30,7 @@ packages:
   - name: neovim/neovim@v0.12.2
   - name: google/osv-scanner@v2.3.8
   - name: oven-sh/bun@bun-v1.3.14
-  - name: suzuki-shunsuke/pinact@v3.9.0
+  - name: suzuki-shunsuke/pinact@v3.10.1
   - name: BurntSushi/ripgrep@15.1.0
   # nvim-treesitter main の :TSInstall が一部パーサ(terraform 等の dialect 系)で
   # 内部的に `tree-sitter build` を呼ぶため必須。
