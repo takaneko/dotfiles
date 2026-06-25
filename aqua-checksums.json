@@ -46,11 +46,6 @@
       "algorithm": "sha512"
     },
     {
-      "id": "github_release/github.com/cli/cli/v2.93.0/gh_2.93.0_macOS_arm64.zip",
-      "checksum": "A86BE4E0A86C26456CF71177D6572D6F1165CF1679E532B72F7F15918EE51FD2",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/cli/cli/v2.94.0/gh_2.94.0_macOS_arm64.zip",
       "checksum": "4F9BC1A5E77500737290A307B40B4C396A4D23729F55340F2A83F414410165A1",
       "algorithm": "sha256"
@@ -141,8 +136,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "http/dl.k8s.io/v1.35.4/bin/darwin/arm64/kubectl",
-      "checksum": "EC644A2473B64B486987F695DFB1867963CE6D42D267B86E944585A546F92B5D",
+      "id": "http/dl.k8s.io/v1.36.2/bin/darwin/arm64/kubectl",
+      "checksum": "4408C85C83FD3A31ADAA555BDF3C7A6C81F74B19449A9060BA31AB91926F023D",
       "algorithm": "sha256"
     },
     {

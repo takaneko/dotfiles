@@ -23,7 +23,7 @@ packages:
   - name: helm/helm@v4.2.0
   - name: jqlang/jq@jq-1.8.1
   - name: kubernetes-sigs/kind@v0.32.0
-  - name: kubernetes/kubernetes/kubectl@v1.35.4
+  - name: kubernetes/kubernetes/kubectl@v1.36.2
   - name: LuaLS/lua-language-server@3.18.2
   - name: mutagen-io/mutagen@v0.18.1
   - name: denisidoro/navi@v2.23.0 # v2.24.0+ dropped darwin prebuilt binaries
