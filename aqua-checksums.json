@@ -96,8 +96,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/neovim/neovim/v0.12.2/nvim-macos-arm64.tar.gz",
-      "checksum": "EEDDEE1009734F9071266E6B1B8A70308CB60CBCC45F5E1C1023ADC471450FEE",
+      "id": "github_release/github.com/neovim/neovim/v0.12.3/nvim-macos-arm64.tar.gz",
+      "checksum": "532DA1D00E465A660FA01C3D4991333D09C52107DCE7DF937368545DACA0A14E",
       "algorithm": "sha256"
     },
     {
