@@ -16,8 +16,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/CircleCI-Public/circleci-cli/v0.1.38646/circleci-cli_0.1.38646_darwin_amd64.tar.gz",
-      "checksum": "BABF077177A83264EC27EAE40182895E63E6DE0DA257F595C390D33EDE68F96F",
+      "id": "github_release/github.com/CircleCI-Public/circleci-cli/v0.1.38646/circleci-cli_0.1.38646_darwin_arm64.tar.gz",
+      "checksum": "357C851C97C562D146E413C5D07069B89B1C0D0CC74422C6C8A22BC77B4AB944",
       "algorithm": "sha256"
     },
     {
@@ -146,8 +146,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.494.1/registry.yaml",
-      "checksum": "BA94F7BB7A80AF07CD73ED588935345E75D232703959FA90988E4414CF8C12B06F05CA8B47BAA33C5C970C83667C027A7D2FE453E52C75924830573CD78FAF48",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.525.0/registry.yaml",
+      "checksum": "2260BF5784750C28414010F65A91D50BB646BE508B37F50FA6E2931DF45C55FB469F03812D42E759169149E2B57B2272185ED2CA75299876E87BABE662328DF8",
       "algorithm": "sha512"
     }
   ]
