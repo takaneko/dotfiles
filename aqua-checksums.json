@@ -71,8 +71,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/jqlang/jq/jq-1.8.1/jq-macos-arm64",
-      "checksum": "A9FE3EA2F86DFC72F6728417521EC9067B343277152B114F4E98D8CB0E263603",
+      "id": "github_release/github.com/jqlang/jq/jq-1.8.2/jq-macos-arm64",
+      "checksum": "2D75340BA57A4B4B4C8708A21C2DC8E958A48AAA8BBA13B27F77F6E4C0ECA07E",
       "algorithm": "sha256"
     },
     {
