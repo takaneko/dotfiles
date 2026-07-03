@@ -28,7 +28,7 @@ packages:
   - name: mutagen-io/mutagen@v0.18.1
   - name: denisidoro/navi@v2.23.0 # v2.24.0+ dropped darwin prebuilt binaries
   - name: neovim/neovim@v0.12.3
-  - name: google/osv-scanner@v2.3.8
+  - name: google/osv-scanner@v2.4.0
   - name: oven-sh/bun@bun-v1.3.14
   - name: suzuki-shunsuke/pinact@v4.1.0
   - name: BurntSushi/ripgrep@15.1.0
