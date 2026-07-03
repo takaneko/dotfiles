@@ -50,3 +50,6 @@ MYTODO.md
 
 # claude code
 .claude/settings.local.json
+
+# 1password cli
+.op/plugins/gh.json
