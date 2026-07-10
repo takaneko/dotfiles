@@ -40,5 +40,5 @@ packages:
   - name: 1password/cli@v2.34.1
   - name: ByteNess/aws-vault@v7.12.3
   - name: zizmorcore/zizmor@v1.26.1
-  - name: anchore/syft@v1.45.1
+  - name: anchore/syft@v1.46.0
   - name: anchore/grype@v0.114.0
