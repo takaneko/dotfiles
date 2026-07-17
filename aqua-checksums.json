@@ -11,8 +11,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ByteNess/aws-vault/v7.12.4/aws-vault-darwin-arm64",
-      "checksum": "BB80BC4586084481A8A588AFFBB9152C14F143DFC4591BFFA4E508632587B382",
+      "id": "github_release/github.com/ByteNess/aws-vault/v7.12.5/aws-vault-darwin-arm64",
+      "checksum": "14CC5AB0DD66EC1C1D6D095216DC0BE0CB82D8817006CB426B646D799DA99DE4",
       "algorithm": "sha256"
     },
     {
