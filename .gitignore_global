@@ -53,3 +53,6 @@ MYTODO.md
 
 # 1password cli
 .op/plugins/gh.json
+
+# cc-plugins
+.claude/skill-retros
