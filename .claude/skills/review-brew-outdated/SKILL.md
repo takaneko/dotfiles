@@ -85,7 +85,7 @@ Classify the upstream into one of four **kinds** and record `{kind, key}` per fo
 | `bitbucket` | `https?://bitbucket\.org/<workspace>/<repo>` | `<workspace> <repo_slug>` — strip trailing `.git`, `/src/...`, `/downloads/...` |
 | `git` | URL ends in `.git` on any other host, **or** homepage is `https://www.gnu.org/software/<name>/` (fallback: probe `https://git.savannah.gnu.org/git/<name>.git` with `git ls-remote --exit-code`; some GNU projects live on `git.gnunet.org` instead) | `<name> <clone_url>` — `<name>` is the formula name, used as the cache key |
 
-If none match, record as **MANUAL** with reason "upstream not resolvable" and skip steps 4–6.
+If none match, try the **tarball fallback** (§3a) before giving up; only if that is not applicable, record as **MANUAL** with reason "upstream not resolvable" and skip steps 4–6.
 
 **Brew-revision-only bumps** (`8.1` → `8.1_1`, `1.86.0` → `1.86.0_1`): the upstream version is unchanged — only the Homebrew formula revision number bumped. Both versions resolve to the same upstream tag and `compare` returns an empty diff. Record these as UPDATE with reason "brew revision only, no upstream diff" and skip the heuristic scan. Do NOT classify as MANUAL. A revision bump commonly means a rebuild against a newer dependency; if the revision bump log message cites another formula (e.g. "revision bump for x265 4.2"), note the dependency in the summary so the user can review it separately.
 
@@ -96,6 +96,38 @@ bash "$SKILL_DIR/adapters/git.sh" init <name> <CLONE_URL>
 ```
 
 Throughout the rest of this doc, `$SKILL_DIR` is this skill's directory: `$HOME/dotfiles/.claude/skills/review-brew-outdated`. Adapters live under `$SKILL_DIR/adapters/<kind>.sh` and share a uniform calling convention — see steps 4 and 6.
+
+### 3a. Tarball fallback (adapter-less upstreams)
+
+Some formulae ship only release tarballs with no git host any adapter understands — SourceForge is the common case (real case: `lame`, `homepage: lame.sourceforge.io`, `stable_url: downloads.sourceforge.net/…`). Rather than dropping these straight to MANUAL, diff the two release tarballs directly. This substitutes for steps 4 and 6.
+
+```bash
+D=/tmp/brew-tarball-<name>; mkdir -p "$D-old" "$D-new"
+# 1. Fetch both tarballs. brew's stable_url is the LATEST; derive the installed URL by
+#    substituting the version into the same path (SourceForge keeps every version).
+curl -sSL -o "$D-new.tgz" "<latest stable_url>"
+curl -sSL -o "$D-old.tgz" "<installed-version url>"
+# 2. Reject HTML error pages masquerading as tarballs (a 404/redirect saved as .tgz):
+file "$D-new.tgz" "$D-old.tgz"   # must say "gzip/xz/bzip2 compressed data", NOT "HTML"
+# 3. INTEGRITY ANCHOR — verify the latest tarball against Homebrew's pinned checksum.
+#    A mismatch means you are NOT reviewing what brew will install: STOP and flag it.
+brew info --json=v2 <name> | jq -r '.formulae[0].urls.stable.checksum'
+shasum -a 256 "$D-new.tgz"
+```
+
+If the SHA matches Homebrew's pin, extract both and compare the trees:
+
+```bash
+tar xf "$D-old.tgz" -C "$D-old"; tar xf "$D-new.tgz" -C "$D-new"
+# added files (in new, not old):
+comm -13 <(cd "$D-old" && find . -type f | sort) <(cd "$D-new" && find . -type f | sort)
+# changed/removed overview:
+diff -rq "$D-old" "$D-new"
+```
+
+Then run the **same step-6 heuristic scan** over the added/changed files. There is no per-commit author cross-check with tarballs, so concentrate the HIGH/MEDIUM patterns on: build scripts (`configure.ac`, `Makefile.am`, `*.m4`, `*.sh`) for injected `curl|wget → shell` or `eval` of network data; non-source-language additions (a C project sprouting `.py`/`.js` build glue); binary-blob additions; and any network endpoint or long base64/hex blob a library of this kind should never carry. For the **age gate**, use the tarball's release date — the internal mtime from `file` output, or the date shown on the host's file listing.
+
+A matching SHA + clean tree promotes the formula to **UPDATE** (subject to the age gate); anything unexplained downgrades exactly as in step 6. Note in the summary that the review was **tarball-based (no commit history)**, and flag major-version jumps (e.g. `lame` 3.100 → 4.0) as behaviorally significant for the user even when supply-chain-clean.
 
 ### 4. Resolve tag names and release date
 
@@ -109,12 +141,24 @@ bash "$SKILL_DIR/adapters/<kind>.sh" resolve-tag <key...> "<VERSION>"
 
 Adapters apply a `contains("<VERSION>")` match against upstream tag listings — tag naming is not standardised (Homebrew's `1.6.58` may appear as `v1.6.58`, `libpng-1.6.58`, `release-1.6.58`, etc.), so substring match is the lowest-common-denominator that works across all hosts.
 
-Call once for the installed version (`installed_versions[0]` — pin explicitly; the array normally has one entry but `brew` allows multiple installed versions for versioned formulae like `python@3.10`) and once for the latest version. If either resolves to `{}`, record the formula as **MANUAL** with reason "tag '<version>' not found" and skip step 6.
+> **`git` kind is the exception to the uniform `<key...>` convention.** Its `resolve-tag` takes only `<name> <version>` — the clone URL is **not** passed here (it is used solely by the one-time `init` in step 3). Likewise git's `fetch-diff` is `<name> <old_ref> <new_ref> <out_prefix>`, with no URL. Passing the clone URL into `resolve-tag`/`fetch-diff` shoves the version into the wrong slot, so every tag silently resolves to `{}`. github/gitlab/bitbucket instead carry their full key (`<owner/repo>`, `<host> <project>`, `<workspace> <repo>`) into every verb.
 
-Compute age in days from the `date` field via the same portable `jq fromdate` expression (avoids BSD/GNU `date` divergence):
+**Guard against variant-tag shadowing.** Because the match is a substring, a suffixed variant can outrank the plain release tag — e.g. `contains("4.1.0")` may return `v4.1.0-cqp-extended` (an experimental/fork tag) instead of `v4.1.0`, silently corrupting the diff base. This bites hardest on the OLD/base ref, where a wrong tag inflates the diff with unrelated changes. When more than one tag matches, prefer the tag that is *exactly* the expected version (`v<VERSION>` / `<VERSION>` / `<name>-<VERSION>`) over any longer suffixed sibling; if the adapter handed back a suffixed variant, re-list the tags and pick the exact match by hand before calling `fetch-diff`.
+
+Call once for the installed version (`installed_versions[0]` — pin explicitly; the array normally has one entry but `brew` allows multiple installed versions for versioned formulae like `python@3.10`) and once for the latest version.
+
+- If the **latest** version resolves to `{}`, record the formula as **MANUAL** with reason "tag '<version>' not found" and skip step 6 — there is nothing to diff *to*.
+- If only the **installed/base** version resolves to `{}` (latest is fine), do **not** jump straight to MANUAL. Some upstreams skip or never tag an intermediate release (real case: `libmicrohttpd` 1.0.5 has no tag on the git.gnunet.org mirror, which jumps `v1.0.4 → v1.0.6`). List the tags, pick the **nearest lower** tag as the base, and diff that → latest as a **conservative superset** — it reviews *more* than the user's actual upgrade span, never less. Note the substituted base in the summary (e.g. "base v1.0.5 absent — reviewed v1.0.4→v1.0.6"). This mirrors the lazy-lock skill's intermediate-commit fallback. Fall back to MANUAL only if no usable lower tag exists.
+
+Compute age in days from the `date` field. **The `date` value is not always UTC-`Z`:** GitHub returns `…Z`, but the `gitlab` and `git` kinds return an ISO-8601 timestamp with a numeric offset (`2026-07-14T08:39:09+02:00`, `…-05:00`). jq's `fromdate` only parses the `Z` form and aborts with `date "…" does not match format "%Y-%m-%dT%H:%M:%SZ"` on offset timestamps — so parse with an offset-aware tool instead:
 
 ```bash
-jq -n --arg d "<date from resolve-tag>" '($d | fromdate) as $t | ((now - $t) / 86400) | floor'
+now=$(date +%s)
+# gdate (GNU coreutils, installed via brew) handles both the Z form and ±HH:MM offsets:
+epoch=$(gdate -d "<date from resolve-tag>" +%s)
+# Fallback if gdate is unavailable — BSD `date` needs the offset colon-stripped and Z→+0000:
+#   d="<date>"; epoch=$(date -j -f "%Y-%m-%dT%H:%M:%S%z" "$(echo "${d/Z/+0000}" | sed 's/\([+-][0-9][0-9]\):\([0-9][0-9]\)$/\1\2/')" +%s)
+age_days=$(( (now - epoch) / 86400 ))
 ```
 
 ### 5. Classify
