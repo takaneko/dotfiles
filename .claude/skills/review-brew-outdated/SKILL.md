@@ -118,7 +118,11 @@ shasum -a 256 "$D-new.tgz"
 If the SHA matches Homebrew's pin, extract both and compare the trees:
 
 ```bash
-tar xf "$D-old.tgz" -C "$D-old"; tar xf "$D-new.tgz" -C "$D-new"
+# --strip-components=1 drops the version-named top dir (lame-4.0/, lame-3.100/) so both
+# trees share the same relative paths. Without it EVERY path differs by its top segment
+# and the comparison is worthless — the whole tree reads as "added".
+tar xf "$D-old.tgz" -C "$D-old" --strip-components=1
+tar xf "$D-new.tgz" -C "$D-new" --strip-components=1
 # added files (in new, not old):
 comm -13 <(cd "$D-old" && find . -type f | sort) <(cd "$D-new" && find . -type f | sort)
 # changed/removed overview:
@@ -156,8 +160,9 @@ Compute age in days from the `date` field. **The `date` value is not always UTC-
 now=$(date +%s)
 # gdate (GNU coreutils, installed via brew) handles both the Z form and ±HH:MM offsets:
 epoch=$(gdate -d "<date from resolve-tag>" +%s)
-# Fallback if gdate is unavailable — BSD `date` needs the offset colon-stripped and Z→+0000:
-#   d="<date>"; epoch=$(date -j -f "%Y-%m-%dT%H:%M:%S%z" "$(echo "${d/Z/+0000}" | sed 's/\([+-][0-9][0-9]\):\([0-9][0-9]\)$/\1\2/')" +%s)
+# Fallback if gdate is unavailable — BSD `date` needs Z→+0000, fractional seconds dropped
+# (gitlab emits .000), and the offset colon stripped before %z will parse it:
+#   d="<date>"; norm=$(echo "${d/Z/+0000}" | sed -E 's/\.[0-9]+//; s/([+-][0-9][0-9]):([0-9][0-9])$/\1\2/'); epoch=$(date -j -f "%Y-%m-%dT%H:%M:%S%z" "$norm" +%s)
 age_days=$(( (now - epoch) / 86400 ))
 ```
 
