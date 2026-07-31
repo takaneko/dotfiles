@@ -24,6 +24,8 @@ The skill never runs `brew upgrade` itself — the user runs the printed command
 
 `brew`, `gh` (authed), `jq`, `syft`, `grype`, `curl`, `git`. All are installed via aqua (`anchore/syft`, `anchore/grype`) or available by default on the system.
 
+"authed" needs care for `gh` specifically: the adapters run as **child processes**, which inherit neither shell aliases nor functions. Where `gh` is authenticated through a 1Password shell plugin (an alias/function in `~/.config/op/plugins.sh`), that wrapper does not reach them. `adapters/github.sh` handles this itself — it falls back to `op plugin run -- gh` when `gh` cannot authenticate on its own — so nothing needs doing per-run. But if you ever lift a `gh` call out of the adapter into a standalone script, it will hit the same wall. The `gh api` calls this doc runs inline (the author cross-check in step 6) are fine: they execute in the top-level shell, where the wrapper is defined.
+
 ## Steps
 
 ### 1. Collect the outdated list
@@ -270,6 +272,7 @@ Format the file as proper Markdown (tables for each classification, fenced code 
 - **grype DB download fails** (first run, or when the cached DB on the machine is stale / offline): report "CVE scan unavailable — falling back to no security classification", then process every formula through the age gate only. Still useful, just less informative. To preempt this on a fresh machine, run `grype db update` once before the first `/review-brew-outdated` invocation.
 - **`gh api compare` 404s** (force-pushed or rewritten history upstream): classify as **MANUAL** with reason "upstream compare unavailable".
 - **GitHub rate limit** (403 with `x-ratelimit-remaining: 0`): stop processing, report remaining formulae as skipped with the reason "github rate limit".
+- **Every GitHub formula fails identically from the first call** (`tags fetch failed` for each, exit 3): this is local `gh` auth, not an upstream fault — but it arrives dressed as one, because exit 3 means "upstream API / network failure" in the table above. A genuine rate limit or outage degrades partway through a run; this is uniform from call one. `adapters/github.sh` prints gh's/op's own stderr precisely so the two can be told apart — read it before classifying anything as MANUAL. Confirm with a single `bash "$SKILL_DIR/adapters/github.sh" resolve-tag cli/cli 2.96.0`, and if it is auth, `export GH_TOKEN="$(gh auth token)"` for the run.
 - **GitLab API returns `{"message":"404 ..."}` or `{"message":"403 ..."}`**: the project path is wrong (private fork, renamed repo) or the instance requires auth. Classify as **MANUAL** with the returned message as the reason.
 - **Bitbucket `/diff/` times out** (Atlassian edge occasionally 504s on large spans like x265 4.1→4.2 = 1.7 MB patch): retry once with `curl --max-time 30`, then fall back to diffstat-only review — set the meta file, leave the patch empty, and mark the formula REVIEW MANUALLY with reason "bitbucket diff unavailable".
 - **`git clone` / `git fetch` for cgit fails** (upstream server offline, network): classify as **MANUAL** with reason "upstream git unreachable". Do NOT delete the cache — a stale cache is better than nothing for the next run.
