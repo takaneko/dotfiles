@@ -6,8 +6,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/BurntSushi/ripgrep/15.1.0/ripgrep-15.1.0-aarch64-apple-darwin.tar.gz",
-      "checksum": "378E973289176CA0C6054054EE7F631A065874A352BF43F0FA60EF079B6BA715",
+      "id": "github_release/github.com/BurntSushi/ripgrep/15.2.0/ripgrep-15.2.0-aarch64-apple-darwin.tar.gz",
+      "checksum": "3750B2E93F37E0C692657DA574D7019A101C0084DA05A790C83FD335BAD973E4",
       "algorithm": "sha256"
     },
     {

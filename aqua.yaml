@@ -31,7 +31,7 @@ packages:
   - name: google/osv-scanner@v2.4.0
   - name: oven-sh/bun@bun-v1.3.14
   - name: suzuki-shunsuke/pinact@v4.1.0
-  - name: BurntSushi/ripgrep@15.1.0
+  - name: BurntSushi/ripgrep@15.2.0
   # nvim-treesitter main の :TSInstall が一部パーサ(terraform 等の dialect 系)で
   # 内部的に `tree-sitter build` を呼ぶため必須。
   - name: tree-sitter/tree-sitter@v0.26.11
