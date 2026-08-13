@@ -26,8 +26,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/anchore/grype/v0.116.0/grype_0.116.0_darwin_arm64.tar.gz",
-      "checksum": "9425C225D0D63D2B384BAF2177D3ABA713A2BFB800235848CE70169E78C9C5FA",
+      "id": "github_release/github.com/anchore/grype/v0.116.1/grype_0.116.1_darwin_arm64.tar.gz",
+      "checksum": "F493F169CBAAE48BADE169532B20235FC16653D2A044A5BC6FE6F69A3923F975",
       "algorithm": "sha256"
     },
     {
