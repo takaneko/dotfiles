@@ -1,6 +1,6 @@
 ---
 name: review-renovate-pr
-description: Review open Renovate-generated PRs on this dotfiles repo. Covers three PR types — vim plugin pins in lazy-lock.json (digest/commit-pinned), CLI tool versions in aqua.yaml (tag-pinned), and the aquaproj/aqua-registry registries[].ref bump (reviewed via git-tree blob comparison of our packages' pkg.yaml). For each unreviewed PR, checks that the upstream commit/tag is >= 10 days old, analyzes the upstream diff for supply-chain red flags (remote script exec, credential access, obfuscation, maintainer changes, compromised release pipelines, changed download URL/host/asset/checksum-algorithm), posts a review comment automatically, then prints a chat summary with a merge recommendation per PR. For lazy PRs whose tip SHA is too recent, falls back to reviewing the newest intermediate commit >=10d old and surfaces it as a hand-pin candidate. For aqua PRs, also flags when the PR lacks the regenerated aqua-checksums.json (needed for merge). Triggered by requests like "review the Renovate PRs", "check lazy plugin updates", "triage aqua updates", "triage the aqua-registry bump", "triage Renovate PRs", or explicit /review-renovate-pr invocation.
+description: Review open Renovate-generated PRs on this dotfiles repo. Covers three PR types — vim plugin pins in lazy-lock.json (digest/commit-pinned), CLI tool versions in aqua.yaml (tag-pinned), and the aquaproj/aqua-registry registries[].ref bump (reviewed via git-tree blob comparison of both pkg.yaml and registry.yaml for our packages). For each unreviewed PR, checks that the upstream commit/tag is >= 10 days old, analyzes the upstream diff for supply-chain red flags (remote script exec, credential access, obfuscation, maintainer changes, compromised release pipelines, changed download URL/host/asset/checksum-algorithm), posts a review comment automatically, then prints a chat summary with a merge recommendation per PR. For lazy PRs whose tip SHA is too recent, falls back to reviewing the newest intermediate commit >=10d old and surfaces it as a hand-pin candidate. For aqua PRs, also flags when the PR lacks the regenerated aqua-checksums.json (needed for merge). Triggered by requests like "review the Renovate PRs", "check lazy plugin updates", "triage aqua updates", "triage the aqua-registry bump", "triage Renovate PRs", or explicit /review-renovate-pr invocation.
 ---
 
 # review-renovate-pr
@@ -257,7 +257,7 @@ Processed N Renovate PR(s):
   Age: <X>d ✗  → WAIT (comment skipped; tag-pinned, no intermediate)
 
 #<N> [registry] aquaproj/aqua-registry (<OLD_TAG> → <NEW_TAG>)
-  Age: <X>d ✓  Our pkgs changed: <M> (<pkg,pkg,…>)  Metadata change: <none|FLAGGED>  Checksum: <in-PR|MISSING>  → <verdict>  (comment posted)
+  Age: <X>d ✓  pkg.yaml changed: <M>/<total> (<pkg,pkg,…>)  registry.yaml changed: <none|K benign|K FLAGGED>  Checksum: <in-PR|MISSING>  → <verdict>  (comment posted)
 
 #<N> [skip] <branch> — not a lazy/aqua/registry PR
 
@@ -311,10 +311,16 @@ Include the intermediate result in the step 6 chat summary line for that PR. If 
 ```
 To apply PR #<N> via intermediate pin:
   1. Edit lazy-lock.json: "<plugin>": commit "<OLD>" → "<INTERMEDIATE>"
-  2. gh pr close <N> --comment "Superseded by direct pin to reviewed intermediate SHA <int7>."
+  2. gh pr close <N> --delete-branch --comment "Superseded by direct pin to reviewed intermediate SHA <int7>."
 
 To skip this proposal on future skill runs (without applying):
   gh pr edit <N> --add-label wait
+```
+
+**Always pass `--delete-branch` when closing.** The repo auto-deletes branches on *merge*, but not on *close* — so a closed Renovate PR leaves its `renovate/<plugin>-digest` branch behind on the remote, and these accumulate one per intermediate pin. Deleting is safe: Renovate recreates the branch from scratch when it next has an update to offer, and the "don't recreate this exact PR" memory lives in the closed PR, not the branch. If closes were already done without the flag, clean up with:
+
+```bash
+gh api -X DELETE "repos/takaneko/dotfiles/git/refs/heads/renovate/<branch>"
 ```
 
 The `wait` label is honored by step 1's PR enumeration filter, so subsequent invocations will not re-propose the same intermediate until the label is removed (or Renovate force-pushes the PR, which usually drops the label).
@@ -340,10 +346,24 @@ age=$(jq -n --arg d "$d" '($d|fromdate) as $t | ((now-$t)/86400)|floor')   # >=1
 #### 8.2 List our installed packages
 
 ```bash
-grep -E '^\s*- name:' aqua.yaml | sed -E 's/.*name: *([^@]+)@.*/\1/'
+grep -E '^\s*- name:' aqua.yaml | sed -E 's/.*name: *([^@]+)@.*/\1/' > ourpkgs.txt
+wc -l < ourpkgs.txt   # record the total; the comment reports "N of our <total> packages"
 ```
 
-These are the registry paths under `pkgs/<pkg>/pkg.yaml` — the **full package name is the directory path**. Use `<pkg>` verbatim from the list above as `<p>` below; do **not** truncate it. A path-style name like `kubernetes/kubernetes/kubectl` lives at `pkgs/kubernetes/kubernetes/kubectl/pkg.yaml` (verified: `pkgs/kubernetes/kubernetes/pkg.yaml` does **not** exist — that directory holds per-binary subdirs). Truncating to `<owner>/<repo>` here would point at a non-existent path and silently score the package "unchanged" — a false-negative on exactly the check step 8 exists to perform. (The first-two-segments rule in step 2.2 / failure-modes identifies the *upstream repo* for an aqua/lazy age check — a different purpose; don't conflate it with the registry pkg.yaml path.)
+(The 8.3 loop reads `ourpkgs.txt`, so write it to a file rather than piping — the comparison needs the list twice.)
+
+These are the registry directory paths — the **full package name is the directory path**. Use `<pkg>` verbatim from the list above as `<p>` below; do **not** truncate it. A path-style name like `kubernetes/kubernetes/kubectl` lives at `pkgs/kubernetes/kubernetes/kubectl/` (verified: `pkgs/kubernetes/kubernetes/pkg.yaml` does **not** exist — that directory holds per-binary subdirs). Truncating to `<owner>/<repo>` here would point at a non-existent path and silently score the package "unchanged" — a false-negative on exactly the check step 8 exists to perform. (The first-two-segments rule in step 2.2 / failure-modes identifies the *upstream repo* for an aqua/lazy age check — a different purpose; don't conflate it with the registry package path.)
+
+**Each package directory holds TWO files, and you must compare BOTH:**
+
+| File | Contents | Why it matters |
+|---|---|---|
+| `pkgs/<p>/pkg.yaml` | *Only* the version alias — a `packages:` list whose one entry is `- name: <pkg>@<tag>`, the registry's "latest" pointer. Typically 150–400 bytes. | **Low value.** Our `aqua.yaml` pins exact versions, so a change here does not affect our installs at all. |
+| `pkgs/<p>/registry.yaml` | The actual **download metadata**: `type`, `repo_owner`/`repo_name`, `url`, `asset`, `checksum`, `cosign`/`slsa_provenance`, `supported_envs`, `overrides`, `version_overrides`, `replacements`, `rosetta2`. | **This is the whole point of step 8.** A URL/host/asset redirect or a weakened verification block can only appear here. |
+
+Comparing `pkg.yaml` alone is a **false negative by construction**: it would report "version-alias bumps only" while never opening the file a redirect actually lives in. (Confirmed 2026-08-14 on the v4.544.0 → v4.547.0 bump: 8 of our 29 packages had a changed `pkg.yaml`, and every single `registry.yaml` was byte-identical — the reassuring half of that finding is the one `pkg.yaml` cannot give you.)
+
+Note the name collision: `pkgs/<p>/registry.yaml` (per-package definition, reviewed in 8.3/8.4) is **not** the released top-level `registry.yaml` artifact that aqua downloads and checksum-pins (step 8.5).
 
 #### 8.3 Fetch both refs' trees and diff blob SHAs for our packages
 
@@ -352,31 +372,50 @@ for ref in <OLD_REF> <NEW_REF>; do
   csha=$(gh api "repos/aquaproj/aqua-registry/commits/$ref" --jq '.sha')
   gh api "repos/aquaproj/aqua-registry/git/trees/$csha?recursive=1" > "raw_$ref.json"   # one call per ref
   echo "$ref truncated=$(jq -r '.truncated' "raw_$ref.json")"
-  jq -r '.tree[] | select(.path|test("^pkgs/.*/pkg.yaml$")) | "\(.sha) \(.path)"' "raw_$ref.json" > "tree_$ref.txt"
+  # BOTH files — pkg.yaml (version alias) and registry.yaml (download metadata)
+  jq -r '.tree[] | select(.path|test("^pkgs/.*/(pkg|registry)\\.yaml$")) | "\(.sha) \(.path)"' "raw_$ref.json" > "tree_$ref.txt"
 done
 ```
 
 **Check `truncated` is `false`** for both. If either is `true`, the tree itself was capped (very rare for this registry) — fall back to REVIEW MANUALLY and say the tree scan was incomplete.
 
-Then, for each package `<p>` from step 8.2, compare the blob SHA of `pkgs/<p>/pkg.yaml` between the two `tree_*.txt` files. A differing SHA means that package's definition changed in the bump.
+Then, for each package `<p>` from step 8.2, compare the blob SHA of **both** `pkgs/<p>/pkg.yaml` **and** `pkgs/<p>/registry.yaml` between the two `tree_*.txt` files. Track the two results separately — they carry very different weight (see the 8.2 table).
+
+```bash
+while read -r p; do
+  [ -z "$p" ] && continue
+  for f in pkg registry; do
+    o=$(awk -v path="pkgs/$p/$f.yaml" '$2==path{print $1}' "tree_<OLD_REF>.txt")
+    n=$(awk -v path="pkgs/$p/$f.yaml" '$2==path{print $1}' "tree_<NEW_REF>.txt")
+    if [ -z "$o" ] || [ -z "$n" ]; then echo "PATH-MISS  $p/$f.yaml"; continue; fi
+    [ "$o" != "$n" ] && echo "CHANGED    $p/$f.yaml"
+  done
+done < ourpkgs.txt
+```
+
+Two guards on this loop:
+- **`PATH-MISS` is never "unchanged".** It means the path did not resolve in one or both trees — a truncated package name, a package newly added/removed upstream, or a layout change. Investigate it; do not let it fall through as a pass. (A package legitimately added in the newer tag will miss on the old side only.)
+- **Zero `CHANGED` lines for `registry.yaml` across every package is the strong result** — it proves every package we install still fetches from the same host, with the same asset name and the same verification. Say so explicitly in the comment; that sentence is the actual finding of step 8.
 
 #### 8.4 Inspect the changed definitions
 
-For each package whose `pkg.yaml` blob SHA differs, fetch both versions and diff them:
+For each `<p>/<f>.yaml` reported `CHANGED` in 8.3 — **including every changed `registry.yaml`, which is the one that matters** — fetch both versions and diff them. `<f>` is `pkg` or `registry`:
 
 ```bash
-gh api "repos/aquaproj/aqua-registry/contents/pkgs/<p>/pkg.yaml?ref=<OLD_REF>" -H "Accept: application/vnd.github.raw" > old.yaml
-gh api "repos/aquaproj/aqua-registry/contents/pkgs/<p>/pkg.yaml?ref=<NEW_REF>" -H "Accept: application/vnd.github.raw" > new.yaml
+gh api "repos/aquaproj/aqua-registry/contents/pkgs/<p>/<f>.yaml?ref=<OLD_REF>" -H "Accept: application/vnd.github.raw" > old.yaml
+gh api "repos/aquaproj/aqua-registry/contents/pkgs/<p>/<f>.yaml?ref=<NEW_REF>" -H "Accept: application/vnd.github.raw" > new.yaml
 diff old.yaml new.yaml
 ```
 
 Classify the change:
-- **Benign (no flag):** only the `latest`/version-alias line moved (the top `- name: <pkg>@<newer-tag>` entry the registry uses as its "latest" pointer). Since our `aqua.yaml` pins exact versions, this doesn't even affect our installs. Also benign: *adding* provenance/verification (a new `cosign`/`slsa_provenance`/`minisign`/`checksum` block, or new `supported_envs`) — that is routine upstream hardening, not a redirect.
-- **HIGH (DO NOT MERGE):** anything that redirects **where or how the binary is fetched or verified** for our env (darwin/arm64) + pinned version. Check the top-level `url`/`asset`/`host`/`type` (e.g. `github_release` → `http`) **and** the per-env / per-version indirection blocks where a *targeted* redirect would most plausibly hide: `overrides:` (by GOOS/GOARCH), `version_overrides:` / `version_constraint:`, `replacements:`, and `rosetta2:` (which flips arm64 to the amd64 asset). Also HIGH: **removal or weakening** of an existing `checksum`/`cosign`/`slsa`/signature block (verification being turned off), or a `checksum.algorithm` downgrade. Report the exact package + line. (A verification block being *added* is benign, per above — flag the direction, not the mere presence of a diff.)
+- **Benign (no flag):** a changed `pkg.yaml` whose only edit is the version-alias line (`- name: <pkg>@<newer-tag>`, the registry's "latest" pointer). Since our `aqua.yaml` pins exact versions, this doesn't even affect our installs — in practice it is what nearly every changed `pkg.yaml` turns out to be. Also benign in `registry.yaml`: *adding* provenance/verification (a new `cosign`/`slsa_provenance`/`minisign`/`checksum` block, or new `supported_envs`) — that is routine upstream hardening, not a redirect.
+- **HIGH (DO NOT MERGE):** anything in `registry.yaml` that redirects **where or how the binary is fetched or verified** for our env (darwin/arm64) + pinned version. Check the top-level `url`/`asset`/`host`/`type` (e.g. `github_release` → `http`) **and** the per-env / per-version indirection blocks where a *targeted* redirect would most plausibly hide: `overrides:` (by GOOS/GOARCH), `version_overrides:` / `version_constraint:`, `replacements:`, and `rosetta2:` (which flips arm64 to the amd64 asset). Also HIGH: **removal or weakening** of an existing `checksum`/`cosign`/`slsa`/signature block (verification being turned off), or a `checksum.algorithm` downgrade. Report the exact package + line. (A verification block being *added* is benign, per above — flag the direction, not the mere presence of a diff.)
 
-#### 8.5 Confirm the registry.yaml checksum was regenerated
+A changed `pkg.yaml` that edits anything *beyond* the alias line is also worth reading — but note a `pkg.yaml` is normally a 2-line file, so "anything beyond the alias" is itself unusual.
 
-The registry.yaml itself is checksum-pinned. A correct PR updates its entry in `aqua-checksums.json`:
+#### 8.5 Confirm the released registry artifact's checksum was regenerated
+
+⚠️ Different file from 8.3/8.4: this is the **released top-level `registry.yaml` artifact** that aqua downloads for the tag (all package definitions merged into one file), not the per-package `pkgs/<p>/registry.yaml`. That artifact is checksum-pinned, and a correct PR updates its entry in `aqua-checksums.json`:
 
 ```bash
 gh pr diff <N> --name-only | grep -qx aqua-checksums.json && echo present || echo missing
@@ -388,11 +427,29 @@ gh pr diff <N> --name-only | grep -qx aqua-checksums.json && echo present || ech
 
 #### 8.6 Verdict, comment, summary
 
-- No changed definition, or only version-alias bumps, tree not truncated, checksum present → **MERGE OK**.
-- Checksum `missing` but otherwise clean → **MERGE OK** *after* `aqua upc -a --prune` on the branch.
-- Any HIGH metadata/verification change, or tree truncated → **REVIEW MANUALLY / DO NOT MERGE**.
+Judge on the **8.4 classification**, not on whether a file changed at all. A changed `registry.yaml` is not by itself a failure — upstream routinely adds verification blocks.
 
-Post a comment using the step-5 template with `Type | registry`, `Package | aquaproj/aqua-registry`, and — in place of `Commits ahead` / `Files changed` — a **Diff review** row like `N of our packages changed (pkg, pkg, …); each a version-alias bump only, no URL/host/asset/checksum change` (or the flagged specifics). Then add the registry line to the step-6 chat summary.
+- No HIGH-classified change, every `PATH-MISS` explained, tree not truncated, checksum present → **MERGE OK**. This covers all three clean shapes: no `registry.yaml` changed at all; only `pkg.yaml` version-alias bumps; and `registry.yaml` changed but every change classified **benign** by 8.4 (e.g. a `cosign`/`slsa_provenance`/`supported_envs` block added).
+- Checksum `missing` but otherwise clean → **MERGE OK** *after* `aqua upc -a --prune` on the branch.
+- Any HIGH metadata/verification change in a `registry.yaml`, any **unresolved** `PATH-MISS`, or tree truncated → **REVIEW MANUALLY / DO NOT MERGE**.
+
+Post a comment using the step-5 template with `Type | registry`, `Package | aquaproj/aqua-registry`, and — in place of `Commits ahead` / `Files changed` — a **Diff review** row that reports the two files **separately**, because a reader who sees only a package count cannot tell which half changed. Pick the row that matches what you actually found; **never emit the all-clean wording on a run where a `registry.yaml` changed**:
+
+```
+# all-clean case
+N of our M packages changed (pkg, pkg, …) — all `pkg.yaml` version-alias only;
+**no** `registry.yaml` (download URL/host/asset/type/checksum metadata) changed for any package
+
+# registry.yaml changed but benign
+N of our M packages changed (pkg, …); K `registry.yaml` changed (pkg, …) — each an added
+`<cosign|slsa_provenance|checksum|supported_envs>` block, no URL/host/asset/type change and no
+verification removed or weakened
+
+# flagged
+N of our M packages changed; **`registry.yaml` HIGH change in <pkg>**: <exact field + old → new>
+```
+
+State the trees' `truncated: false` and the blob counts in the findings body so the scan is auditable, and say explicitly that **both** files were compared. Then add the registry line to the step-6 chat summary.
 
 ## Recommendation table
 
@@ -409,8 +466,8 @@ Post a comment using the step-5 template with `Type | registry`, `Package | aqua
 | aqua | PASS | n/a | MEDIUM/HIGH or too large | Comment posted → REVIEW MANUALLY / DO NOT MERGE |
 | aqua | PASS | n/a | unavailable (non-GitHub) | Comment posted → REVIEW MANUALLY against vendor release notes; checksum pin is the control |
 | aqua | FAIL | n/a (tag-pinned) | (not performed) | No comment. Chat reports WAIT. |
-| registry | PASS (>=10d) | n/a (tag-pinned) | our pkgs: none changed or version-alias only, tree not truncated (step 8) | Comment posted → MERGE OK (checksum present; else after `aqua upc -a --prune`) |
-| registry | PASS | n/a | HIGH: url/host/asset/type redirect (incl. `overrides`/`version_overrides`/`replacements`/`rosetta2`), verification removed/weakened, or tree truncated | Comment posted → REVIEW MANUALLY / DO NOT MERGE |
+| registry | PASS (>=10d) | n/a (tag-pinned) | our pkgs: **no HIGH-classified change** — i.e. no `registry.yaml` changed, or only `pkg.yaml` version-alias bumps, or `registry.yaml` changed but benign per 8.4 (verification/provenance *added*); every `PATH-MISS` explained; tree not truncated (step 8) | Comment posted → MERGE OK (checksum present; else after `aqua upc -a --prune`) |
+| registry | PASS | n/a | HIGH in a `registry.yaml`: url/host/asset/type redirect (incl. `overrides`/`version_overrides`/`replacements`/`rosetta2`), verification removed/weakened; or unresolved `PATH-MISS`; or tree truncated | Comment posted → REVIEW MANUALLY / DO NOT MERGE |
 | registry | FAIL (<10d) | n/a (tag-pinned) | (not performed) | No comment. Chat reports WAIT. |
 
 ## Force re-review
@@ -419,6 +476,14 @@ To re-review a PR that was already reviewed or suppressed:
 - Delete the comment containing `<!-- review-renovate-pr -->` (added by step 5 on age PASS reviews), or
 - Remove the `reviewed*` label (if one was added manually), or
 - Remove the `wait` label (added via the step 7.3 hint to suppress repeat intermediate-fallback proposals): `gh pr edit <N> --remove-label wait`
+
+## Shell gotchas (hit in practice)
+
+- **`gh` inside a `while read` loop steals stdin** and dies with `[ERROR] interactive IO not available`, silently producing empty output files. Any loop that both reads a heredoc/file list *and* calls `gh` must redirect the `gh` call's stdin: `gh api ... </dev/null`. This bites hardest in step 4 (per-PR compare fetches) and step 8.4.
+- **Check the output file, not just the exit status.** With the bug above, `gh api ... > out.json` leaves a 0-byte `out.json` while the loop keeps going. Guard with `[ ! -s out.json ] && echo ERROR` before parsing.
+- **`gh pr diff` takes no path argument** — see step 2. Pipe the full diff through `grep` instead.
+- **`gh` occasionally returns `authorization timeout` / `authorization prompt dismissed`** on a burst of calls. It is transient: retry the single call rather than re-running the whole step.
+- macOS ships bash 3.2 — no `declare -A`. Use plain files (`tree_<ref>.txt`, `ourpkgs.txt`) and `awk` lookups, as the step 8.3 loop does.
 
 ## Failure modes
 
@@ -429,7 +494,10 @@ To re-review a PR that was already reviewed or suppressed:
 - (aqua) Mega-repo / truncated compare: record `diff too large for automated scan` → REVIEW MANUALLY.
 - (aqua) `aqua-checksums.json` missing from the PR is **not** a red flag — it just means the bump predates the `aqua upc` postUpgrade hook; flag that `aqua upc -a --prune` must run before merge.
 - (registry) Do **not** review a `registries[].ref` bump via `gh api compare` — it spans thousands of files and truncates at 300, hiding changes. Use the trees-API blob-SHA diff in step 8.
-- (registry) If a package's `pkg.yaml` fetch returns empty/0 bytes, the fetch failed (often a stray `cd` inside the loop changing cwd, or a wrong path) — re-fetch with a stable working directory before concluding "no change"; a real "unchanged" is proven by equal blob SHAs in step 8.3, not by an empty diff.
+- (registry) **Never conclude the review from `pkg.yaml` alone.** That file is only the version alias; the download metadata a redirect would alter lives in `pkgs/<p>/registry.yaml`. Comparing just `pkg.yaml` produces a confident-sounding "version-alias bumps only" verdict without ever opening the file step 8 exists to check — a false negative by construction. (This was the skill's own bug until 2026-08-14.) The 8.3 tree filter must be `(pkg|registry)\.yaml$`.
+- (registry) Don't confuse the two `registry.yaml`s: `pkgs/<p>/registry.yaml` is the per-package definition (8.3/8.4); the released top-level `registry.yaml` artifact is what `aqua-checksums.json` pins (8.5).
+- (registry) A `PATH-MISS` in the 8.3 loop is **not** "unchanged" — it means the path didn't resolve in one or both trees (truncated package name, package added/removed upstream, layout change). Resolve it before issuing a verdict.
+- (registry) If a package's `pkg.yaml` / `registry.yaml` fetch returns empty/0 bytes, the fetch failed (often a stray `cd` inside the loop changing cwd, or a wrong path) — re-fetch with a stable working directory before concluding "no change"; a real "unchanged" is proven by equal blob SHAs in step 8.3, not by an empty diff.
 - (registry) If either recursive tree reports `truncated: true`: the blob scan is incomplete → REVIEW MANUALLY, say so.
 - If `gh api compare` 404s (commit/tag unavailable or force-pushed): report as "upstream diff unavailable" and recommend manual review.
 - Rate limit (403 with `x-ratelimit-remaining: 0`): stop processing, report remaining PRs as skipped.
