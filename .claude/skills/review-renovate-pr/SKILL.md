@@ -320,7 +320,8 @@ To skip this proposal on future skill runs (without applying):
 **Always pass `--delete-branch` when closing.** The repo auto-deletes branches on *merge*, but not on *close* — so a closed Renovate PR leaves its `renovate/<plugin>-digest` branch behind on the remote, and these accumulate one per intermediate pin. Deleting is safe: Renovate recreates the branch from scratch when it next has an update to offer, and the "don't recreate this exact PR" memory lives in the closed PR, not the branch. If closes were already done without the flag, clean up with:
 
 ```bash
-gh api -X DELETE "repos/takaneko/dotfiles/git/refs/heads/renovate/<branch>"
+# <branch> is the full headRefName, e.g. renovate/ale-digest — do NOT re-add the renovate/ prefix
+gh api -X DELETE "repos/takaneko/dotfiles/git/refs/heads/<branch>"
 ```
 
 The `wait` label is honored by step 1's PR enumeration filter, so subsequent invocations will not re-propose the same intermediate until the label is removed (or Renovate force-pushes the PR, which usually drops the label).
@@ -331,7 +332,7 @@ The `wait` label is honored by step 1's PR enumeration filter, so subsequent inv
 
 A `registries[].ref` bump upgrades `aquaproj/aqua-registry` — the metadata registry that tells aqua **how** to fetch every package (download URL template, host, asset-name template, checksum algorithm, supported envs). An *already-pinned* binary can't be silently swapped by the bump alone (its recorded SHA256 still has to match), but the registry change governs where/how newly-resolved and future versions are fetched — and, per step 8.5, the PR's own `aqua upc` re-pins against the new metadata, so the checksum file is not an independent guard here. That makes the metadata itself worth a targeted look. The catch: the registry holds **thousands** of package definitions, and `gh api compare` truncates at 250 commits / 300 files — so a naive compare would hide changes. Instead, compare the two tags' **git trees** (blob SHAs) and narrow to just the packages we actually install.
 
-**Why the trees API, not compare:** the recursive trees endpoint returns every blob's SHA in one call and reports whether it was truncated. Comparing blob SHAs for our ~30 package paths is exact and has no 300-file blind spot. (This is also why bulk per-package `gh api contents` loops are the wrong tool — 30 packages × 2 refs of sequential calls hits GitHub latency and can blow a 2-minute command budget; one tree call per ref is O(1) round-trips. Note macOS ships bash 3.2, so avoid `declare -A` associative arrays in any helper loop — use plain space-separated lists.)
+**Why the trees API, not compare:** the recursive trees endpoint returns every blob's SHA in one call and reports whether it was truncated. Comparing blob SHAs for our ~60 package paths (2 files × ~30 packages) is exact and has no 300-file blind spot. (This is also why bulk per-package `gh api contents` loops are the wrong tool — 30 packages × 2 files × 2 refs of sequential calls hits GitHub latency and can blow a 2-minute command budget; one tree call per ref is O(1) round-trips. Note macOS ships bash 3.2, so avoid `declare -A` associative arrays in any helper loop — use the plain-file + `awk` lookup that step 8.3 uses.)
 
 #### 8.1 Age gate (owned by step 3 — do not recompute)
 
@@ -346,11 +347,11 @@ age=$(jq -n --arg d "$d" '($d|fromdate) as $t | ((now-$t)/86400)|floor')   # >=1
 #### 8.2 List our installed packages
 
 ```bash
-grep -E '^\s*- name:' aqua.yaml | sed -E 's/.*name: *([^@]+)@.*/\1/' > ourpkgs.txt
-wc -l < ourpkgs.txt   # record the total; the comment reports "N of our <total> packages"
+grep -E '^\s*- name:' aqua.yaml | sed -E 's/.*name: *([^@]+)@.*/\1/' > /tmp/rr-<N>-ourpkgs.txt
+wc -l < /tmp/rr-<N>-ourpkgs.txt   # record the total; the comment reports "N of our <total> packages"
 ```
 
-(The 8.3 loop reads `ourpkgs.txt`, so write it to a file rather than piping — the comparison needs the list twice.)
+Write it to a file (the 8.3 loop consumes it as the loop's stdin) and keep every step-8 scratch file under `/tmp/rr-<N>-*`, matching step 4. The skill runs with cwd = `~/dotfiles` (see the top of this file), so a bare `ourpkgs.txt` / `raw_*.json` / `tree_*.txt` / `old.yaml` / `new.yaml` would land untracked in a repo whose whole point is committed dotfiles — and `old.yaml`/`new.yaml` are generic enough to be swept up by a stray `git add .`.
 
 These are the registry directory paths — the **full package name is the directory path**. Use `<pkg>` verbatim from the list above as `<p>` below; do **not** truncate it. A path-style name like `kubernetes/kubernetes/kubectl` lives at `pkgs/kubernetes/kubernetes/kubectl/` (verified: `pkgs/kubernetes/kubernetes/pkg.yaml` does **not** exist — that directory holds per-binary subdirs). Truncating to `<owner>/<repo>` here would point at a non-existent path and silently score the package "unchanged" — a false-negative on exactly the check step 8 exists to perform. (The first-two-segments rule in step 2.2 / failure-modes identifies the *upstream repo* for an aqua/lazy age check — a different purpose; don't conflate it with the registry package path.)
 
@@ -358,7 +359,7 @@ These are the registry directory paths — the **full package name is the direct
 
 | File | Contents | Why it matters |
 |---|---|---|
-| `pkgs/<p>/pkg.yaml` | *Only* the version alias — a `packages:` list whose one entry is `- name: <pkg>@<tag>`, the registry's "latest" pointer. Typically 150–400 bytes. | **Low value.** Our `aqua.yaml` pins exact versions, so a change here does not affect our installs at all. |
+| `pkgs/<p>/pkg.yaml` | *Only* version aliases — a `packages:` list whose **first** entry is `- name: <pkg>@<tag>` (the registry's "latest" pointer), optionally followed by older pinned entries (`- name: <pkg>` + `version: <tag>`). Size and length vary a lot: `ByteNess/aws-vault` is 2 aliases / 145 B, `cli/cli` is 8 aliases / 16 lines / 306 B. | **Low value.** Our `aqua.yaml` pins exact versions, so a change here does not affect our installs at all. |
 | `pkgs/<p>/registry.yaml` | The actual **download metadata**: `type`, `repo_owner`/`repo_name`, `url`, `asset`, `checksum`, `cosign`/`slsa_provenance`, `supported_envs`, `overrides`, `version_overrides`, `replacements`, `rosetta2`. | **This is the whole point of step 8.** A URL/host/asset redirect or a weakened verification block can only appear here. |
 
 Comparing `pkg.yaml` alone is a **false negative by construction**: it would report "version-alias bumps only" while never opening the file a redirect actually lives in. (Confirmed 2026-08-14 on the v4.544.0 → v4.547.0 bump: 8 of our 29 packages had a changed `pkg.yaml`, and every single `registry.yaml` was byte-identical — the reassuring half of that finding is the one `pkg.yaml` cannot give you.)
@@ -370,10 +371,12 @@ Note the name collision: `pkgs/<p>/registry.yaml` (per-package definition, revie
 ```bash
 for ref in <OLD_REF> <NEW_REF>; do
   csha=$(gh api "repos/aquaproj/aqua-registry/commits/$ref" --jq '.sha')
-  gh api "repos/aquaproj/aqua-registry/git/trees/$csha?recursive=1" > "raw_$ref.json"   # one call per ref
-  echo "$ref truncated=$(jq -r '.truncated' "raw_$ref.json")"
+  gh api "repos/aquaproj/aqua-registry/git/trees/$csha?recursive=1" > "/tmp/rr-<N>-raw-$ref.json"   # one call per ref
+  echo "$ref truncated=$(jq -r '.truncated' "/tmp/rr-<N>-raw-$ref.json")"
   # BOTH files — pkg.yaml (version alias) and registry.yaml (download metadata)
-  jq -r '.tree[] | select(.path|test("^pkgs/.*/(pkg|registry)\\.yaml$")) | "\(.sha) \(.path)"' "raw_$ref.json" > "tree_$ref.txt"
+  jq -r '.tree[] | select(.path|test("^pkgs/.*/(pkg|registry)\\.yaml$")) | "\(.sha) \(.path)"' \
+    "/tmp/rr-<N>-raw-$ref.json" > "/tmp/rr-<N>-tree-$ref.txt"
+  wc -l < "/tmp/rr-<N>-tree-$ref.txt"   # blob count, quoted in the comment for auditability
 done
 ```
 
@@ -382,16 +385,24 @@ done
 Then, for each package `<p>` from step 8.2, compare the blob SHA of **both** `pkgs/<p>/pkg.yaml` **and** `pkgs/<p>/registry.yaml` between the two `tree_*.txt` files. Track the two results separately — they carry very different weight (see the 8.2 table).
 
 ```bash
+changed=0; miss=0
 while read -r p; do
   [ -z "$p" ] && continue
   for f in pkg registry; do
-    o=$(awk -v path="pkgs/$p/$f.yaml" '$2==path{print $1}' "tree_<OLD_REF>.txt")
-    n=$(awk -v path="pkgs/$p/$f.yaml" '$2==path{print $1}' "tree_<NEW_REF>.txt")
-    if [ -z "$o" ] || [ -z "$n" ]; then echo "PATH-MISS  $p/$f.yaml"; continue; fi
-    [ "$o" != "$n" ] && echo "CHANGED    $p/$f.yaml"
+    o=$(awk -v path="pkgs/$p/$f.yaml" '$2==path{print $1}' "/tmp/rr-<N>-tree-<OLD_REF>.txt")
+    n=$(awk -v path="pkgs/$p/$f.yaml" '$2==path{print $1}' "/tmp/rr-<N>-tree-<NEW_REF>.txt")
+    if [ -z "$o" ] || [ -z "$n" ]; then
+      echo "PATH-MISS  $p/$f.yaml"; miss=$((miss+1)); continue
+    fi
+    if [ "$o" != "$n" ]; then
+      echo "CHANGED    $p/$f.yaml"; changed=$((changed+1))
+    fi
   done
-done < ourpkgs.txt
+done < /tmp/rr-<N>-ourpkgs.txt
+echo "SCAN DONE  changed=$changed path-miss=$miss"
 ```
+
+**The trailing `SCAN DONE` line is load-bearing.** Use `if … fi`, not `[ … ] && echo`: as the last command in the loop body the latter makes the whole loop exit **1** on the all-identical run — i.e. exactly on the clean, expected, MERGE-OK outcome — and an empty-output/non-zero-exit run is precisely what the Shell-gotchas section below teaches you to read as *broken*. Confirm the clean result positively from `SCAN DONE changed=0 path-miss=0`; never infer it from silence.
 
 Two guards on this loop:
 - **`PATH-MISS` is never "unchanged".** It means the path did not resolve in one or both trees — a truncated package name, a package newly added/removed upstream, or a layout change. Investigate it; do not let it fall through as a pass. (A package legitimately added in the newer tag will miss on the old side only.)
@@ -402,16 +413,16 @@ Two guards on this loop:
 For each `<p>/<f>.yaml` reported `CHANGED` in 8.3 — **including every changed `registry.yaml`, which is the one that matters** — fetch both versions and diff them. `<f>` is `pkg` or `registry`:
 
 ```bash
-gh api "repos/aquaproj/aqua-registry/contents/pkgs/<p>/<f>.yaml?ref=<OLD_REF>" -H "Accept: application/vnd.github.raw" > old.yaml
-gh api "repos/aquaproj/aqua-registry/contents/pkgs/<p>/<f>.yaml?ref=<NEW_REF>" -H "Accept: application/vnd.github.raw" > new.yaml
-diff old.yaml new.yaml
+gh api "repos/aquaproj/aqua-registry/contents/pkgs/<p>/<f>.yaml?ref=<OLD_REF>" -H "Accept: application/vnd.github.raw" > /tmp/rr-<N>-old.yaml
+gh api "repos/aquaproj/aqua-registry/contents/pkgs/<p>/<f>.yaml?ref=<NEW_REF>" -H "Accept: application/vnd.github.raw" > /tmp/rr-<N>-new.yaml
+diff /tmp/rr-<N>-old.yaml /tmp/rr-<N>-new.yaml
 ```
 
 Classify the change:
 - **Benign (no flag):** a changed `pkg.yaml` whose only edit is the version-alias line (`- name: <pkg>@<newer-tag>`, the registry's "latest" pointer). Since our `aqua.yaml` pins exact versions, this doesn't even affect our installs — in practice it is what nearly every changed `pkg.yaml` turns out to be. Also benign in `registry.yaml`: *adding* provenance/verification (a new `cosign`/`slsa_provenance`/`minisign`/`checksum` block, or new `supported_envs`) — that is routine upstream hardening, not a redirect.
 - **HIGH (DO NOT MERGE):** anything in `registry.yaml` that redirects **where or how the binary is fetched or verified** for our env (darwin/arm64) + pinned version. Check the top-level `url`/`asset`/`host`/`type` (e.g. `github_release` → `http`) **and** the per-env / per-version indirection blocks where a *targeted* redirect would most plausibly hide: `overrides:` (by GOOS/GOARCH), `version_overrides:` / `version_constraint:`, `replacements:`, and `rosetta2:` (which flips arm64 to the amd64 asset). Also HIGH: **removal or weakening** of an existing `checksum`/`cosign`/`slsa`/signature block (verification being turned off), or a `checksum.algorithm` downgrade. Report the exact package + line. (A verification block being *added* is benign, per above — flag the direction, not the mere presence of a diff.)
 
-A changed `pkg.yaml` that edits anything *beyond* the alias line is also worth reading — but note a `pkg.yaml` is normally a 2-line file, so "anything beyond the alias" is itself unusual.
+A changed `pkg.yaml` that edits anything *beyond* the latest-alias line is also worth a read. Note that a normal `pkg.yaml` legitimately carries several older pinned aliases (8 for `cli/cli`), so their mere presence is not a finding — a version bump touches only the first `- name: <pkg>@<tag>` line, so look at *which* lines moved, not how many entries the file has.
 
 #### 8.5 Confirm the released registry artifact's checksum was regenerated
 
@@ -479,11 +490,11 @@ To re-review a PR that was already reviewed or suppressed:
 
 ## Shell gotchas (hit in practice)
 
-- **`gh` inside a `while read` loop steals stdin** and dies with `[ERROR] interactive IO not available`, silently producing empty output files. Any loop that both reads a heredoc/file list *and* calls `gh` must redirect the `gh` call's stdin: `gh api ... </dev/null`. This bites hardest in step 4 (per-PR compare fetches) and step 8.4.
-- **Check the output file, not just the exit status.** With the bug above, `gh api ... > out.json` leaves a 0-byte `out.json` while the loop keeps going. Guard with `[ ! -s out.json ] && echo ERROR` before parsing.
+- **`gh` can fail with `[ERROR] interactive IO not available` and leave 0-byte output files.** This is an **auth/credential-path** failure, not a stdin problem: `gh api` does not read stdin unless given `--input -`. Verified — the same error reproduces outside any loop and is *not* cured by appending `</dev/null`, while a `while read` loop over a heredoc that calls `gh api` in a `$(…)` works fine without any redirect. So do **not** "fix" it with `</dev/null` and move on; that changes nothing and leaves you believing the empty output is benign. Check `gh auth status`, then retry — it is usually transient and clears on its own (same family as the `authorization timeout` entry below).
+- **Check the output file, not just the exit status.** When the above hits inside a loop, `gh api ... > out.json` leaves a 0-byte `out.json` while the loop keeps going and the last iteration's status masks it. Guard every fetch with `[ ! -s out.json ] && echo ERROR` before parsing — this matters most in step 4 (per-PR compare fetches) and step 8.3/8.4, where a silently empty file reads as "nothing changed".
 - **`gh pr diff` takes no path argument** — see step 2. Pipe the full diff through `grep` instead.
 - **`gh` occasionally returns `authorization timeout` / `authorization prompt dismissed`** on a burst of calls. It is transient: retry the single call rather than re-running the whole step.
-- macOS ships bash 3.2 — no `declare -A`. Use plain files (`tree_<ref>.txt`, `ourpkgs.txt`) and `awk` lookups, as the step 8.3 loop does.
+- macOS ships bash 3.2 — no `declare -A`. Use plain files (`/tmp/rr-<N>-tree-<ref>.txt`, `/tmp/rr-<N>-ourpkgs.txt`) and `awk` lookups, as the step 8.3 loop does. Keep scratch files under `/tmp/rr-<N>-*`, never in the repo working tree.
 
 ## Failure modes
 
