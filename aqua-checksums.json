@@ -16,8 +16,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/CircleCI-Public/circleci-cli/v0.1.38646/circleci-cli_0.1.38646_darwin_arm64.tar.gz",
-      "checksum": "357C851C97C562D146E413C5D07069B89B1C0D0CC74422C6C8A22BC77B4AB944",
+      "id": "github_release/github.com/CircleCI-Public/circleci-cli/v1.0.47571/circleci-cli_1.0.47571_darwin_arm64.tar.gz",
+      "checksum": "485DE99B9A55FB9027674E0560EC9F399AC294426C541BDD61DDD5A446DD3884",
       "algorithm": "sha256"
     },
     {
