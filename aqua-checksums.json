@@ -21,8 +21,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/LuaLS/lua-language-server/3.18.2/lua-language-server-3.18.2-darwin-arm64.tar.gz",
-      "checksum": "CEC99D70B1F612ACEC4A10A79A03664E3AA0C229D4D8A586CB3F928EC37D509E",
+      "id": "github_release/github.com/LuaLS/lua-language-server/3.19.0/lua-language-server-3.19.0-darwin-arm64.tar.gz",
+      "checksum": "C952ADB8521D316ECBFE3B6ADD88E7CC03A4B5D74143911CBB61B30BBEAFD7BB",
       "algorithm": "sha256"
     },
     {
