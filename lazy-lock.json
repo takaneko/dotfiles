@@ -1,6 +1,6 @@
 {
   "SQLUtilities": { "branch": "master", "commit": "566184530da81aa05ae4ac4ba6cf5034292a9b89" },
-  "ale": { "branch": "master", "commit": "9e2efaa4d348b1f93200b24e5540c670eb6fdd3f" },
+  "ale": { "branch": "master", "commit": "1c6e71732f3811197ec21cd6d3130791955ca80a" },
   "cmp-nvim-lsp": { "branch": "main", "commit": "cbc7b02bb99fae35cb42f514762b89b5126651ef" },
   "copilot.vim": { "branch": "release", "commit": "a12fd5672110c8aa7e3c8419e28c96943ca179be" },
   "emmet-vim": { "branch": "master", "commit": "92ef2f74f4093edc99db5e9e4cf7e40116a85bd6" },
