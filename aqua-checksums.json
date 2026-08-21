@@ -11,8 +11,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ByteNess/aws-vault/v7.13.2/aws-vault-darwin-arm64",
-      "checksum": "688DEB866EC3E993FF984F6DEA06730D9BF7CEF034AE84694C05E345640A4047",
+      "id": "github_release/github.com/ByteNess/aws-vault/v7.13.3/aws-vault-darwin-arm64",
+      "checksum": "F56DF16315DEE1C7F0FA7FD2FF1ECB90AAA0CDAC34921C00F6B805E444741E89",
       "algorithm": "sha256"
     },
     {
@@ -21,8 +21,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/LuaLS/lua-language-server/3.18.2/lua-language-server-3.18.2-darwin-arm64.tar.gz",
-      "checksum": "CEC99D70B1F612ACEC4A10A79A03664E3AA0C229D4D8A586CB3F928EC37D509E",
+      "id": "github_release/github.com/LuaLS/lua-language-server/3.19.0/lua-language-server-3.19.0-darwin-arm64.tar.gz",
+      "checksum": "C952ADB8521D316ECBFE3B6ADD88E7CC03A4B5D74143911CBB61B30BBEAFD7BB",
       "algorithm": "sha256"
     },
     {
@@ -31,13 +31,13 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/anchore/syft/v1.50.0/syft_1.50.0_darwin_arm64.tar.gz",
-      "checksum": "E32FDB9D47823FA633748A1EFCA2528FD77C37469EA93C9E40AB835DA44E4CCE",
+      "id": "github_release/github.com/anchore/syft/v1.51.0/syft_1.51.0_darwin_arm64.tar.gz",
+      "checksum": "4F37F4C7FEFCE0A68E4CF71BA3F5F9829A99E65D89B29F7EE41B8C2C10EA8C59",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/astral-sh/uv/0.12.1/uv-aarch64-apple-darwin.tar.gz",
-      "checksum": "77D2906988E8074FD43F2F329EC452EBBF9B0C257BA1C66451C71DE70A6BAF42",
+      "id": "github_release/github.com/astral-sh/uv/0.12.3/uv-aarch64-apple-darwin.tar.gz",
+      "checksum": "546F7F8A6C70FF13A3A9D2BC958DB3427298CEBF3E0CB756F9177133B7068843",
       "algorithm": "sha256"
     },
     {
@@ -66,8 +66,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/google/osv-scanner/v2.4.0/osv-scanner_darwin_arm64",
-      "checksum": "9CA3185AD63E9AB54F7CB90F46A7362BE02D80E37F0123D095A54355EA202F5D",
+      "id": "github_release/github.com/google/osv-scanner/v2.5.0/osv-scanner_darwin_arm64",
+      "checksum": "FFF5A2E351B7F0A60001E87CBF862E82FB82E2792D368B533FEC7A5865A73DA2",
       "algorithm": "sha256"
     },
     {
@@ -121,8 +121,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/tree-sitter/tree-sitter/v0.26.11/tree-sitter-macos-arm64.gz",
-      "checksum": "0BB646B2A29007233BD44855F00D0B8E238084D5B442F097D841B476318C2C90",
+      "id": "github_release/github.com/tree-sitter/tree-sitter/v0.26.12/tree-sitter-macos-arm64.gz",
+      "checksum": "A7DDEFF2507391EBDFD0B8FA0DFE91BABED291EA00D86426CB0E6CFADE891697",
       "algorithm": "sha256"
     },
     {
@@ -146,8 +146,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.547.0/registry.yaml",
-      "checksum": "9FFEA59A968377BAF4A7902B7D29A17DC835C74C37FCCC5C9FAB91D518B77FAD8168C6158E01B54A463B53FA57BDCA8C5A368C59BCB966B49DF3DA26B3D6B189",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.550.0/registry.yaml",
+      "checksum": "52361BF402DDF47A7EB62C3D02B20FF47B95E7651F087A1C47FB18CBAABF67AECDC14B3F6EA2C4CA7387F4ECE97843C7CD48FE624061E9BA26D14E68EEF44448",
       "algorithm": "sha512"
     }
   ]
