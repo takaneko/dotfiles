@@ -16,11 +16,6 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/CircleCI-Public/circleci-cli/v0.1.38646/circleci-cli_0.1.38646_darwin_arm64.tar.gz",
-      "checksum": "357C851C97C562D146E413C5D07069B89B1C0D0CC74422C6C8A22BC77B4AB944",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/LuaLS/lua-language-server/3.19.0/lua-language-server-3.19.0-darwin-arm64.tar.gz",
       "checksum": "C952ADB8521D316ECBFE3B6ADD88E7CC03A4B5D74143911CBB61B30BBEAFD7BB",
       "algorithm": "sha256"
