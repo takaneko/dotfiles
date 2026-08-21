@@ -66,6 +66,11 @@
       "algorithm": "sha256"
     },
     {
+      "id": "github_release/github.com/herdrdev/herdr/v0.8.0/herdr-macos-aarch64",
+      "checksum": "D53A9F93FCCFDFCC55632927BF51002F5ADD0AA7990BCDF508FFBD84AC658178",
+      "algorithm": "sha256"
+    },
+    {
       "id": "github_release/github.com/jqlang/jq/jq-1.8.2/jq-macos-arm64",
       "checksum": "2D75340BA57A4B4B4C8708A21C2DC8E958A48AAA8BBA13B27F77F6E4C0ECA07E",
       "algorithm": "sha256"
