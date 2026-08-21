@@ -31,8 +31,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/anchore/syft/v1.50.0/syft_1.50.0_darwin_arm64.tar.gz",
-      "checksum": "E32FDB9D47823FA633748A1EFCA2528FD77C37469EA93C9E40AB835DA44E4CCE",
+      "id": "github_release/github.com/anchore/syft/v1.51.0/syft_1.51.0_darwin_arm64.tar.gz",
+      "checksum": "4F37F4C7FEFCE0A68E4CF71BA3F5F9829A99E65D89B29F7EE41B8C2C10EA8C59",
       "algorithm": "sha256"
     },
     {
