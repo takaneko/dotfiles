@@ -76,8 +76,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/junegunn/fzf/v0.74.2/fzf-0.74.2-darwin_arm64.tar.gz",
-      "checksum": "D60DDB36356566AC69BAE7C3504E888916CF747C9AD2132141C09229B1E28DEE",
+      "id": "github_release/github.com/junegunn/fzf/v0.74.3/fzf-0.74.3-darwin_arm64.tar.gz",
+      "checksum": "1F8501CEA4F9C0C2D6110D0FF75D0EC9451CD9D7524D9A26244A154EA89F3BD5",
       "algorithm": "sha256"
     },
     {
