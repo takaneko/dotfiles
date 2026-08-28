@@ -51,7 +51,7 @@
 |---|------|--------|----|-------------|------|
 | 1 | [x] | シンボリックリンク越しの読み取りを実地検証する | 検証（変更なし） | scratchpad のサンドボックス | - |
 | 2 | [x] | `skills/` を `.agents/` へ移してリンクを張る | エージェント設定 | `.agents/skills/**`, `.claude/skills` | 1 |
-| 3 | [ ] | `plans/` を `.agents/` に作り、本計画を移してリンクを張る | エージェント設定 | `.agents/plans/`, `.claude/plans` | 1 |
+| 3 | [x] | `plans/` を `.agents/` に作り、本計画を移してリンクを張る | エージェント設定 | `.agents/plans/`, `.claude/plans` | 1 |
 | 4 | [ ] | `SKILL.md` の `$SKILL_DIR` 直書きパスを実体側に更新する | スキル本文 | `.agents/skills/review-brew-outdated/SKILL.md` | 2 |
 | 5 | [ ] | `CLAUDE.md` を `AGENTS.md` 実体 + リンクにする | ドキュメント | `AGENTS.md`, `CLAUDE.md` | 2, 3 |
 | 6 | [ ] | 分類ルールと検証結果を `AGENTS.md` に書き残す | ドキュメント | `AGENTS.md` | 5 |
@@ -234,6 +234,8 @@ claude -p "Without using any tools, list the names of the project-level skills a
 
 ### タスク 3: `plans/` を `.agents/` に作り、本計画を移してリンクを張る
 
+**完了日**: 2026-08-28
+
 **層**: エージェント設定
 
 **対象ファイル**:
@@ -264,6 +266,10 @@ git ls-files .claude/plans        # 追跡されていれば git mv、空なら�
 `git mv` は staged-add の段階（コミット前）でも動く。逆に**未ステージの untracked ファイルに `git mv` を打つと失敗する**ので、上の確認を飛ばさない。
 
 移動後、**このタスクの完了チェックを書き込む先は `.agents/plans/plan-agents-dir-symlink.md`** になる。`.claude/plans/plan-agents-dir-symlink.md` からも同じ実体に届くが、以降は `.agents` 側のパスを使う。
+
+**検証結果（2026-08-28 実測）**: 順序の罠は踏まずに済んだ。git が `rename … (100%)` + `create mode 120000 .claude/plans` として記録しており、**リンクを先に張っていれば rename ではなく delete + add になる**ので、移動が先だったことが git 側から裏取りできる。`.claude/plans/plans` は生成されておらず、`git ls-files .claude/plans/`（リンク越し）も空。blob は `3b851bb` で、タスク 1 で固定した期待値および先行実装 2 件と一致した。
+
+**計画置き場の解決も曖昧にならない。** 計画を読むスキル群は `.agents/plans/` → `.claude/plans/` の順で「`*.md` が入っている方」を選ぶが、両者は同じ実体を指すので競合と判定されない（同じ inode に解決される）。**`.gitkeep` は判定に影響しない**（`*.md` だけを見るため）。計画ファイルを同じ操作の中で移したので、「空の `.agents/plans` の隣に中身のある `.claude/plans`」という危険な状態は発生しなかった。
 
 **参考パターン**:
 - 先行実装B の `.agents/plans/` — `.gitkeep` + 計画ファイルが同居する構成
