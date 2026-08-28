@@ -54,7 +54,7 @@
 | 3 | [x] | `plans/` を `.agents/` に作り、本計画を移してリンクを張る | エージェント設定 | `.agents/plans/`, `.claude/plans` | 1 |
 | 4 | [x] | `SKILL.md` の `$SKILL_DIR` 直書きパスを実体側に更新する | スキル本文 | `.agents/skills/review-brew-outdated/SKILL.md` | 2 |
 | 5 | [x] | `CLAUDE.md` を `AGENTS.md` 実体 + リンクにする | ドキュメント | `AGENTS.md`, `CLAUDE.md` | 2, 3 |
-| 6 | [ ] | 分類ルールと検証結果を `AGENTS.md` に書き残す | ドキュメント | `AGENTS.md` | 5 |
+| 6 | [x] | 分類ルールと検証結果を `AGENTS.md` に書き残す | ドキュメント | `AGENTS.md` | 5 |
 
 ## タスク詳細
 
@@ -366,7 +366,7 @@ git add CLAUDE.md
 
 どちらも `.agents/skills/...` に直す。行番号は移動で変わらないが、編集前に `rg -n '\.claude/skills' AGENTS.md` で必ず引き直す。
 
-**見出しと冒頭の一文も直す。** `AGENTS.md` が正典になるのに `# CLAUDE.md` という見出しのままだと、その名前はもうリンクの側を指す。先行実装は正典ファイルの見出しをリポジトリ名にしている（先行実装A の `AGENTS.md:1` = `# 先行実装A`）ので揃える。冒頭の「This file provides guidance to Claude Code…」も、エージェント非依存の入口に特定エージェント宛の枠組みが残る形になるので中立な文に置き換える。**横展開先でも同じ2箇所を直す。**
+**見出しと冒頭の一文も直す。** `AGENTS.md` が正典になるのに `# CLAUDE.md` という見出しのままだと、その名前はもうリンクの側を指す。先行実装は正典ファイルの見出しをそのリポジトリ名にしているので揃える。冒頭の「This file provides guidance to Claude Code…」も、エージェント非依存の入口に特定エージェント宛の枠組みが残る形になるので中立な文に置き換える。**横展開先でも同じ2箇所を直す。**
 
 **DoD で「`.claude/skills` が 0 件」を条件にしないこと。** タスク 6 が追記する構成図には `.claude/skills -> ../.agents/skills` という行が正当に入るため、0 件はタスク 6 の完了後に必ず偽になる。散文中の参照だけを見る（下の DoD）。
 
@@ -396,6 +396,8 @@ git show HEAD:CLAUDE.md > /tmp/old.md && diff /tmp/old.md AGENTS.md   # 意図�
 
 ### タスク 6: 分類ルールと検証結果を `AGENTS.md` に書き残す
 
+**完了日**: 2026-08-28
+
 **層**: ドキュメント
 
 **対象ファイル**:
@@ -405,7 +407,7 @@ git show HEAD:CLAUDE.md > /tmp/old.md && diff /tmp/old.md AGENTS.md   # 意図�
 
 要件の「分類ルールと確認結果は、他リポジトリにそのまま適用できる形で計画に書き残すこと」に対応する。先行実装A の `AGENTS.md` の同節の構成を土台に、**本リポジトリの実測値**で書く。
 
-置き場所は「Repository purpose」節の直後（構成の話なので、個別ツールの節より前）。含める内容:
+置き場所は「Repository purpose」節の直後（構成の話なので、個別ツールの節より前）。**節見出しは `AGENTS.md` 本体の言語に合わせる**（本リポジトリは英語なので `## Agent config layout (...)`）。含める内容:
 
 1. **構成図** — 本リポジトリの実態を書く。`rules/` は**無い**ので図に入れない:
    ```
@@ -437,10 +439,15 @@ git show HEAD:CLAUDE.md > /tmp/old.md && diff /tmp/old.md AGENTS.md   # 意図�
 **DoD コマンド**:
 ```bash
 cd ~/dotfiles
-rg -n 'エージェント設定の構成' AGENTS.md          # 節が入っていること
+rg -n 'Agent config layout' AGENTS.md             # 節が入っていること（節見出しは AGENTS.md 本体に合わせて英語）
 rg -n 'gitignore_global' AGENTS.md                # gitignore の注意が入っていること
 grep -n '\.claude/' .gitignore_global             # 書き残した行番号が実態と合っていること
 readlink CLAUDE.md                                # AGENTS.md であること
-rg -n 'エージェント設定の構成' CLAUDE.md          # リンク越しに新しい節まで届くこと（head -3 では届かない）
+rg -n 'Agent config layout' CLAUDE.md             # リンク越しに新しい節まで届くこと（head -3 では届かない）
 git status --porcelain                            # 意図した差分だけであること
 ```
+
+---
+
+## 完了
+すべてのタスクが完了しました。（2026-08-28）

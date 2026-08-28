@@ -6,6 +6,99 @@ This file is the agent-neutral entry point for this repository; `CLAUDE.md` is a
 
 Personal macOS dotfiles. Primary content is a Neovim config (Lua + `lazy.nvim`); the rest are shell/tmux/git dotfiles and a `cheats/` directory for `navi`. There is no build system, test suite, or linter — changes are validated by running Neovim or reloading the shell.
 
+## Agent config layout (`.agents/` and `.claude/`)
+
+Agent-neutral assets live in **`.agents/` as the real files, with `.claude/` pointing at them through relative symlinks**. Other agents get the same copies, while everything that hardcodes a `.claude/` path keeps resolving.
+
+```
+.agents/skills/  ← real    .claude/skills -> ../.agents/skills
+.agents/plans/   ← real    .claude/plans  -> ../.agents/plans
+
+.claude/settings.local.json, .claude/.gitignore, .claude/skill-retros/  ← real, stay put
+AGENTS.md        ← real    CLAUDE.md      -> AGENTS.md
+```
+
+This repo has no `.claude/rules/`; the table below is the general classification, so it lists items this repo does not have.
+
+### Classification
+
+| Class | Handling | Items | Why |
+|---|---|---|---|
+| **Shareable** | real file in `.agents/`, symlink from `.claude/` | `rules/`, `plans/`, `skills/` | agent-neutral assets other agents should reach too |
+| **Claude Code specific** | stays in `.claude/` | `settings.json`, `settings.local.json`, `scheduled_tasks.lock`, `.gitignore` | only Claude Code reads them; `.claude/.gitignore` scopes an exclusion to that directory |
+| **Skill output** | leave alone | `project-health-report.md`, `skill-retros/`, `retro/`, `blog-ideas/` | artifacts a skill writes; don't move them unless the producing skill's output path moves |
+| **Unclear** | **stays in `.claude/`** | — | don't move what you haven't classified |
+
+### Does a symlink actually work?
+
+Measured 2026-08-28 (macOS 25.6.0, Claude Code 2.1.250).
+
+**Skill discovery works through a directory symlink — this is the one that matters.** Everything else here is about reaching file *contents*; discovery is whether the runtime enumerates `.claude/skills/` at all. A skill that is not discovered simply stops existing as a `/`-command, with no error. Verified directly rather than assumed:
+
+```bash
+cd ~/dotfiles
+claude -p "Without using any tools, list the names of the project-level skills available to you that start with 'review-'. If there are none, reply exactly: NONE"
+# → review-brew-outdated, review-renovate-pr
+```
+
+The only copies on disk are under `.agents/`, so the runtime followed the link. `claude -p` needs no interactive session, so the same check works in any repo — but **swap the `review-` prefix for whatever that repo's skills are actually called.** Left as-is it answers `NONE` in a repo whose skills are named otherwise, and that false negative reads exactly like a discovery failure. **Check contents AND discovery — passing the first proves nothing about the second.**
+
+**Recursive tools do not follow symlinks by default.**
+
+| Tool | link met while walking | link passed as an argument |
+|---|---|---|
+| `find` | does not follow (`-L` needed) | does not follow — **but a trailing `/` makes it follow** |
+| `rg` | does not follow (`--follow` needed) | **follows** |
+| shell glob (`ls .claude/skills/*/SKILL.md`) | follows | follows |
+| Claude Code Read tool | — | **follows** |
+| Claude Code Glob / Grep tools | **check per environment** | **check per environment** |
+
+The `find` trailing-slash asymmetry is the easy one to trip on, confirmed live in this repo: `find .claude/skills -name '*.md'` returns 0, `find .claude/skills/ -name '*.md'` returns 2. Nothing here depends on it today (checked `setup.sh`, `scripts/`, both `SKILL.md`, this file), but it is the only traversal that silently returns nothing. **So when a skill or script looks for files through a link, use a shell glob or pass the link as an argument — don't rely on pattern-based recursion.**
+
+The Glob / Grep row says "check per environment" because it depends on the build: this one has no such tools (`ToolSearch select:Glob,Grep` returns nothing), so file lookup goes through `rg` / `find` and their rows are what actually apply.
+
+**Executable bits survive.** `adapters/*.sh` are mode `100755`; through the link they still read `-rwxr-xr-x` and both `bash …` and `test -x` pass.
+
+**git records a directory symlink as a mode `120000` blob** whose content is the relative path itself. Same relative path ⇒ same blob, so expected values can be fixed up front:
+
+| Link | blob |
+|---|---|
+| `.claude/skills -> ../.agents/skills` | `2b7a412` |
+| `.claude/plans -> ../.agents/plans` | `3b851bb` |
+| `.claude/rules -> ../.agents/rules` | `2d5c9a9` (unused here; for rollout) |
+
+`git mv` preserves both history and the exec bits. Note that converting `CLAUDE.md` into a symlink is **not** recorded as a rename — the path is not deleted, just retyped — so `git status` shows `A AGENTS.md` + `T CLAUDE.md` and `-M` finds nothing. Verify that one by diffing against `HEAD:CLAUDE.md`.
+
+### gitignore: the sharp edge
+
+**`~/.gitignore_global` is a file in this repo** (`~/.gitignore_global` → `~/dotfiles/.gitignore_global`), so its `.claude/`-pinned lines are editable from here. Two of them name paths directly:
+
+- `.gitignore_global:52` — `.claude/settings.local.json`
+- `.gitignore_global:58` — `.claude/skill-retros`
+
+Plus, repo-local: `.gitignore:2` is `/.claude/skill-retros/` (**leading `/` anchors it**, so it stops matching entirely if the directory moves), and `.claude/.gitignore:1` is `settings.local.json`, which works by sitting in that directory.
+
+All of these cover items classified as staying in `.claude/`, so they are unaffected — **and that is exactly why none of them may move.** Moving one silently un-ignores a local settings file.
+
+**`.agents/` has no exclusions at all.** Everything under it is tracked, which is right for the assets moved so far. But if you later put local settings or skill output under `.agents/`, decide whether it needs an exclusion *before* adding it.
+
+Line numbers drift; re-derive them per machine:
+
+```bash
+grep -n '\.claude/' ~/dotfiles/.gitignore_global
+```
+
+### Rolling this out to another repo
+
+1. Classify first; move only what the table calls shareable, one item at a time — never the whole directory.
+2. `git mv` the real files into `.agents/`, then **`rmdir` the old directory before `ln -s`**. `git mv` only moves tracked files, so a stray untracked file leaves the directory in place and the link lands *inside* it (`.claude/skills/skills`). **`git add` the new link afterwards** — otherwise it stays untracked while git records the old path as deleted, which commits a half-migration.
+3. For a `plans/` that does not exist yet, create it with a `.gitkeep` so git tracks the empty directory. Move any existing plan file out *before* linking — the plan describing this work lived in the directory being converted.
+4. Repoint every path that names something you moved. Two separate cases, and it is easy to fix only the first: a skill that documents **its own** directory, and the entry doc's prose references to the moved assets (here, the two sentences naming where each skill is defined).
+5. Make `AGENTS.md` the real file and `CLAUDE.md` the symlink; fix the heading and the opening line, which otherwise still name Claude Code on what is now the neutral entry point.
+6. **Verify discovery with the `claude -p` one-liner above**, and confirm `git check-ignore -v .claude/settings.local.json` still resolves.
+
+Two other personal repos still need this applied.
+
 ## Install / apply changes
 
 `setup.sh` creates symlinks; it is idempotent (uses `ln -sf`).
