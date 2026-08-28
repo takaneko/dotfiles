@@ -50,7 +50,7 @@
 | # | 状態 | タスク | 層 | 対象ファイル | 依存 |
 |---|------|--------|----|-------------|------|
 | 1 | [x] | シンボリックリンク越しの読み取りを実地検証する | 検証（変更なし） | scratchpad のサンドボックス | - |
-| 2 | [ ] | `skills/` を `.agents/` へ移してリンクを張る | エージェント設定 | `.agents/skills/**`, `.claude/skills` | 1 |
+| 2 | [x] | `skills/` を `.agents/` へ移してリンクを張る | エージェント設定 | `.agents/skills/**`, `.claude/skills` | 1 |
 | 3 | [ ] | `plans/` を `.agents/` に作り、本計画を移してリンクを張る | エージェント設定 | `.agents/plans/`, `.claude/plans` | 1 |
 | 4 | [ ] | `SKILL.md` の `$SKILL_DIR` 直書きパスを実体側に更新する | スキル本文 | `.agents/skills/review-brew-outdated/SKILL.md` | 2 |
 | 5 | [ ] | `CLAUDE.md` を `AGENTS.md` 実体 + リンクにする | ドキュメント | `AGENTS.md`, `CLAUDE.md` | 2, 3 |
@@ -146,6 +146,8 @@ ln -s ../.agents/skills "$SB/.claude/skills"
 
 ### タスク 2: `skills/` を `.agents/` へ移してリンクを張る
 
+**完了日**: 2026-08-28
+
 **層**: エージェント設定
 
 **対象ファイル**:
@@ -213,6 +215,20 @@ git add -A .claude/skills
 ```
 
 再度セッションを開いて確認し、それでも出てこない場合は `git mv .agents/skills .claude/skills` で全面的に戻し、`skills/` を移す判断そのものを取り下げる（`plans/` の移行はそのまま進めてよい）。**どちらに落ちたかはタスク 6 に必ず書き残す** — 横展開先で同じ判断をやり直さずに済むため。
+
+**検証結果（2026-08-28 実測 / Claude Code 2.1.250）**: **ディレクトリ単位のリンクで発見された。ロールバック不要。**
+
+新しいセッションを別プロセスとして起動し、`.claude/skills` がリンクの状態で列挙させた:
+
+```bash
+cd ~/dotfiles
+claude -p "Without using any tools, list the names of the project-level skills available to you that start with 'review-'. If there are none, reply exactly: NONE"
+# → review-brew-outdated, review-renovate-pr
+```
+
+実体は `.agents/skills/` にしか無く、`.claude/skills` は `../.agents/skills` へのリンクだけなので、**ランタイムの走査がディレクトリリンクを辿っている**ことになる。`claude -p`（print モード）は対話セッションを開かずに済むので、横展開先でも同じ 1 コマンドで確かめられる。
+
+あわせて、タスク 1 で固定した blob の期待値どおりに記録された: `git ls-files -s .claude/skills` → `120000 2b7a412…`。
 
 ---
 
@@ -384,7 +400,7 @@ git status --porcelain CLAUDE.md AGENTS.md  # AGENTS.md が R（rename）で記�
    .claude/settings.local.json, .claude/.gitignore, .claude/skill-retros/  ← 実体のまま
    ```
 2. **分類ルール表** — 汎用の分類として `rules/` も含めた 4 分類（共有可能 / Claude Code 固有 / スキルの出力 / 不明）。「本リポジトリに無い項目も汎用の分類として並べている」と断る
-3. **落とし穴** — タスク 1 の実測値。`find` の末尾スラッシュ差、`rg` の `--follow`、シェル glob、Read ツール、**実行ビットがリンク越しに保たれるか**（本リポジトリ固有の検証項目）。Glob / Grep 欄は**環境ごとに確かめる項目**である旨を添える（このビルドには両ツールが無い）
+3. **落とし穴** — タスク 1 の実測値。`find` の末尾スラッシュ差、`rg` の `--follow`、シェル glob、Read ツール、**実行ビットがリンク越しに保たれるか**（本リポジトリ固有の検証項目）。Glob / Grep 欄は**環境ごとに確かめる項目**である旨を添える（このビルドには両ツールが無い）。**サンドボックスだけでなく本リポジトリでも再確認済み**（タスク2 のレビュー時、実測）: `find .claude/skills -name '*.md'` → 0 件 / `find .claude/skills/ -name '*.md'` → 2 件。現状これに依存するスクリプトは repo 内に無い（`setup.sh` / `scripts/` / 両 `SKILL.md` / `CLAUDE.md` を確認済み）が、**黙って 0 件を返す唯一の走査形**なので必ず書く
 4. **スキルの発見（本リポジトリで一番効く項目）** — Claude Code がリンク越しに `.claude/skills/` を走査してスキルを列挙できたか、タスク 2 の DoD の実測結果を書く。ディレクトリ単位のリンクで通ったのか、ファイル単位に落としたのか、`skills/` の移行自体を取り下げたのかを明記する。**ファイルの中身が読めることと、スキルが発見されることは別**で、前者だけ確かめて移すと `/`-コマンドが黙って消える、という順序で書く
 5. **git での記録のされ方** — ディレクトリへのリンクは mode `120000` の blob で、中身はリンク先の相対パス
 6. **gitignore の注意** — ここは**本リポジトリ固有の警告として強めに書く**:
@@ -392,6 +408,7 @@ git status --porcelain CLAUDE.md AGENTS.md  # AGENTS.md が R（rename）で記�
    - root `.gitignore:2` の `/.claude/skill-retros/` は**先頭 `/` でアンカーされている**ので `.agents/` へ移すと一切効かなくなる
    - `.claude/.gitignore` はそのディレクトリに対して効くので `.claude/` に残す
    - **いずれも `.claude/` に実体を残す分類なので現状は無影響。移してはいけない**
+   - **`.agents/` 側には対応する除外が一切無い**（非対称）。今回移した 6 ファイルは全て追跡されるべきものなので無影響だが、**将来 `.agents/` の下にローカル設定やスキル出力を置くと、そのまま追跡対象になる**。横展開先で `.agents/` に何かを足すときは、先に除外が要るかを判断する
    - 行番号はファイルの変化で動くので、適用先で毎回洗い出す: `grep -n '\.claude/' ~/dotfiles/.gitignore_global`
 7. **横展開時の注意** — 残り 2 リポジトリへ適用するときの手順の要点。`git mv` を使うこと、**リンクを張る前に対象ディレクトリを `rmdir` で空にすること**（untracked ファイルが残るとリンクがディレクトリの中に作られる）、`plans/` が無ければ `.gitkeep` で作ること、**移した後に必ずスキルの発見を確かめること**
 
