@@ -52,7 +52,7 @@
 | 1 | [x] | シンボリックリンク越しの読み取りを実地検証する | 検証（変更なし） | scratchpad のサンドボックス | - |
 | 2 | [x] | `skills/` を `.agents/` へ移してリンクを張る | エージェント設定 | `.agents/skills/**`, `.claude/skills` | 1 |
 | 3 | [x] | `plans/` を `.agents/` に作り、本計画を移してリンクを張る | エージェント設定 | `.agents/plans/`, `.claude/plans` | 1 |
-| 4 | [ ] | `SKILL.md` の `$SKILL_DIR` 直書きパスを実体側に更新する | スキル本文 | `.agents/skills/review-brew-outdated/SKILL.md` | 2 |
+| 4 | [x] | `SKILL.md` の `$SKILL_DIR` 直書きパスを実体側に更新する | スキル本文 | `.agents/skills/review-brew-outdated/SKILL.md` | 2 |
 | 5 | [ ] | `CLAUDE.md` を `AGENTS.md` 実体 + リンクにする | ドキュメント | `AGENTS.md`, `CLAUDE.md` | 2, 3 |
 | 6 | [ ] | 分類ルールと検証結果を `AGENTS.md` に書き残す | ドキュメント | `AGENTS.md` | 5 |
 
@@ -292,6 +292,8 @@ git status --porcelain
 ---
 
 ### タスク 4: `SKILL.md` の `$SKILL_DIR` 直書きパスを実体側に更新する
+
+**完了日**: 2026-08-28
 
 **層**: スキル本文
 

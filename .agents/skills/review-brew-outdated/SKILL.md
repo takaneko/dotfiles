@@ -98,7 +98,7 @@ If none match, try the **tarball fallback** (§3a) before giving up; only if tha
 bash "$SKILL_DIR/adapters/git.sh" init <name> <CLONE_URL>
 ```
 
-Throughout the rest of this doc, `$SKILL_DIR` is this skill's directory: `$HOME/dotfiles/.claude/skills/review-brew-outdated`. Adapters live under `$SKILL_DIR/adapters/<kind>.sh` and share a uniform calling convention — see steps 4 and 6.
+Throughout the rest of this doc, `$SKILL_DIR` is this skill's directory: `$HOME/dotfiles/.agents/skills/review-brew-outdated`. The `skills` directory under `.claude/` is a symlink pointing here, so a path through there reaches the same files. Adapters live under `$SKILL_DIR/adapters/<kind>.sh` and share a uniform calling convention — see steps 4 and 6.
 
 ### 3a. Tarball fallback (adapter-less upstreams)
 
