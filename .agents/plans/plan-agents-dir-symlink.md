@@ -53,7 +53,7 @@
 | 2 | [x] | `skills/` を `.agents/` へ移してリンクを張る | エージェント設定 | `.agents/skills/**`, `.claude/skills` | 1 |
 | 3 | [x] | `plans/` を `.agents/` に作り、本計画を移してリンクを張る | エージェント設定 | `.agents/plans/`, `.claude/plans` | 1 |
 | 4 | [x] | `SKILL.md` の `$SKILL_DIR` 直書きパスを実体側に更新する | スキル本文 | `.agents/skills/review-brew-outdated/SKILL.md` | 2 |
-| 5 | [ ] | `CLAUDE.md` を `AGENTS.md` 実体 + リンクにする | ドキュメント | `AGENTS.md`, `CLAUDE.md` | 2, 3 |
+| 5 | [x] | `CLAUDE.md` を `AGENTS.md` 実体 + リンクにする | ドキュメント | `AGENTS.md`, `CLAUDE.md` | 2, 3 |
 | 6 | [ ] | 分類ルールと検証結果を `AGENTS.md` に書き残す | ドキュメント | `AGENTS.md` | 5 |
 
 ## タスク詳細
@@ -340,6 +340,8 @@ git diff --stat
 
 ### タスク 5: `CLAUDE.md` を `AGENTS.md` 実体 + リンクにする
 
+**完了日**: 2026-08-28
+
 **層**: ドキュメント
 
 **対象ファイル**:
@@ -364,9 +366,13 @@ git add CLAUDE.md
 
 どちらも `.agents/skills/...` に直す。行番号は移動で変わらないが、編集前に `rg -n '\.claude/skills' AGENTS.md` で必ず引き直す。
 
+**見出しと冒頭の一文も直す。** `AGENTS.md` が正典になるのに `# CLAUDE.md` という見出しのままだと、その名前はもうリンクの側を指す。先行実装は正典ファイルの見出しをリポジトリ名にしている（先行実装A の `AGENTS.md:1` = `# 先行実装A`）ので揃える。冒頭の「This file provides guidance to Claude Code…」も、エージェント非依存の入口に特定エージェント宛の枠組みが残る形になるので中立な文に置き換える。**横展開先でも同じ2箇所を直す。**
+
 **DoD で「`.claude/skills` が 0 件」を条件にしないこと。** タスク 6 が追記する構成図には `.claude/skills -> ../.agents/skills` という行が正当に入るため、0 件はタスク 6 の完了後に必ず偽になる。散文中の参照だけを見る（下の DoD）。
 
-**履歴の確認はコミット後に行う。** このタスクは `git mv` + `git add` までで、コミットはしない。`git log` は index ではなくコミットを読むので、この時点では `git log --follow -- AGENTS.md` は何も返さない（`AGENTS.md` はまだどのコミットにも存在しない）。rename の記録は `git status --porcelain` の `R` で確かめる。
+**履歴の確認はコミット後に行う。** このタスクは `git mv` + `git add` までで、コミットはしない。`git log` は index ではなくコミットを読むので、この時点では `git log --follow -- AGENTS.md` は何も返さない（`AGENTS.md` はまだどのコミットにも存在しない）。
+
+**そして `git status` は rename（`R`）を出さない。** `git mv` を使っても、`CLAUDE.md` は削除されずシンボリックリンクとして残るため、rename の相手になる削除が存在しない。実際に出るのは `A  AGENTS.md` + `T  CLAUDE.md`（typechange）で、`-M` を付けても rename は検出されない（実測）。**内容が保たれたことは `diff` で直接確かめる**（下の DoD）。rename の系譜が要るならコミット後に `git log --follow` を使う。
 
 **参考パターン**:
 - 先行実装A の `CLAUDE.md` — `AGENTS.md` への相対リンク（`readlink` で `AGENTS.md`）
@@ -382,7 +388,8 @@ git ls-files -s CLAUDE.md AGENTS.md         # CLAUDE.md が 120000、AGENTS.md �
 head -3 CLAUDE.md                           # リンク越しに読めること
 rg -n 'skill \(defined in' AGENTS.md        # 2件とも .agents/skills/... を指していること
 wc -l AGENTS.md                             # 126 行から極端に減っていないこと
-git status --porcelain CLAUDE.md AGENTS.md  # AGENTS.md が R（rename）で記録されていること
+git status --porcelain CLAUDE.md AGENTS.md  # 'A  AGENTS.md' + 'T  CLAUDE.md'（R は出ない）
+git show HEAD:CLAUDE.md > /tmp/old.md && diff /tmp/old.md AGENTS.md   # 意図した2行だけの差であること
 ```
 
 ---
