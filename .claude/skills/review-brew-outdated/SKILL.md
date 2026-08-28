@@ -8,9 +8,10 @@ description: Review Homebrew formulae reported by `brew outdated`, classify each
 Reviews outdated Homebrew formulae and decides which are safe to upgrade. For each candidate it:
 
 1. Cross-references installed versions against a CVE scan (syft + grype) to flag security-relevant updates.
-2. Enforces a 10-day release-age gate for non-security updates (same policy as Renovate).
-3. Scans the upstream diff for supply-chain red flags (remote script exec, credential access, obfuscation, unexpected dependency pulls). Host-aware: GitHub, GitLab, Bitbucket Cloud, and generic git (cgit / self-hosted) are all supported via per-kind adapters.
-4. Prints a chat summary and a `brew upgrade` command covering only packages classified as UPDATE.
+2. Greps every candidate's own commit subjects *and* in-tree changelog additions for published advisory IDs (CVE / GHSA), because grype systematically misses fresh fixes in Homebrew C/C++ libraries. A hit outranks the age gate.
+3. Enforces a 10-day release-age gate for non-security updates (same policy as Renovate).
+4. Scans the upstream diff for supply-chain red flags (remote script exec, credential access, obfuscation, unexpected dependency pulls). Host-aware: GitHub, GitLab, Bitbucket Cloud, and generic git (cgit / self-hosted) are all supported via per-kind adapters.
+5. Prints a chat summary and a `brew upgrade` command covering only packages classified as UPDATE.
 
 The skill never runs `brew upgrade` itself — the user runs the printed command.
 
@@ -168,22 +169,91 @@ epoch=$(gdate -d "<date from resolve-tag>" +%s)
 age_days=$(( (now - epoch) / 86400 ))
 ```
 
+### 4a. Advisory-ID scan (every candidate, WAIT included)
+
+grype alone is not a sufficient security signal for this repo, and both of its failure
+modes point the wrong way (see **Why these choices**). Before classifying, check whether
+the release *itself* says it fixes a published advisory.
+
+Run `fetch-diff` now for every formula whose base and latest tags resolved — including ones
+that failed the age gate, and including the substituted base of step 4. This writes the same
+`$OUT.patch` / `$OUT-meta.json` artefacts step 6 consumes, so **do not fetch twice**; step 6
+reuses them. A non-zero adapter exit is handled exactly as in step 6 (see the exit-code table
+there), except that a formula whose fetch fails gets no advisory scan at all — classify it
+**MANUAL**, never let a failed fetch read as a clean scan.
+
+**Run both greps. Neither is a superset of the other.**
+
+```bash
+OUT=/tmp/brew-diff-<name>
+ADV='CVE-[0-9]{4}-[0-9]{4,}|GHSA-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}'
+
+# A. Commit subjects — high precision. Maintainers cite the advisory in the fix's subject line.
+jq -r '.commits[].message' "$OUT-meta.json" | grep -oEi "$ADV" | sort -u
+
+# B. Added patch lines — high recall. Catches projects that record advisories in an in-tree
+#    changelog (NEWS, Misc/NEWS.d) and never in a commit subject. Needs triage; see below.
+grep -nE "^\+.*($ADV)" "$OUT.patch"
+```
+
+Measured over the 2026-08-28 formulae:
+
+| Formula | A: subjects | B: added patch lines |
+|---|---|---|
+| `imagemagick` 7.1.2-29 → -30 | **10 GHSAs** | 0 |
+| `libheif` 1.23.1 → 1.23.2 | **8 GHSAs** | 6 (a subset of A) |
+| `glib` 2.88.2 → 2.88.3 | 0 | **CVE-2026-15588** |
+| `python@3.10` 3.10.20 → 3.10.21 | 2 | **8** (6 additional, all genuine) |
+| `fontconfig`, `imath`, `little-cms2`, `sdl3`, `tmux` | 0 | 0 |
+
+Running A alone would have missed glib's CVE-2026-15588 — the one advisory that run's grype
+pass also missed, i.e. exactly the case this step exists to catch. Running B alone would have
+missed all ten of imagemagick's GHSAs. When there is no commit list at all — a shallow
+tag-to-tag diff, or the step-3a tarball path — B is the only signal available.
+
+**Triage the B hits by reading the matched line.** That is what `grep -n` prints them for, and
+at the volumes above (single digits per formula) it costs seconds. Discard:
+
+- hits in translation catalogues (`*.po`) and other generated artefacts;
+- hits in historical or archived release notes. A fix cites its *own* advisory, so an ID
+  attached to a version far below the one under review is documentation, not a fix. A project
+  migrating its changelog format (rst→md, per-release files → one combined file) re-adds years
+  of old entries as new lines and can produce dozens of these at once.
+
+Keep hits that sit in the entry for the version being installed. glib's `NEWS` line
+`- #3985 (CVE-2026-15588) Security report: GDBusServer pre-authentication DoS` and CPython's
+`Misc/NEWS.d` entries are the shape to expect.
+
+A surviving hit means the release fixes a known, *published* vulnerability. Record the IDs —
+they drive the top row of the step-5 table and appear in the summary.
+
+**A miss is not an all-clear.** Plenty of genuine fixes ship with no ID at all. In the same run
+`fontconfig` 2.18.3 fixed a NULL-pointer dereference and a use-after-free, with no CVE assigned,
+no grype match, and nothing on either grep. Those stay under the age gate, but say so in the
+summary so the user can override deliberately.
+
 ### 5. Classify
 
 Apply rules in order:
 
 | Condition | Classification | Rationale |
 |---|---|---|
-| Name appears in grype CVE map | **SECURITY** | Known vuln — age gate does not apply, upgrade is worth the tail risk. |
+| Release cites a published advisory (surviving step 4a hit) | **SECURITY** | Maintainer-attested fix for a known vuln. Age gate does not apply. This outranks grype, which routinely misses exactly these. |
+| Name appears in grype CVE map | **SECURITY** | Known vuln — age gate does not apply, upgrade is worth the tail risk. Cross-check against the step-4a IDs: a grype hit with an empty `fix` array and no 4a corroboration is usually a stale false positive, so report it as such rather than as the reason to upgrade. |
 | Latest tag age ≥ 10 days | **UPDATE** (diff-pending) | Passes age gate, proceed to diff review. |
-| Latest tag age < 10 days | **WAIT** | Release is too fresh — let it bake. No diff review. |
+| Latest tag age < 10 days | **WAIT** | Release is too fresh — let it bake. Step 4a already cleared it of *published* advisories; no full diff review. |
 | Upstream or tag not resolvable | **MANUAL** | Cannot inspect — user decides. |
 
-For **SECURITY** and age-PASS **UPDATE**, run step 6. **WAIT** and **MANUAL** skip diff review.
+**MANUAL** has nothing to diff and skips step 6. Everything else already has its
+artefacts from step 4a: run the full heuristic scan for **SECURITY** and **UPDATE**.
+For **WAIT**, the step-4a advisory grep is the whole review — no full scan needed.
 
 ### 6. Diff review (SECURITY and UPDATE only)
 
-Every adapter exposes the same `fetch-diff` verb, which writes two files sharing a common prefix:
+Step 4a already ran `fetch-diff` for every resolvable formula, so the artefacts below exist
+on disk — reuse them rather than fetching again. The verb is documented here because this is
+where its output is consumed. Every adapter exposes the same `fetch-diff`, writing two files
+that share a common prefix:
 
 ```bash
 OUT=/tmp/brew-diff-<name>
@@ -234,7 +304,7 @@ Print one compact block, grouped by classification:
 Processed N formula(s):
 
 SECURITY (upgrade recommended regardless of age):
-  <name> <old> → <new>  CVE(s): <CVE-IDs>  Diff: <clean | N flags>
+  <name> <old> → <new>  Advisories: <IDs>  Source: <grype | in-release | both>  Diff: <clean | N flags>
 
 UPDATE (≥10d old, diff clean):
   <name> <old> → <new>  Age: <X>d  Diff: clean
@@ -244,6 +314,7 @@ REVIEW MANUALLY:
 
 WAIT (<10d old):
   <name> <old> → <new>  Age: <X>d — try again in <10-X>d
+  <name> <old> → <new>  Age: <X>d — ⚠ security-relevant, no advisory ID: <one line>
 
 DO NOT UPGRADE:
   <name> <old> → <new>  Reason: <HIGH finding summary>
@@ -269,6 +340,17 @@ Format the file as proper Markdown (tables for each classification, fenced code 
 
 ## Failure modes
 
+- **grype reports nothing for a formula that plainly fixed a vulnerability.** Expected, not a
+  malfunction. Check `grype db status` first and record the DB age in the report — grype's own
+  freshness ceiling is 5 days, and `grype db update` can answer "no newer build" while the cached
+  DB is older than that, as it did on 2026-08-28 at seven days. But a current DB does not close
+  the gap: Homebrew C/C++ libraries have no purl→advisory mapping in the GitHub Advisory Database,
+  so they match only once NVD assigns a CPE, which lags by weeks to months. Step 4a is the
+  compensating control for both. Never read a grype miss as evidence of safety.
+- **grype matches ancient CVEs with an empty `fix` array.** Also expected. Name-based CPE
+  matching, plus Homebrew version strings it cannot parse (`7.1.2-29` is a patch counter, not
+  a semver prerelease, and grype orders it *before* `7.1.2`), produce stale hits. Treat a grype
+  hit as a prompt to read the release notes, never as the finding itself.
 - **grype DB download fails** (first run, or when the cached DB on the machine is stale / offline): report "CVE scan unavailable — falling back to no security classification", then process every formula through the age gate only. Still useful, just less informative. To preempt this on a fresh machine, run `grype db update` once before the first `/review-brew-outdated` invocation.
 - **`gh api compare` 404s** (force-pushed or rewritten history upstream): classify as **MANUAL** with reason "upstream compare unavailable".
 - **GitHub rate limit** (403 with `x-ratelimit-remaining: 0`): stop processing, report remaining formulae as skipped with the reason "github rate limit".
@@ -281,7 +363,35 @@ Format the file as proper Markdown (tables for each classification, fenced code 
 
 ## Why these choices
 
-- **syft + grype over keyword heuristics.** A grep-for-"CVE" over release notes misses advisories that were fixed silently and flags prose that just mentions past incidents. Advisory databases are authoritative and cheap to query.
+- **syft + grype, but never as the only security signal.** Advisory databases are authoritative
+  and cheap to query for what they cover. What they cover badly is this repo's centre of mass —
+  C/C++ libraries installed by Homebrew, which reach the databases only after NVD assigns a CPE.
+  On 2026-08-28 grype produced no match for the CVE- and GHSA-fixing releases of `glib`,
+  `python@3.10`, `python@3.12`, and `postgresql@15` / `libpq` (same source tree); every
+  one was caught only by reading
+  the releases themselves. The one formula it did flag, `imagemagick`, it flagged on four stale
+  CPE matches (`CVE-2014-9826`, `CVE-2016-7538`, `CVE-2017-5506` with empty `fix` arrays, plus a
+  2023 entry) and not on any of the ten GHSAs that release actually fixed — the right
+  classification for the wrong reason. That run's DB was seven days old and `grype db update`
+  reported no newer build, so freshness was a contributing factor; the purl gap is the structural
+  one and persists with a current DB.
+- **Step 4a exists because the two blind spots align.** A release that is days old is both too
+  new for NVD enrichment to reach grype *and* too new to pass the age gate into diff review.
+  Under the original ordering, freshness closed both eyes at once — systematically, not randomly.
+  On 2026-08-28 `libheif` 1.23.2 (eight GHSAs, two days old, two of them rated critical) landed in
+  WAIT and was never looked at; it surfaced only because it happened to be a dependency of
+  `imagemagick`, which was being upgraded for unrelated reasons. Reading the changelog for every
+  candidate costs one extra adapter call per WAIT formula and closes that hole.
+- **Both greps, not one.** Matching the strict `CVE-`/`GHSA-` ID forms is necessary but not
+  sufficient: scope decides what you find. Projects split into two camps and neither camp is the
+  minority here. ImageMagick and libheif cite the advisory in the fix's commit subject and never
+  in-tree, so subjects find 10 and 8 while added patch lines find 0 and 6. glib and CPython
+  record advisories in `NEWS` / `Misc/NEWS.d` and say nothing in the subject, so subjects find 0
+  and 2 while patch lines find 1 and 8. Picking either scope alone drops real findings — subjects
+  alone would have missed glib's CVE-2026-15588, the one advisory grype missed too. The patch
+  scope's cost is noise rather than falsity, and it is bounded: a changelog-format migration can
+  re-add years of old entries at once, which is why step 4a triages hits by reading the matched
+  line instead of trusting the count.
 - **10-day gate kept from Renovate policy.** The rest of this repo (`lazy-lock.json`, `aqua.yaml`) already uses `minimumReleaseAge: 10 days` via Renovate. Matching the threshold here keeps expectations consistent.
 - **No automatic `brew upgrade`.** Homebrew upgrades touch `/opt/homebrew` and can trigger cascading dependency upgrades. The user runs the command so they can eyeball it and interrupt if something looks off.
 - **Cellar-wide syft scan.** Per-formula scans would duplicate work; one pass is O(minutes) and feeds every downstream decision.
