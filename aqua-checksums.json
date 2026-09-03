@@ -136,8 +136,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "http/dl.k8s.io/v1.36.3/bin/darwin/arm64/kubectl",
-      "checksum": "FC8582ACDE13869A606730A79379D6515F30C68AFCCED0B5AC8789D5D002B7D6",
+      "id": "http/dl.k8s.io/v1.36.4/bin/darwin/arm64/kubectl",
+      "checksum": "C9E4F713D6FEE0043A3D835CCA13077CDA2BC0973840EB9779360DF0B5BDFC69",
       "algorithm": "sha256"
     },
     {
