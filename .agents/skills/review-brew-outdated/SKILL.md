@@ -105,13 +105,13 @@ Classify the upstream into one of four **kinds** and record `{kind, key}` per fo
 
 **Homepages that name no repository.** Several formulae publish only tarballs from a
 project-owned host, so no row above matches and they fall to MANUAL despite having a perfectly
-reviewable upstream. Check this list before giving up — all of these are ordinary `github` kind
-once you know the mirror:
+reviewable upstream. Check this list before giving up — knowing the mirror is enough to make most
+of them ordinary `github` kind, with `nss` the noted exception:
 
 | Homepage / stable_url host | Key |
 |---|---|
 | `gnupg.org`, `www.gnupg.org` | `gpg/<formula>` — `gpg/gnupg`, `gpg/gpgme`, `gpg/libgcrypt`. **`gpgmepp` is its own repo `gpg/gpgmepp`**, not a subdirectory of `gpg/gpgme`, and its tags (`gpgmepp-2.2.0`) track a cadence separate from gpgme's. |
-| `ftp.mozilla.org/pub/security/nss`, `firefox-source-docs.mozilla.org` | `nss-dev/nss` — tags are `NSS_3_128_RTM` (underscores plus an `_RTM` suffix, so see the separator-mismatch guard in step 4) |
+| `ftp.mozilla.org/pub/security/nss`, `firefox-source-docs.mozilla.org` | `mozilla/nss` (`nss-dev/nss` redirects here) — **the adapter cannot resolve this one**; see the pagination note in step 4. Tags are `NSS_3_128_RTM`: underscores plus an `_RTM` suffix, so the separator-mismatch guard applies as well. |
 
 Do **not** spend probes on `git.gnupg.org` or `dev.gnupg.org`: both refused `git ls-remote` for
 gnupg, gpgme, libgcrypt and gpgmepp on 2026-09-03. The GitHub mirror is the only working path.
@@ -188,11 +188,30 @@ accepting `{}` from a repo that plainly exists, retry with `.` replaced by `_` (
 just list the tags and pick by eye:
 
 ```bash
-gh api "repos/<owner>/<repo>/tags?per_page=100" -q '.[].name' | grep -F "$(echo '<VERSION>' | tr . _)"
+gh api "repos/<owner>/<repo>/tags?per_page=100" --paginate -q '.[].name' \
+  | grep -F "$(echo '<VERSION>' | tr . _)"
 ```
 
 `{}` means "no tag *contained that exact string*", which is not the same as "no tag for this
-release". `nss` (`NSS_3_128_RTM`) needs the same treatment.
+release".
+
+**The two guards are one procedure, not two — fixing the separator re-exposes the shadowing trap.**
+Confirmed on curl 8.22.0: once `8_22_0` matches, the tag list leads with `rc-8_22_0-3`,
+`rc-8_22_0-2`, `rc-8_22_0-1` and only *then* `curl-8_22_0`. Taking `.[0]` at that point pins a
+release candidate. Always re-apply the exact-match preference above after re-spelling the version.
+
+**`--paginate` is load-bearing, and the adapter does not have it.** `github.sh resolve-tag` issues a
+single `tags?per_page=100`, and GitHub does not return that page in any useful order — for a repo
+with many tags the newest release may simply not be on it. `nss` is the standing case: page 1 is
+2000s-era refs (`travisWebshell_03082000_BASE`, `nss_20021204`, …) with **no `NSS_3_*` tag at all**,
+so the adapter returns `{}` for `mozilla/nss` no matter how the version is spelled, and the
+separator guard cannot save it. Measured 2026-09-04: the paginated command above finds
+`NSS_3_128_RTM` and `NSS_3_128_BETA1`; without `--paginate` it exits 1 with no output.
+
+So for `nss` — and any formula where the paginated lookup finds a tag the adapter did not —
+classify **MANUAL** with reason "tag beyond adapter's first tag page", and note the tag you found by
+hand so the user can review the release themselves. Do not hand a tag the adapter never produced to
+`fetch-diff` and report the result as an adapter-verified diff.
 
 Call once for the installed version (`installed_versions[0]` — pin explicitly; the array normally has one entry but `brew` allows multiple installed versions for versioned formulae like `python@3.10`) and once for the latest version.
 
@@ -236,6 +255,10 @@ gh api "repos/<owner>/<repo>/security-advisories?per_page=100" --paginate \
 Filter on `patched_versions` containing the **new** version — that is what makes a hit mean *this
 upgrade fixes it*. An empty result is not an all-clear: fall through to B.
 
+`.cvss.score` is null on a minority of advisories (2 of libheif's 11 on 2026-09-03), which is why
+the `// "?"` is there. Report those as `CVSS n/a` rather than dropping them or reading the missing
+score as low — `.severity` is populated even when the score is not, so rank on that.
+
 #### Source B — OSV.dev, `GIT` ecosystem (any kind, once you know the repo URL)
 
 Covers projects that publish CVEs with git ranges but file no GitHub advisories. OpenSSL is the
@@ -247,6 +270,11 @@ curl -s --max-time 25 -X POST https://api.osv.dev/v1/query -H 'Content-Type: app
   -d '{"package":{"name":"https://github.com/<owner>/<repo>","ecosystem":"GIT"},"version":"<INSTALLED_VERSION>"}' \
   | jq -r '.vulns[]? | select(.id | startswith("OSV-") | not) | "\(.id) \(.summary)"'
 ```
+
+The `name` is the repository's canonical web URL, not necessarily a GitHub one — use
+`https://gitlab.com/<project>` or the clone URL minus `.git` for `gitlab` / `bitbucket` / `git`
+kinds. OSV's GIT coverage outside GitHub is thin, so an empty result there is even weaker evidence
+than usual.
 
 Query the **installed** version here — OSV answers "what affects this version", so a hit means what
 you have is vulnerable. Drop `OSV-`-prefixed ids: those are OSS-Fuzz crash reports, not published
@@ -264,21 +292,40 @@ reuses them. A non-zero adapter exit is handled exactly as in step 6 (see the ex
 there), except that a formula whose fetch fails gets no advisory scan at all — classify it
 **MANUAL**, never let a failed fetch read as a clean scan.
 
-**Check every fetched diff for truncation before you scan it.** The GitHub compare API caps a
-response at **250 commits and 300 files**, and says so nowhere in the text you grep — a truncated
-diff greps exactly like a complete clean one, so an unchecked truncation reads as an all-clear.
-`fetch-diff` records the real span in `.ahead`, which is what makes this detectable at all:
+**Check every fetched diff for truncation before you scan it.** Compare endpoints cap their
+response, and say so nowhere in the text you grep — a truncated diff greps exactly like a complete
+clean one, so an unchecked truncation reads as an all-clear.
+
+For **`github` kind only**, the cap is **250 commits and 300 files**, and `github.sh` records the
+real span in `.ahead`, which is what makes this detectable at all:
 
 ```bash
-jq -r 'if (.ahead > (.commits|length)) or ((.files|length) >= 300)
+jq -r 'if (.ahead == null) then "UNKNOWN: non-github meta, .ahead absent — see below"
+       elif (.ahead > (.commits|length)) or ((.files|length) >= 300)
        then "TRUNCATED: \(.commits|length)/\(.ahead) commits, \(.files|length) files"
        else "complete: \(.ahead) commits, \(.files|length) files" end' "$OUT-meta.json"
 ```
 
+**The `.ahead == null` arm is not decoration — without it this check lies.** Only `github.sh` emits
+`ahead`; `gitlab.sh`, `bitbucket.sh` and `git.sh` write `{commits, files}` only. jq evaluates
+`null > 3` as `false`, so the naive two-arm form falls to the else branch and prints
+`complete: null commits, N files` for every non-GitHub formula — a fabricated all-clear, which is
+precisely the failure this paragraph exists to prevent.
+
+What the other three actually do:
+
+| kind | cap | detectable? |
+|---|---|---|
+| `github` | 250 commits / 300 files | **yes** — via `.ahead`, above |
+| `bitbucket` | 100 commits (`pagelen=100`), 200 files (`pagelen=200`), neither paginated | **no** — no total is fetched. Treat a diff at exactly 100 commits or 200 files as truncated. |
+| `gitlab` | server-side compare limit, instance-dependent | **no** — treat a suspiciously round or huge span as unverified |
+| `git` | none — local clone, full history | n/a, always complete |
+
 A truncated diff makes the step-4a scan **inconclusive, not clean.** Classify per step 5 and say so
 in the summary — never let a sampled diff be reported as reviewed. Measured 2026-09-03: `libomp`
 22.1.8→23.1.0 was **23,416** commits behind a 250-commit sample, `mise` 2,444, `usage` 622, `curl`
-525; `nss` had all 52 commits but hit the 300-file cap. Every one of them greped clean.
+525; `nss` (resolved by hand — see step 4) had all 52 commits but hit the 300-file cap. Every one of
+them greped clean.
 
 **Run both greps. Neither is a superset of the other.**
 
@@ -298,7 +345,7 @@ grep -nE "^\+.*($ADV)" "$OUT.patch"
 
 | Formula | A (GitHub) | B (OSV GIT) | C (greps) | grype |
 |---|---|---|---|---|
-| `libheif` 1.23.2→1.23.3 | **11**, one *critical* CVSS 9.8 | 0 | 13 — two wrong, one missed | 0 |
+| `libheif` 1.23.2→1.23.3 | **11**, one *critical* CVSS 9.8 | 0 | 13 — three wrong, one missed | 0 |
 | `pcre2` 10.47→10.48 | **6**, no noise | 0 | 6, after triaging 13 historical IDs | 0 |
 | `libde265` 1.1.1→1.1.2 | **2** | 0 | 2 | 0 |
 | `openssl@3` 3.6.3→3.6.4 | 0 | **11** | 11 | 0 |
@@ -371,10 +418,17 @@ resolve itself. A surviving 4a hit or a grype match still promotes to **SECURITY
 truncation; say in the summary that the review was partial.
 
 **MANUAL** has nothing to diff and skips step 6. Everything else already has its
-artefacts from step 4a: run the full heuristic scan for **SECURITY** and **UPDATE**.
-For **WAIT**, the step-4a advisory grep is the whole review — no full scan needed.
+artefacts from step 4a: run the full heuristic scan for **SECURITY**, **UPDATE**, and
+**REVIEW MANUALLY**. For **WAIT**, the step-4a advisory grep is the whole review — no full scan
+needed.
 
-### 6. Diff review (SECURITY and UPDATE only)
+**A truncation-derived REVIEW MANUALLY still gets the step-6 scan.** It is the one REVIEW MANUALLY
+that arrives with artefacts already on disk rather than as a step-6 verdict, so it is easy to route
+to the same "nothing to diff" path as MANUAL — do not. A HIGH finding inside the 250-commit sample
+is a real HIGH finding and promotes the formula to **DO NOT UPGRADE**; only the *absence* of
+findings is what the truncation makes meaningless.
+
+### 6. Diff review (SECURITY, UPDATE, and REVIEW MANUALLY)
 
 Step 4a already ran `fetch-diff` for every resolvable formula, so the artefacts below exist
 on disk — reuse them rather than fetching again. The verb is documented here because this is
@@ -438,6 +492,8 @@ UPDATE (≥10d old, diff clean):
 
 REVIEW MANUALLY:
   <name> <old> → <new>  Reason: <MEDIUM finding summary>
+  <name> <old> → <new>  Reason: diff truncated <N>/<AHEAD> commits, <F> files — sampled only,
+                        clean grep proves nothing; sampled scan: <clean | N flags>
 
 WAIT (<10d old):
   <name> <old> → <new>  Age: <X>d — try again in <10-X>d
@@ -488,6 +544,18 @@ Format the file as proper Markdown (tables for each classification, fenced code 
   commits / 300 files; `libomp` 22.1.8→23.1.0 sampled 250 of **23,416** commits and greped clean.
   A version span this wide is not reviewable through this skill at all — say so rather than
   implying it passed.
+- **The truncation check reports `complete` for a gitlab / bitbucket / git formula.** It is telling
+  you nothing: only `github.sh` writes `.ahead`, and `null > N` is `false` in jq, so the two-arm
+  form of that check falls through to "complete" for the other three adapters and prints
+  `complete: null commits`. Use the three-arm form in step 4a and read the per-kind table beside it.
+  `bitbucket` is the one that silently truncates without any total to compare against — 100 commits
+  and 200 files, unpaginated.
+- **A formula resolves to `{}` even after re-spelling the version with `_` and `-`.** Before calling
+  it MANUAL, re-run the tag lookup with `--paginate`. `github.sh` fetches a single tag page and
+  GitHub does not order it usefully; `mozilla/nss`'s first page is entirely 2000s-era refs, so its
+  current release is invisible to the adapter. A tag found only by the paginated lookup means the
+  adapter cannot drive this formula — classify MANUAL and name the tag, do not feed it to
+  `fetch-diff` and present the result as adapter-verified.
 - **grype DB download fails** (first run, or when the cached DB on the machine is stale / offline): report "CVE scan unavailable — falling back to no security classification", then process every formula through the age gate only. Still useful, just less informative. To preempt this on a fresh machine, run `grype db update` once before the first `/review-brew-outdated` invocation.
 - **Source A returns 0 for a project that clearly ships security fixes.** Normal — it means the
   project does not file GitHub advisories, not that the release is clean. OpenSSL is the standing
@@ -526,8 +594,10 @@ Format the file as proper Markdown (tables for each classification, fenced code 
   came from a `grype db status` run alongside the scan, which races the auto-update — treat it as
   unverified. The 2026-09-03 run settles the question with the authoritative field: the scan's own
   `.descriptor.db.status` showed a DB built that morning, `valid: true`, and it still matched none
-  of the 11 CVEs in `openssl@3` 3.6.4, the 13 GHSAs in `libheif` 1.23.3, the 6 in `pcre2` 10.48, or
-  the 2 in `libde265` 1.1.2 — **32 advisories missed on a current database**. Of the 13 brew matches
+  of the 11 CVEs in `openssl@3` 3.6.4, the 11 GHSAs in `libheif` 1.23.3, the 6 in `pcre2` 10.48, or
+  the 2 in `libde265` 1.1.2 — **30 advisories missed on a current database**. (Count libheif at A's
+  11, not the greps' 13: three of those are false positives this skill's own step 4a discards, and
+  padding the indictment with them would repeat the mistake being documented.) Of the 13 brew matches
   it did return, 12 had an empty `fix` array and four of the formulae (`imagemagick`, `libtiff`,
   `pixman`, `redis`) were not outdated at all. Freshness is not part of this story; the purl gap is
   the whole of it.
