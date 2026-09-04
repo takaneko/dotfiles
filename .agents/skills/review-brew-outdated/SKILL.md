@@ -23,7 +23,8 @@ The skill never runs `brew upgrade` itself — the user runs the printed command
 
 ## Required tools
 
-`brew`, `gh` (authed), `jq`, `syft`, `grype`, `curl`, `git`. All are installed via aqua (`anchore/syft`, `anchore/grype`) or available by default on the system.
+`brew`, `gh` (authed), `jq`, `syft`, `grype`, `curl`, `git`. Step 4a additionally queries
+`api.osv.dev` over plain `curl` — no account, no token. All are installed via aqua (`anchore/syft`, `anchore/grype`) or available by default on the system.
 
 "authed" needs care for `gh` specifically: the adapters run as **child processes**, which inherit neither shell aliases nor functions. Where `gh` is authenticated through a 1Password shell plugin (an alias/function in `~/.config/op/plugins.sh`), that wrapper does not reach them. `adapters/github.sh` handles this itself — it falls back to `op plugin run -- gh` when `gh` cannot authenticate on its own — so nothing needs doing per-run. But if you ever lift a `gh` call out of the adapter into a standalone script, it will hit the same wall. The `gh api` calls this doc runs inline (the author cross-check in step 6) are fine: they execute in the top-level shell, where the wrapper is defined.
 
@@ -56,6 +57,20 @@ syft "$HOMEBREW_CELLAR" -o cyclonedx-json > /tmp/brew-sbom.json 2>/dev/null
 grype sbom:/tmp/brew-sbom.json -o json > /tmp/brew-cves.json 2>/dev/null
 ```
 
+**Record the DB the scan actually used — from the scan's own output, never from a concurrent
+`grype db status`.** grype auto-updates its DB when a scan starts (the default; no
+`GRYPE_DB_AUTO_UPDATE` is set here) and `syft` takes minutes to build the SBOM first, so a
+`grype db status` run alongside the scan reads the *previous* cache and reports a staleness that
+no longer applies by the time grype runs. Measured 2026-09-03: `grype db status` reported
+`built 2026-08-27` / `Status: invalid` while the scan it was racing recorded
+`built 2026-09-03T06:30:55Z` / `valid: true`.
+
+```bash
+jq -c '.descriptor.db.status | {built, valid}' /tmp/brew-cves.json
+```
+
+That field is written by the scan itself, so it cannot race. Report *that* value as the DB age.
+
 Build a map from formula name → list of CVE matches (brew packages only — syft also catalogs vendored deps like python wheels inside bottles, which we do not care about because `brew upgrade` cannot act on them):
 
 ```bash
@@ -87,6 +102,19 @@ Classify the upstream into one of four **kinds** and record `{kind, key}` per fo
 | `gitlab` | `https?://<host>/<project_path>` where `<host>` starts with `gitlab.` or is in the known-GitLab list (`code.videolan.org`, `salsa.debian.org`, `foss.heptapod.net`) | `<host> <project_path>` — `project_path` is the slash-joined namespace and repo; adapters URL-encode it |
 | `bitbucket` | `https?://bitbucket\.org/<workspace>/<repo>` | `<workspace> <repo_slug>` — strip trailing `.git`, `/src/...`, `/downloads/...` |
 | `git` | URL ends in `.git` on any other host, **or** homepage is `https://www.gnu.org/software/<name>/` (fallback: probe `https://git.savannah.gnu.org/git/<name>.git` with `git ls-remote --exit-code`; some GNU projects live on `git.gnunet.org` instead) | `<name> <clone_url>` — `<name>` is the formula name, used as the cache key |
+
+**Homepages that name no repository.** Several formulae publish only tarballs from a
+project-owned host, so no row above matches and they fall to MANUAL despite having a perfectly
+reviewable upstream. Check this list before giving up — knowing the mirror is enough to make most
+of them ordinary `github` kind, with `nss` the noted exception:
+
+| Homepage / stable_url host | Key |
+|---|---|
+| `gnupg.org`, `www.gnupg.org` | `gpg/<formula>` — `gpg/gnupg`, `gpg/gpgme`, `gpg/libgcrypt`. **`gpgmepp` is its own repo `gpg/gpgmepp`**, not a subdirectory of `gpg/gpgme`, and its tags (`gpgmepp-2.2.0`) track a cadence separate from gpgme's. |
+| `ftp.mozilla.org/pub/security/nss`, `firefox-source-docs.mozilla.org` | `mozilla/nss` (`nss-dev/nss` redirects here) — **the adapter cannot resolve this one**; see the pagination note in step 4. Tags are `NSS_3_128_RTM`: underscores plus an `_RTM` suffix, so the separator-mismatch guard applies as well. |
+
+Do **not** spend probes on `git.gnupg.org` or `dev.gnupg.org`: both refused `git ls-remote` for
+gnupg, gpgme, libgcrypt and gpgmepp on 2026-09-03. The GitHub mirror is the only working path.
 
 If none match, try the **tarball fallback** (§3a) before giving up; only if that is not applicable, record as **MANUAL** with reason "upstream not resolvable" and skip steps 4–6.
 
@@ -150,7 +178,40 @@ Adapters apply a `contains("<VERSION>")` match against upstream tag listings —
 
 > **`git` kind is the exception to the uniform `<key...>` convention.** Its `resolve-tag` takes only `<name> <version>` — the clone URL is **not** passed here (it is used solely by the one-time `init` in step 3). Likewise git's `fetch-diff` is `<name> <old_ref> <new_ref> <out_prefix>`, with no URL. Passing the clone URL into `resolve-tag`/`fetch-diff` shoves the version into the wrong slot, so every tag silently resolves to `{}`. github/gitlab/bitbucket instead carry their full key (`<owner/repo>`, `<host> <project>`, `<workspace> <repo>`) into every verb.
 
-**Guard against variant-tag shadowing.** Because the match is a substring, a suffixed variant can outrank the plain release tag — e.g. `contains("4.1.0")` may return `v4.1.0-cqp-extended` (an experimental/fork tag) instead of `v4.1.0`, silently corrupting the diff base. This bites hardest on the OLD/base ref, where a wrong tag inflates the diff with unrelated changes. When more than one tag matches, prefer the tag that is *exactly* the expected version (`v<VERSION>` / `<VERSION>` / `<name>-<VERSION>`) over any longer suffixed sibling; if the adapter handed back a suffixed variant, re-list the tags and pick the exact match by hand before calling `fetch-diff`.
+**Guard against variant-tag shadowing.** Because the match is a substring, a suffixed variant can outrank the plain release tag — e.g. `contains("4.1.0")` may return `v4.1.0-cqp-extended` (an experimental/fork tag) instead of `v4.1.0`, silently corrupting the diff base. This bites hardest on the OLD/base ref, where a wrong tag inflates the diff with unrelated changes. When more than one tag matches, prefer the tag that is *exactly* the expected version (`v<VERSION>` / `<VERSION>` / `<name>-<VERSION>`) over any longer suffixed sibling; if the adapter handed back a suffixed variant, re-list the tags and pick the exact match by hand before calling `fetch-diff`. Confirmed live on 2026-09-03: `mise` 2026.9.1 resolved to **`vfox-v2026.9.1`** instead of `v2026.9.1`.
+
+**Guard against separator mismatch, too — this one returns `{}`, not a wrong tag.** The substring
+match assumes upstream spells the version the way Homebrew does. Plenty of projects do not: curl
+tags `8.22.0` as `curl-8_22_0`, so `contains("8.22.0")` misses *both* refs and the formula reads as
+"tag not found" → MANUAL, even though the repo resolved fine and the tags are right there. Before
+accepting `{}` from a repo that plainly exists, retry with `.` replaced by `_` (and by `-`), or
+just list the tags and pick by eye:
+
+```bash
+gh api "repos/<owner>/<repo>/tags?per_page=100" --paginate -q '.[].name' \
+  | grep -F "$(echo '<VERSION>' | tr . _)"
+```
+
+`{}` means "no tag *contained that exact string*", which is not the same as "no tag for this
+release".
+
+**The two guards are one procedure, not two — fixing the separator re-exposes the shadowing trap.**
+Confirmed on curl 8.22.0: once `8_22_0` matches, the tag list leads with `rc-8_22_0-3`,
+`rc-8_22_0-2`, `rc-8_22_0-1` and only *then* `curl-8_22_0`. Taking `.[0]` at that point pins a
+release candidate. Always re-apply the exact-match preference above after re-spelling the version.
+
+**`--paginate` is load-bearing, and the adapter does not have it.** `github.sh resolve-tag` issues a
+single `tags?per_page=100`, and GitHub does not return that page in any useful order — for a repo
+with many tags the newest release may simply not be on it. `nss` is the standing case: page 1 is
+2000s-era refs (`travisWebshell_03082000_BASE`, `nss_20021204`, …) with **no `NSS_3_*` tag at all**,
+so the adapter returns `{}` for `mozilla/nss` no matter how the version is spelled, and the
+separator guard cannot save it. Measured 2026-09-04: the paginated command above finds
+`NSS_3_128_RTM` and `NSS_3_128_BETA1`; without `--paginate` it exits 1 with no output.
+
+So for `nss` — and any formula where the paginated lookup finds a tag the adapter did not —
+classify **MANUAL** with reason "tag beyond adapter's first tag page", and note the tag you found by
+hand so the user can review the release themselves. Do not hand a tag the adapter never produced to
+`fetch-diff` and report the result as an adapter-verified diff.
 
 Call once for the installed version (`installed_versions[0]` — pin explicitly; the array normally has one entry but `brew` allows multiple installed versions for versioned formulae like `python@3.10`) and once for the latest version.
 
@@ -175,12 +236,96 @@ grype alone is not a sufficient security signal for this repo, and both of its f
 modes point the wrong way (see **Why these choices**). Before classifying, check whether
 the release *itself* says it fixes a published advisory.
 
+**Three sources, in this order. Run all three — their coverage is disjoint.** On 2026-09-03 three
+of the four formulae that mattered were found by exactly one source each, and the sources
+disagreed about the fourth.
+
+#### Source A — GitHub Repository Security Advisories (`github` kind only)
+
+The maintainer's own advisory record, and the only source here that carries **severity and CVSS** —
+no amount of commit-message reading will give you that.
+
+```bash
+gh api "repos/<owner>/<repo>/security-advisories?per_page=100" --paginate \
+  | jq -r --arg v "<NEW_VERSION>" \
+      '[.[] | select([.vulnerabilities[]?.patched_versions // ""] | any(contains($v)))]
+       | .[] | "\(.ghsa_id) \(.severity) cvss=\(.cvss.score // "?") cve=\(.cve_id // "none") \(.summary)"'
+```
+
+Filter on `patched_versions` containing the **new** version — that is what makes a hit mean *this
+upgrade fixes it*. An empty result is not an all-clear: fall through to B.
+
+`.cvss.score` is null on a minority of advisories (2 of libheif's 11 on 2026-09-03), which is why
+the `// "?"` is there. Report those as `CVSS n/a` rather than dropping them or reading the missing
+score as low — `.severity` is populated even when the score is not, so rank on that.
+
+#### Source B — OSV.dev, `GIT` ecosystem (any kind, once you know the repo URL)
+
+Covers projects that publish CVEs with git ranges but file no GitHub advisories. OpenSSL is the
+case in point: Source A returns **zero** for `openssl/openssl` because OpenSSL publishes on
+`openssl-library.org` instead, while Source B returns exactly the eleven CVEs 3.6.4 fixes.
+
+```bash
+curl -s --max-time 25 -X POST https://api.osv.dev/v1/query -H 'Content-Type: application/json' \
+  -d '{"package":{"name":"https://github.com/<owner>/<repo>","ecosystem":"GIT"},"version":"<INSTALLED_VERSION>"}' \
+  | jq -r '.vulns[]? | select(.id | startswith("OSV-") | not) | "\(.id) \(.summary)"'
+```
+
+The `name` is the repository's canonical web URL, not necessarily a GitHub one — use
+`https://gitlab.com/<project>` or the clone URL minus `.git` for `gitlab` / `bitbucket` / `git`
+kinds. OSV's GIT coverage outside GitHub is thin, so an empty result there is even weaker evidence
+than usual.
+
+Query the **installed** version here — OSV answers "what affects this version", so a hit means what
+you have is vulnerable. Drop `OSV-`-prefixed ids: those are OSS-Fuzz crash reports, not published
+advisories, and libheif alone carries 16.
+
+#### Source C — the two greps over the diff
+
+The third net, and the only one that works when a project files nothing anywhere. It needs the
+diff, so fetch it now.
+
 Run `fetch-diff` now for every formula whose base and latest tags resolved — including ones
 that failed the age gate, and including the substituted base of step 4. This writes the same
 `$OUT.patch` / `$OUT-meta.json` artefacts step 6 consumes, so **do not fetch twice**; step 6
 reuses them. A non-zero adapter exit is handled exactly as in step 6 (see the exit-code table
 there), except that a formula whose fetch fails gets no advisory scan at all — classify it
 **MANUAL**, never let a failed fetch read as a clean scan.
+
+**Check every fetched diff for truncation before you scan it.** Compare endpoints cap their
+response, and say so nowhere in the text you grep — a truncated diff greps exactly like a complete
+clean one, so an unchecked truncation reads as an all-clear.
+
+For **`github` kind only**, the cap is **250 commits and 300 files**, and `github.sh` records the
+real span in `.ahead`, which is what makes this detectable at all:
+
+```bash
+jq -r 'if (.ahead == null) then "UNKNOWN: non-github meta, .ahead absent — see below"
+       elif (.ahead > (.commits|length)) or ((.files|length) >= 300)
+       then "TRUNCATED: \(.commits|length)/\(.ahead) commits, \(.files|length) files"
+       else "complete: \(.ahead) commits, \(.files|length) files" end' "$OUT-meta.json"
+```
+
+**The `.ahead == null` arm is not decoration — without it this check lies.** Only `github.sh` emits
+`ahead`; `gitlab.sh`, `bitbucket.sh` and `git.sh` write `{commits, files}` only. jq evaluates
+`null > 3` as `false`, so the naive two-arm form falls to the else branch and prints
+`complete: null commits, N files` for every non-GitHub formula — a fabricated all-clear, which is
+precisely the failure this paragraph exists to prevent.
+
+What the other three actually do:
+
+| kind | cap | detectable? |
+|---|---|---|
+| `github` | 250 commits / 300 files | **yes** — via `.ahead`, above |
+| `bitbucket` | 100 commits (`pagelen=100`), 200 files (`pagelen=200`), neither paginated | **no** — no total is fetched. Treat a diff at exactly 100 commits or 200 files as truncated. |
+| `gitlab` | server-side compare limit, instance-dependent | **no** — treat a suspiciously round or huge span as unverified |
+| `git` | none — local clone, full history | n/a, always complete |
+
+A truncated diff makes the step-4a scan **inconclusive, not clean.** Classify per step 5 and say so
+in the summary — never let a sampled diff be reported as reviewed. Measured 2026-09-03: `libomp`
+22.1.8→23.1.0 was **23,416** commits behind a 250-commit sample, `mise` 2,444, `usage` 622, `curl`
+525; `nss` (resolved by hand — see step 4) had all 52 commits but hit the 300-file cap. Every one of
+them greped clean.
 
 **Run both greps. Neither is a superset of the other.**
 
@@ -196,7 +341,29 @@ jq -r '.commits[].message' "$OUT-meta.json" | grep -oEi "$ADV" | sort -u
 grep -nE "^\+.*($ADV)" "$OUT.patch"
 ```
 
-Measured over the 2026-08-28 formulae:
+**Measured 2026-09-03 — why all three, and which to trust when they disagree:**
+
+| Formula | A (GitHub) | B (OSV GIT) | C (greps) | grype |
+|---|---|---|---|---|
+| `libheif` 1.23.2→1.23.3 | **11**, one *critical* CVSS 9.8 | 0 | 13 — three wrong, one missed | 0 |
+| `pcre2` 10.47→10.48 | **6**, no noise | 0 | 6, after triaging 13 historical IDs | 0 |
+| `libde265` 1.1.1→1.1.2 | **2** | 0 | 2 | 0 |
+| `openssl@3` 3.6.3→3.6.4 | 0 | **11** | 11 | 0 |
+| `gnupg`, `curl`, `nss`, `libgcrypt` | 0 | 0 | 0 | 1 stale |
+
+**Where A returns hits, prefer its list over C's.** On libheif the greps counted 13 by reading code
+comments about *older* fixes as current (`GHSA-jc8f-p23p-5hjg` was patched in v1.23.1,
+`GHSA-2c3g-p585-8rpq` in 1.19.6, `GHSA-prcj-g5xh-rw95` is not an advisory at all) while
+simultaneously dropping `GHSA-73p7-m7gg-w2jv` by misreading it as a prior incomplete fix. The
+changelog-noise problem this section warns about applies to **code comments too**, and C cannot
+tell you that `GHSA-x8r2-mggj-j6wr` is CVSS 9.8 while the other ten are not.
+
+Do **not** reach for `osv-scanner` against the SBOM as a shortcut. Tested on the same
+`/tmp/brew-sbom.json`: 39 vulnerable packages, **none of them an outdated formula** — every hit was
+a Go/Rust/Python dependency vendored inside a bottle, which `brew upgrade` cannot act on. It shares
+grype's purl gap and adds noise.
+
+Measured over the 2026-08-28 formulae, source C alone:
 
 | Formula | A: subjects | B: added patch lines |
 |---|---|---|
@@ -240,15 +407,28 @@ Apply rules in order:
 |---|---|---|
 | Release cites a published advisory (surviving step 4a hit) | **SECURITY** | Maintainer-attested fix for a known vuln. Age gate does not apply. This outranks grype, which routinely misses exactly these. |
 | Name appears in grype CVE map | **SECURITY** | Known vuln — age gate does not apply, upgrade is worth the tail risk. Cross-check against the step-4a IDs: a grype hit with an empty `fix` array and no 4a corroboration is usually a stale false positive, so report it as such rather than as the reason to upgrade. |
+| Diff truncated at the API cap (step 4a) **and** age ≥ 10 days | **REVIEW MANUALLY** | The scan saw a sample, not the release; a clean grep proves nothing about the other 23,000 commits. Never let this become a plain UPDATE. |
 | Latest tag age ≥ 10 days | **UPDATE** (diff-pending) | Passes age gate, proceed to diff review. |
 | Latest tag age < 10 days | **WAIT** | Release is too fresh — let it bake. Step 4a already cleared it of *published* advisories; no full diff review. |
 | Upstream or tag not resolvable | **MANUAL** | Cannot inspect — user decides. |
 
-**MANUAL** has nothing to diff and skips step 6. Everything else already has its
-artefacts from step 4a: run the full heuristic scan for **SECURITY** and **UPDATE**.
-For **WAIT**, the step-4a advisory grep is the whole review — no full scan needed.
+A truncated diff on a **WAIT** formula stays WAIT — it is not being upgraded — but the summary must
+still mark it, because re-running after the gate expires will truncate identically and will not
+resolve itself. A surviving 4a hit or a grype match still promotes to **SECURITY** regardless of
+truncation; say in the summary that the review was partial.
 
-### 6. Diff review (SECURITY and UPDATE only)
+**MANUAL** has nothing to diff and skips step 6. Everything else already has its
+artefacts from step 4a: run the full heuristic scan for **SECURITY**, **UPDATE**, and
+**REVIEW MANUALLY**. For **WAIT**, the step-4a advisory grep is the whole review — no full scan
+needed.
+
+**A truncation-derived REVIEW MANUALLY still gets the step-6 scan.** It is the one REVIEW MANUALLY
+that arrives with artefacts already on disk rather than as a step-6 verdict, so it is easy to route
+to the same "nothing to diff" path as MANUAL — do not. A HIGH finding inside the 250-commit sample
+is a real HIGH finding and promotes the formula to **DO NOT UPGRADE**; only the *absence* of
+findings is what the truncation makes meaningless.
+
+### 6. Diff review (SECURITY, UPDATE, and REVIEW MANUALLY)
 
 Step 4a already ran `fetch-diff` for every resolvable formula, so the artefacts below exist
 on disk — reuse them rather than fetching again. The verb is documented here because this is
@@ -304,17 +484,21 @@ Print one compact block, grouped by classification:
 Processed N formula(s):
 
 SECURITY (upgrade recommended regardless of age):
-  <name> <old> → <new>  Advisories: <IDs>  Source: <grype | in-release | both>  Diff: <clean | N flags>
+  <name> <old> → <new>  Advisories: <IDs>  Max severity: <critical|high|medium|low> (CVSS <x.y>)
+                        Source: <A github | B osv | C grep | grype, combined>  Diff: <clean | N flags>
 
 UPDATE (≥10d old, diff clean):
   <name> <old> → <new>  Age: <X>d  Diff: clean
 
 REVIEW MANUALLY:
   <name> <old> → <new>  Reason: <MEDIUM finding summary>
+  <name> <old> → <new>  Reason: diff truncated <N>/<AHEAD> commits, <F> files — sampled only,
+                        clean grep proves nothing; sampled scan: <clean | N flags>
 
 WAIT (<10d old):
   <name> <old> → <new>  Age: <X>d — try again in <10-X>d
   <name> <old> → <new>  Age: <X>d — ⚠ security-relevant, no advisory ID: <one line>
+  <name> <old> → <new>  Age: <X>d — ⚠ diff truncated <N>/<AHEAD> commits — scan inconclusive
 
 DO NOT UPGRADE:
   <name> <old> → <new>  Reason: <HIGH finding summary>
@@ -341,17 +525,51 @@ Format the file as proper Markdown (tables for each classification, fenced code 
 ## Failure modes
 
 - **grype reports nothing for a formula that plainly fixed a vulnerability.** Expected, not a
-  malfunction. Check `grype db status` first and record the DB age in the report — grype's own
-  freshness ceiling is 5 days, and `grype db update` can answer "no newer build" while the cached
-  DB is older than that, as it did on 2026-08-28 at seven days. But a current DB does not close
-  the gap: Homebrew C/C++ libraries have no purl→advisory mapping in the GitHub Advisory Database,
+  malfunction. Record the DB age from the scan's own `.descriptor.db.status` (step 2), never from a
+  concurrent `grype db status`. And do not reach for `grype db update` as the remedy — a current DB
+  does not close the gap: Homebrew C/C++ libraries have no purl→advisory mapping in the GitHub Advisory Database,
   so they match only once NVD assigns a CPE, which lags by weeks to months. Step 4a is the
   compensating control for both. Never read a grype miss as evidence of safety.
 - **grype matches ancient CVEs with an empty `fix` array.** Also expected. Name-based CPE
   matching, plus Homebrew version strings it cannot parse (`7.1.2-29` is a patch counter, not
   a semver prerelease, and grype orders it *before* `7.1.2`), produce stale hits. Treat a grype
   hit as a prompt to read the release notes, never as the finding itself.
+- **`grype db status` disagrees with the scan.** Not a fault — a race. grype auto-updates at scan
+  start, `syft` runs for minutes beforehand, so a status check launched alongside the run reads the
+  pre-update cache. On 2026-09-03 it reported a six-day-old `invalid` DB for a scan that recorded
+  `valid: true` built that morning, and the whole "stale DB" finding had to be retracted. Read
+  `.descriptor.db.status` from `/tmp/brew-cves.json` and ignore the standalone command.
+- **A diff came back suspiciously clean on a huge version jump.** Check `.ahead` against
+  `.commits|length` before believing it (step 4a). The compare API truncates silently at 250
+  commits / 300 files; `libomp` 22.1.8→23.1.0 sampled 250 of **23,416** commits and greped clean.
+  A version span this wide is not reviewable through this skill at all — say so rather than
+  implying it passed.
+- **The truncation check reports `complete` for a gitlab / bitbucket / git formula.** It is telling
+  you nothing: only `github.sh` writes `.ahead`, and `null > N` is `false` in jq, so the two-arm
+  form of that check falls through to "complete" for the other three adapters and prints
+  `complete: null commits`. Use the three-arm form in step 4a and read the per-kind table beside it.
+  `bitbucket` is the one that silently truncates without any total to compare against — 100 commits
+  and 200 files, unpaginated.
+- **A formula resolves to `{}` even after re-spelling the version with `_` and `-`.** Before calling
+  it MANUAL, re-run the tag lookup with `--paginate`. `github.sh` fetches a single tag page and
+  GitHub does not order it usefully; `mozilla/nss`'s first page is entirely 2000s-era refs, so its
+  current release is invisible to the adapter. A tag found only by the paginated lookup means the
+  adapter cannot drive this formula — classify MANUAL and name the tag, do not feed it to
+  `fetch-diff` and present the result as adapter-verified.
 - **grype DB download fails** (first run, or when the cached DB on the machine is stale / offline): report "CVE scan unavailable — falling back to no security classification", then process every formula through the age gate only. Still useful, just less informative. To preempt this on a fresh machine, run `grype db update` once before the first `/review-brew-outdated` invocation.
+- **Source A returns 0 for a project that clearly ships security fixes.** Normal — it means the
+  project does not file GitHub advisories, not that the release is clean. OpenSSL is the standing
+  example (publishes on `openssl-library.org`). Fall through to B, then C; never treat an empty A
+  as an all-clear.
+- **Source B returns only `OSV-…` ids.** Those are OSS-Fuzz crash reports, not published
+  advisories — filter them out. A repo can carry dozens (libheif: 16) and reporting them as
+  advisories would manufacture a SECURITY classification out of nothing.
+- **api.osv.dev unreachable or slow.** Non-fatal: note "OSV lookup unavailable" and rely on A and
+  C. Use `--max-time`; the endpoint occasionally hangs rather than erroring.
+- **A and C disagree on the count.** Trust A. C reads commit subjects and patch text, which
+  routinely mention *previously* fixed advisories in comments and regression-test names; A is keyed
+  on `patched_versions` and cannot make that mistake. Reconcile before writing the summary rather
+  than reporting a union.
 - **`gh api compare` 404s** (force-pushed or rewritten history upstream): classify as **MANUAL** with reason "upstream compare unavailable".
 - **GitHub rate limit** (403 with `x-ratelimit-remaining: 0`): stop processing, report remaining formulae as skipped with the reason "github rate limit".
 - **Every GitHub formula fails identically from the first call** (`tags fetch failed` for each, exit 3): this is local `gh` auth, not an upstream fault — but it arrives dressed as one, because exit 3 means "upstream API / network failure" in the table above. A genuine rate limit or outage degrades partway through a run; this is uniform from call one. `adapters/github.sh` prints gh's/op's own stderr precisely so the two can be told apart — read it before classifying anything as MANUAL. Confirm with a single `bash "$SKILL_DIR/adapters/github.sh" resolve-tag cli/cli 2.96.0`, and if it is auth, `export GH_TOKEN="$(gh auth token)"` for the run.
@@ -372,9 +590,17 @@ Format the file as proper Markdown (tables for each classification, fenced code 
   the releases themselves. The one formula it did flag, `imagemagick`, it flagged on four stale
   CPE matches (`CVE-2014-9826`, `CVE-2016-7538`, `CVE-2017-5506` with empty `fix` arrays, plus a
   2023 entry) and not on any of the ten GHSAs that release actually fixed — the right
-  classification for the wrong reason. That run's DB was seven days old and `grype db update`
-  reported no newer build, so freshness was a contributing factor; the purl gap is the structural
-  one and persists with a current DB.
+  classification for the wrong reason. That run's DB was recorded as seven days old, but the reading
+  came from a `grype db status` run alongside the scan, which races the auto-update — treat it as
+  unverified. The 2026-09-03 run settles the question with the authoritative field: the scan's own
+  `.descriptor.db.status` showed a DB built that morning, `valid: true`, and it still matched none
+  of the 11 CVEs in `openssl@3` 3.6.4, the 11 GHSAs in `libheif` 1.23.3, the 6 in `pcre2` 10.48, or
+  the 2 in `libde265` 1.1.2 — **30 advisories missed on a current database**. (Count libheif at A's
+  11, not the greps' 13: three of those are false positives this skill's own step 4a discards, and
+  padding the indictment with them would repeat the mistake being documented.) Of the 13 brew matches
+  it did return, 12 had an empty `fix` array and four of the formulae (`imagemagick`, `libtiff`,
+  `pixman`, `redis`) were not outdated at all. Freshness is not part of this story; the purl gap is
+  the whole of it.
 - **Step 4a exists because the two blind spots align.** A release that is days old is both too
   new for NVD enrichment to reach grype *and* too new to pass the age gate into diff review.
   Under the original ordering, freshness closed both eyes at once — systematically, not randomly.
@@ -392,6 +618,19 @@ Format the file as proper Markdown (tables for each classification, fenced code 
   scope's cost is noise rather than falsity, and it is bounded: a changelog-format migration can
   re-add years of old entries at once, which is why step 4a triages hits by reading the matched
   line instead of trusting the count.
+- **Three advisory sources, because each one is blind somewhere the others are not.** This is the
+  same argument as "both greps", one level up. Source A (GitHub advisories) is the most accurate
+  and the only one carrying severity, but it is empty for any project that files elsewhere —
+  OpenSSL, the single largest attack surface in the Cellar, returns zero. Source B (OSV `GIT`)
+  catches exactly that case and nothing else here: it returned all 11 OpenSSL CVEs and zero for
+  libheif, whose GHSAs are not in OSV at all. Source C (greps) is the only thing left for projects
+  that file nothing anywhere — gnupg, curl, nss and libgcrypt were invisible to A, B *and* grype on
+  2026-09-03, and their releases still carried real memory-safety fixes. Running one source and
+  calling it done reproduces the exact failure this skill was written to stop.
+- **Severity is a reason to prefer Source A, not a nice-to-have.** The 2026-09-03 report ranked
+  libheif's eleven advisories flat because commit subjects carry no severity. One of them,
+  `GHSA-x8r2-mggj-j6wr`, is critical at CVSS 9.8. A user deciding how urgently to run the upgrade
+  command needs that number, and only A has it.
 - **10-day gate kept from Renovate policy.** The rest of this repo (`lazy-lock.json`, `aqua.yaml`) already uses `minimumReleaseAge: 10 days` via Renovate. Matching the threshold here keeps expectations consistent.
 - **No automatic `brew upgrade`.** Homebrew upgrades touch `/opt/homebrew` and can trigger cascading dependency upgrades. The user runs the command so they can eyeball it and interrupt if something looks off.
 - **Cellar-wide syft scan.** Per-formula scans would duplicate work; one pass is O(minutes) and feeds every downstream decision.
