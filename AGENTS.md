@@ -25,7 +25,7 @@ This repo has no `.claude/rules/`; the table below is the general classification
 | Class | Handling | Items | Why |
 |---|---|---|---|
 | **Shareable** | real file in `.agents/`, symlink from `.claude/` | `rules/`, `plans/`, `skills/` | agent-neutral assets other agents should reach too |
-| **Claude Code specific** | stays in `.claude/` | `settings.json`, `settings.local.json`, `scheduled_tasks.lock`, `.gitignore` | only Claude Code reads them; `.claude/.gitignore` scopes an exclusion to that directory |
+| **Claude Code specific** | stays in `.claude/` | `settings.json`, `settings.local.json`, `scheduled_tasks.lock`, `.gitignore`, `worktrees/` | only Claude Code reads them; `.claude/.gitignore` scopes its exclusions to that directory |
 | **Skill output** | leave alone | `project-health-report.md`, `skill-retros/`, `retro/`, `blog-ideas/` | artifacts a skill writes; don't move them unless the producing skill's output path moves |
 | **Unclear** | **stays in `.claude/`** | — | don't move what you haven't classified |
 
@@ -76,7 +76,7 @@ The Glob / Grep row says "check per environment" because it depends on the build
 - `.gitignore_global:52` — `.claude/settings.local.json`
 - `.gitignore_global:58` — `.claude/skill-retros`
 
-Plus, repo-local: `.gitignore:2` is `/.claude/skill-retros/` (**leading `/` anchors it**, so it stops matching entirely if the directory moves), and `.claude/.gitignore:1` is `settings.local.json`, which works by sitting in that directory.
+Plus, repo-local: `.gitignore:2` is `/.claude/skill-retros/` (**leading `/` anchors it**, so it stops matching entirely if the directory moves), and `.claude/.gitignore` holds two entries that work by sitting in that directory — `settings.local.json` on line 1, and `worktrees/` on line 2 for the ephemeral checkouts `EnterWorktree` creates under `.claude/worktrees/`.
 
 All of these cover items classified as staying in `.claude/`, so they are unaffected — **and that is exactly why none of them may move.** Moving one silently un-ignores a local settings file.
 
