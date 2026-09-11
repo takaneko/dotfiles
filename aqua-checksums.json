@@ -31,8 +31,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/astral-sh/uv/0.12.5/uv-aarch64-apple-darwin.tar.gz",
-      "checksum": "5BB0E5FE008A773C3DBCB97FF79CD89E1241464FE9D2F986D52AD8F1B037BD62",
+      "id": "github_release/github.com/astral-sh/uv/0.12.7/uv-aarch64-apple-darwin.tar.gz",
+      "checksum": "127EBDDA7AD953CDF198E964B570EA5771B85467EA93EB7CB6D6F8E6F55408F3",
       "algorithm": "sha256"
     },
     {
