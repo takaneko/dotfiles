@@ -11,8 +11,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/ByteNess/aws-vault/v7.13.5/aws-vault-darwin-arm64",
-      "checksum": "B4008AF1D771E4839FB76DA3623D31CD33032099AA273CF283117CD6AB8BDBA9",
+      "id": "github_release/github.com/ByteNess/aws-vault/v7.13.6/aws-vault-darwin-arm64",
+      "checksum": "F5246E89A13EB2EAEB6B25839184B68C82A1155F9C786EDEAB353E8B344B8531",
       "algorithm": "sha256"
     },
     {
@@ -21,18 +21,18 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/anchore/grype/v0.117.0/grype_0.117.0_darwin_arm64.tar.gz",
-      "checksum": "BFCEFA3F3B1690D9C77D847841B32EBD6106AB0E0E32F810924707E704D53584",
+      "id": "github_release/github.com/anchore/grype/v0.118.0/grype_0.118.0_darwin_arm64.tar.gz",
+      "checksum": "938F050BB5076C8AA761867B39843ABAD2414DFE4CC82B7D36886E634F49C640",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/anchore/syft/v1.51.0/syft_1.51.0_darwin_arm64.tar.gz",
-      "checksum": "4F37F4C7FEFCE0A68E4CF71BA3F5F9829A99E65D89B29F7EE41B8C2C10EA8C59",
+      "id": "github_release/github.com/anchore/syft/v1.51.1/syft_1.51.1_darwin_arm64.tar.gz",
+      "checksum": "AC063AF3B9874769DEB7EA1E6D76841E68F9E3BB50CD654226FC977DE65532C1",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/astral-sh/uv/0.12.5/uv-aarch64-apple-darwin.tar.gz",
-      "checksum": "5BB0E5FE008A773C3DBCB97FF79CD89E1241464FE9D2F986D52AD8F1B037BD62",
+      "id": "github_release/github.com/astral-sh/uv/0.12.7/uv-aarch64-apple-darwin.tar.gz",
+      "checksum": "127EBDDA7AD953CDF198E964B570EA5771B85467EA93EB7CB6D6F8E6F55408F3",
       "algorithm": "sha256"
     },
     {
@@ -56,8 +56,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/golangci/golangci-lint/v2.13.1/golangci-lint-2.13.1-darwin-arm64.tar.gz",
-      "checksum": "0C9818BAF6FB8AD26C6D2EF51B68D5A1E260EF07727036B1431647CC44637C7C",
+      "id": "github_release/github.com/golangci/golangci-lint/v2.13.2/golangci-lint-2.13.2-darwin-arm64.tar.gz",
+      "checksum": "F4BF83F0B64F055C42B28FC9A38861839F69C096E61C788E72DFAAE412011789",
       "algorithm": "sha256"
     },
     {
@@ -86,8 +86,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/kubernetes-sigs/kind/v0.32.0/kind-darwin-arm64",
-      "checksum": "DCA67911095A110C2B5C36E26DF6CAC860C602033E456C0DB47BE498CDEF1EBB",
+      "id": "github_release/github.com/kubernetes-sigs/kind/v0.33.0/kind-darwin-arm64",
+      "checksum": "0C8C7DBE5E23594A198B786C4BC13DACC101FA6196B0CB0B23A1CA44E61F4B4F",
       "algorithm": "sha256"
     },
     {
@@ -111,8 +111,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/sharkdp/fd/v10.4.2/fd-v10.4.2-aarch64-apple-darwin.tar.gz",
-      "checksum": "623DC0AFC81B92E4D4606B380D7BC91916BA7B97814263E554D50923A39E480A",
+      "id": "github_release/github.com/sharkdp/fd/v10.5.0/fd-v10.5.0-aarch64-apple-darwin.tar.gz",
+      "checksum": "B67E1836C468E42E411984B56E52FA7ABEC08C2BD22C867398E7CC134AAC5E12",
       "algorithm": "sha256"
     },
     {
@@ -121,8 +121,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/tree-sitter/tree-sitter/v0.26.13/tree-sitter-macos-arm64.gz",
-      "checksum": "0A13C53D178D4CCA22D2DA220D5841C76CBA0C39C220B789B64D752AE5D31864",
+      "id": "github_release/github.com/tree-sitter/tree-sitter/v0.27.0/tree-sitter-macos-arm64.gz",
+      "checksum": "70F7573B2B2E5371A5B58CC5227D2AD981FD5374596B9874E770AF486060774E",
       "algorithm": "sha256"
     },
     {
@@ -146,8 +146,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.554.0/registry.yaml",
-      "checksum": "80FC5A849EB5907E37DEEE616CA1AF08CF96D6F52ECC179FC2473EB0BCA74998498D801DDE6FDF33BDC190E9FED51E7795C32A872A2978E2689E6B339B045758",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.558.0/registry.yaml",
+      "checksum": "14195C070AE8D00BA9273DB82ABB4ECFC8135AFB9A1EA3CC1839738C98E315419FE13CBEB727EF743F945372C1908FF9621D047CE90239F953E3D75CF093D0A6",
       "algorithm": "sha512"
     }
   ]
