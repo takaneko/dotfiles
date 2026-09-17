@@ -101,8 +101,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/oven-sh/bun/bun-v1.4.0/bun-darwin-aarch64.zip",
-      "checksum": "C669E97F6164E1C96E0701748DB98DFA77492908CBD8394C7557134A735DE381",
+      "id": "github_release/github.com/oven-sh/bun/bun-v1.4.2/bun-darwin-aarch64.zip",
+      "checksum": "90987A3A16D7DB556D886AC3D551E7B6D3EDF0A1CF43ACAED622E8676BE1D12F",
       "algorithm": "sha256"
     },
     {
