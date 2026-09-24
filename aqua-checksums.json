@@ -141,8 +141,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "http/get.helm.sh/helm-v4.2.4-darwin-arm64.tar.gz",
-      "checksum": "D747EB4E28BD2727173D15B759FA0A17822291EC09DB7CED3D55AF290A3661A2",
+      "id": "http/get.helm.sh/helm-v4.3.0-darwin-arm64.tar.gz",
+      "checksum": "D3870437E1E95B67F8EDBDE964156C84A26503F560821D40C542441658934FBA",
       "algorithm": "sha256"
     },
     {
