@@ -61,8 +61,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/google/osv-scanner/v2.5.1/osv-scanner_darwin_arm64",
-      "checksum": "75C44D6332F892A1E56286F4105A98ED751AE28D215CA0A8B65CC00D84103054",
+      "id": "github_release/github.com/google/osv-scanner/v2.6.0/osv-scanner_darwin_arm64",
+      "checksum": "98C460DCD37DE25819BABD757D04542045B6243113E209EDCD4D89FEDB0256B4",
       "algorithm": "sha256"
     },
     {
