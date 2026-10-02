@@ -131,10 +131,28 @@ If none match, try the **tarball fallback** (§3a); only if that is not applicab
 with reason "upstream not resolvable" and skip steps 4–6.
 
 **Brew-revision-only bumps** (`8.1` → `8.1_1`, `1.86.0` → `1.86.0_1`): the upstream version is
-unchanged — only the Homebrew formula revision bumped. Both versions resolve to the same tag and
-`compare` returns an empty diff. Record as UPDATE with reason "brew revision only, no upstream
-diff" and skip the heuristic scan. Do NOT classify as MANUAL. If the revision bump log cites another
-formula ("revision bump for x265 4.2"), note the dependency so the user can review it separately.
+unchanged — only the Homebrew formula revision bumped. There is no upstream diff, so **review the
+formula change instead** — it is where the substance is:
+
+```bash
+gh api "repos/Homebrew/homebrew-core/commits?path=Formula/<first-letter>/<name>.rb&per_page=4" \
+  -q '.[] | "\(.commit.committer.date[:10]) \(.commit.message|split("\n")[0])"'
+# then read the non-bottle commit's patch: gh api repos/Homebrew/homebrew-core/commits/<sha> -q '.files[].patch'
+```
+
+(`lib*` formulae live under `Formula/lib/`, not `Formula/l/`.) Classify by what the change does:
+
+| Formula change | Classification |
+|---|---|
+| Adds `patch` blocks with `resolves "CVE-…"` | **SECURITY** — verify each patch URL is a commit on the upstream default branch |
+| "revision bump (<dep> X.Y)" where `<dep>` is also being upgraded | **Same class as `<dep>`, never held back alone.** A major/SONAME bump of `<dep>` deletes the old dylib on upgrade; the stale-revision dependent then fails to load (`otool -L` still names the old `.dylib`). If `<dep>` is approved, this is approved. |
+| `depends_on` switches to a formula not currently installed (e.g. `openssl@3` → `openssl@4`) | Review the **new formula** as an install: its release age (age gate applies), advisories, and whether it is `keg_only`. A non-keg-only formula with `link_overwrite` repoints shared paths (`bin/openssl`, `include/openssl`) — state that in the summary. The new formula's age gate decides: under 10 days → **WAIT**; otherwise **UPDATE** (or **REVIEW MANUALLY** if its review finds MEDIUM). |
+| Rebuild / linkage fix / livecheck only | **UPDATE** — "brew revision only, no upstream diff" |
+
+Do NOT classify a revision-only bump as MANUAL. The classification decided here is final (step 5's
+revision-only row carries it through; only a grype hit can still promote it to SECURITY): skip
+step 4, step 4a source C and step 6 for the formula itself — the formula change *is* the review,
+and there is no upstream diff to fetch.
 
 **For the `git` kind only**, run the one-time init before any other verb:
 
@@ -329,6 +347,7 @@ Apply rules in order:
 |---|---|---|
 | Release cites a published advisory (surviving step 4a hit) | **SECURITY** | Maintainer-attested fix for a known vuln. Age gate does not apply. Outranks grype, which routinely misses exactly these. |
 | Name appears in grype CVE map | **SECURITY** | Known vuln — age gate does not apply. Cross-check against the step-4a IDs: a grype hit with an empty `fix` array and no 4a corroboration is usually a stale false positive, so report it as such rather than as the reason to upgrade. |
+| Brew-revision-only bump (step 3) | **As classified in step 3** | Placed after the two SECURITY rows so a grype hit still promotes it. No upstream release to age-gate or diff; the formula change was the review. Do not let the rows below re-derive it from the (unchanged) upstream tag date. |
 | Diff truncated (step 4a) **and** age ≥ 10 days | **REVIEW MANUALLY** | The scan saw a sample, not the release; a clean grep proves nothing about the other 23,000 commits. Never let this become a plain UPDATE. |
 | Latest tag age ≥ 10 days | **UPDATE** (diff-pending) | Passes age gate, proceed to diff review. |
 | Latest tag age < 10 days | **WAIT** | Too fresh — let it bake. Step 4a already cleared it of *published* advisories; no full diff review. |
@@ -431,6 +450,26 @@ Upgrade command (SECURITY + UPDATE only):
 
 Omit empty sections. If there are no approved upgrades, omit the final command block entirely and
 say so explicitly.
+
+**Verify the command before printing it** — `brew upgrade <list>` also upgrades outdated
+dependencies, and guessing from `brew deps` is unreliable (it over- and under-reports):
+
+```bash
+HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade --dry-run <name1> <name2> ... 2>&1 | sed -n '/^==> Would /,$p'
+```
+
+Naming an extra package under the command does not stop `brew upgrade` from installing it, so
+the output must contain **only approved packages** before the command is printed. For each package
+in it (`Would install` or `Would upgrade`) that is not in the approved list:
+
+- **Classified in this run as anything but SECURITY/UPDATE** (WAIT, REVIEW MANUALLY, DO NOT
+  UPGRADE, MANUAL): remove the root(s) that pull it in, move each removed root to **WAIT** with
+  reason "would pull <dep> (<class>)", and re-run the dry run.
+- **Not analyzed in this run** (a `Would install` of a new formula, or a dependency outside a
+  restricted invocation's scope): review it through steps 3–6 first, then apply the rule above.
+
+Repeat until the dry run is clean. Conversely, do not hold a formula back on a dependency-drag
+theory the dry run does not confirm.
 
 ### 8. Persist the report
 
