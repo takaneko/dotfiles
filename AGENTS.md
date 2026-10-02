@@ -14,7 +14,7 @@ Agent-neutral assets live in **`.agents/` as the real files, with `.claude/` poi
 .agents/skills/  ← real    .claude/skills -> ../.agents/skills
 .agents/plans/   ← real    .claude/plans  -> ../.agents/plans
 
-.claude/settings.local.json, .claude/.gitignore, .claude/skill-retros/  ← real, stay put
+.claude/settings.local.json, .claude/.gitignore, .claude/skill-retros/, .claude/retro/  ← real, stay put
 AGENTS.md        ← real    CLAUDE.md      -> AGENTS.md
 ```
 
@@ -76,7 +76,7 @@ The Glob / Grep row says "check per environment" because it depends on the build
 - `.gitignore_global:52` — `.claude/settings.local.json`
 - `.gitignore_global:58` — `.claude/skill-retros`
 
-Plus, repo-local: `.gitignore:2` is `/.claude/skill-retros/` (**leading `/` anchors it**, so it stops matching entirely if the directory moves), and `.claude/.gitignore` holds two entries that work by sitting in that directory — `settings.local.json` on line 1, and `worktrees/` on line 2 for the ephemeral checkouts `EnterWorktree` creates under `.claude/worktrees/`.
+Plus, repo-local: `.gitignore:2` is `/.claude/skill-retros/` (**leading `/` anchors it**, so it stops matching entirely if the directory moves), and `.claude/.gitignore` holds three entries that work by sitting in that directory — `settings.local.json` on line 1, `worktrees/` on line 2 for the ephemeral checkouts `EnterWorktree` creates under `.claude/worktrees/`, and `retro/` on line 3 for the fix instructions `skill-retro` writes to `.claude/retro/`.
 
 All of these cover items classified as staying in `.claude/`, so they are unaffected — **and that is exactly why none of them may move.** Moving one silently un-ignores a local settings file.
 
