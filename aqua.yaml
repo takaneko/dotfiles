@@ -41,4 +41,4 @@ packages:
   - name: ByteNess/aws-vault@v7.14.0
   - name: zizmorcore/zizmor@v1.30.0
   - name: anchore/syft@v1.52.0
-  - name: anchore/grype@v0.118.0
+  - name: anchore/grype@v0.119.0
