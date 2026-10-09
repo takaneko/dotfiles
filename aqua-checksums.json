@@ -126,8 +126,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "http/cache.agilebits.com/dist/1P/op2/pkg/v2.39.0/op_darwin_arm64_v2.39.0.zip",
-      "checksum": "05391D3388A0C0B4F602691BEDC1AB368541C487B6F14D2E3399743B4682AF67",
+      "id": "http/cache.agilebits.com/dist/1P/op2/pkg/v2.40.0/op_darwin_arm64_v2.40.0.zip",
+      "checksum": "43B9E7C245B48207C789BA1B8A481CCF4A658F60DBED8CC8B70D36044548A994",
       "algorithm": "sha256"
     },
     {
