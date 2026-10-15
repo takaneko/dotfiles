@@ -21,11 +21,6 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/anchore/grype/v0.119.0/grype_0.119.0_darwin_arm64.tar.gz",
-      "checksum": "500C9B2B6C089D21481815F57A553FABBD441EC7D1E79D95E3AAF40C3BFC7E36",
-      "algorithm": "sha256"
-    },
-    {
       "id": "github_release/github.com/anchore/syft/v1.52.0/syft_1.52.0_darwin_arm64.tar.gz",
       "checksum": "014D561B6D13059124155F74A6C5A9A99501F5E209313638DD884F39EB418EE6",
       "algorithm": "sha256"
