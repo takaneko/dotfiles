@@ -94,7 +94,7 @@ vim.lsp.enable('ruby_lsp')
 vim.lsp.config('ts_ls', {
   capabilities = capabilities,
   filetypes =  {'typescript', 'typescriptreact', 'javascript', 'javascriptreact'},
-  root_makers = {'.git', 'package.json', 'tsconfig.json'}
+  root_markers = {'.git', 'package.json', 'tsconfig.json'}
 })
 vim.lsp.enable('ts_ls')
 
