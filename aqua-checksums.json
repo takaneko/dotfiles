@@ -26,8 +26,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/anchore/syft/v1.52.0/syft_1.52.0_darwin_arm64.tar.gz",
-      "checksum": "014D561B6D13059124155F74A6C5A9A99501F5E209313638DD884F39EB418EE6",
+      "id": "github_release/github.com/anchore/syft/v1.54.1/syft_1.54.1_darwin_arm64.tar.gz",
+      "checksum": "B4319C3ABAA87A0170AB76EE83EA2260CA34B53AECFA3AB0DD5428D2319D744F",
       "algorithm": "sha256"
     },
     {
@@ -36,13 +36,13 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/caddyserver/caddy/v2.11.2/caddy_2.11.2_mac_arm64.tar.gz",
-      "checksum": "1738E3E6B661A9C3E9C0EBBFE2F00D3BD3D0137AE2B534DC8F477CD96E9849E719BCE31B61C6407EDBC4FE5DA4E3DE923EC435BF4E29BB53AEE60A2FA882C500",
+      "id": "github_release/github.com/caddyserver/caddy/v2.11.7/caddy_2.11.7_mac_arm64.tar.gz",
+      "checksum": "68F592DF8F0EC058FBDB9B137B64E9A0AA792D28C06E1E3B9EC12D0E7FB371683A54E73EF6D8E6D0DD70DC6B941A5B5D5B73FAEDD3F89DE119AD2EB78BDC668E",
       "algorithm": "sha512"
     },
     {
-      "id": "github_release/github.com/cli/cli/v2.101.0/gh_2.101.0_macOS_arm64.zip",
-      "checksum": "E4303E39D8F07141C4BAD4B99B01079F05029C59B27076E8FBC825C985ECDD8B",
+      "id": "github_release/github.com/cli/cli/v2.102.0/gh_2.102.0_macOS_arm64.zip",
+      "checksum": "DA922C20D1792E5B2CBF375593D7A658ACF034C12C84E007E71C76EF959C337E",
       "algorithm": "sha256"
     },
     {
@@ -66,8 +66,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/herdrdev/herdr/v0.9.1/herdr-macos-aarch64",
-      "checksum": "5FC7A7E7ADFACA56FA80AA89DCB025693357268DAB8285B9CE2D08A2313C89DE",
+      "id": "github_release/github.com/herdrdev/herdr/v0.9.3/herdr-macos-aarch64",
+      "checksum": "5173A3E0AE42D5D1AB7EBFA5D5E6329F7C3D23F8E1A3677C7CE3231DA2884157",
       "algorithm": "sha256"
     },
     {
@@ -116,8 +116,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/tree-sitter/tree-sitter/v0.27.0/tree-sitter-macos-arm64.gz",
-      "checksum": "70F7573B2B2E5371A5B58CC5227D2AD981FD5374596B9874E770AF486060774E",
+      "id": "github_release/github.com/tree-sitter/tree-sitter/v0.27.1/tree-sitter-macos-arm64.gz",
+      "checksum": "46CB97D9A2C52C94E22D9A76C2F1116156B8B61F98360E2A9CCE05FCB197CD4D",
       "algorithm": "sha256"
     },
     {
@@ -126,8 +126,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "http/cache.agilebits.com/dist/1P/op2/pkg/v2.40.0/op_darwin_arm64_v2.40.0.zip",
-      "checksum": "43B9E7C245B48207C789BA1B8A481CCF4A658F60DBED8CC8B70D36044548A994",
+      "id": "http/cache.agilebits.com/dist/1P/op2/pkg/v2.41.1/op_darwin_arm64_v2.41.1.zip",
+      "checksum": "2289771B68B521EE3DC1D63A013A6A1C5691E0C53E4C4FE79AF8042B6AD3C7F5",
       "algorithm": "sha256"
     },
     {
