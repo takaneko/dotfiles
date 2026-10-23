@@ -51,8 +51,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/direnv/direnv/v2.37.1/direnv.darwin-arm64",
-      "checksum": "4F569F3A36732BFD8B8FEA7BFCC6AD87A59745C109022164D0CA4832451D5369",
+      "id": "github_release/github.com/direnv/direnv/v2.38.2/direnv.darwin-arm64",
+      "checksum": "30443C413E74614A53DEB90234E9C97661B1041A0F4ACA601CEB482A578AE8B6",
       "algorithm": "sha256"
     },
     {
