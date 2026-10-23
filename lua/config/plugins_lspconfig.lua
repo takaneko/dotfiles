@@ -90,13 +90,11 @@ vim.lsp.config('ruby_lsp', {
 })
 vim.lsp.enable('ruby_lsp')
 
--- tsserverの設定
-vim.lsp.config('ts_ls', {
+-- TypeScript 7 (native) の組み込み LSP。プロジェクトの typescript が 7 未満なら PATH 上の tsc を使う
+vim.lsp.config('tsc', {
   capabilities = capabilities,
-  filetypes =  {'typescript', 'typescriptreact', 'javascript', 'javascriptreact'},
-  root_makers = {'.git', 'package.json', 'tsconfig.json'}
 })
-vim.lsp.enable('ts_ls')
+vim.lsp.enable('tsc')
 
 -- tailwindcssの設定
 vim.lsp.config('tailwindcss', {
