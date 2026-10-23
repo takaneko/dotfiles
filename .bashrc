@@ -58,7 +58,8 @@ export NAVI_PATH="~/.cheats:.cheats:cheats:../.cheats:../cheats:$NAVI_PATH"
 
 # pnpm
 export PNPM_HOME="/Users/takaneko/Library/pnpm"
+# pnpm v12+ puts global bins under $PNPM_HOME/bin
 case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
