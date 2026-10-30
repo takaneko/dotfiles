@@ -66,8 +66,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/herdrdev/herdr/v0.9.3/herdr-macos-aarch64",
-      "checksum": "5173A3E0AE42D5D1AB7EBFA5D5E6329F7C3D23F8E1A3677C7CE3231DA2884157",
+      "id": "github_release/github.com/herdrdev/herdr/v0.9.5/herdr-macos-aarch64",
+      "checksum": "FB77C2232A05A8035421382C894392F4174E4E38A18E48AF3DD0290157C3A7E2",
       "algorithm": "sha256"
     },
     {
