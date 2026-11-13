@@ -41,8 +41,8 @@
       "algorithm": "sha512"
     },
     {
-      "id": "github_release/github.com/cli/cli/v2.102.0/gh_2.102.0_macOS_arm64.zip",
-      "checksum": "DA922C20D1792E5B2CBF375593D7A658ACF034C12C84E007E71C76EF959C337E",
+      "id": "github_release/github.com/cli/cli/v2.103.3/gh_2.103.3_macOS_arm64.zip",
+      "checksum": "D700207EAE9AE98FE2B89535C2C087C07823D4628C56364695A5A07EF311C062",
       "algorithm": "sha256"
     },
     {
