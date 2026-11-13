@@ -111,8 +111,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.0/pinact_darwin_arm64.tar.gz",
-      "checksum": "3437EBFC9DB720E431E86FD03ED19173B88DCB80B0F177D11A892126108661B5",
+      "id": "github_release/github.com/suzuki-shunsuke/pinact/v5.0.2/pinact_darwin_arm64.tar.gz",
+      "checksum": "9B9545D53376654005DAAEE5AB736D579887205CA3DF99925C8FE8358C6E7FDB",
       "algorithm": "sha256"
     },
     {
