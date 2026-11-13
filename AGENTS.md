@@ -131,7 +131,7 @@ Most CLI tools (gh, jq, helm, kubectl, ripgrep, fd, direnv, navi, neovim, …) a
 - `AQUA_GLOBAL_CONFIG=$HOME/dotfiles/aqua.yaml` is exported in `.bashrc`, so `aqua` commands work from any cwd.
 - aqua's `bin` directory is prepended to PATH **before** the `direnv hook` / `navi widget` evals so those evals resolve to the aqua-managed binaries, not the brew-managed ones.
 
-Homebrew is intentionally retained only for things aqua can't manage: macOS GUI casks, shared libraries, build tools, language runtimes (`python@3.10`, `perl`, `lua`, …), GNU userland (`gnu-sed`, `gnu-getopt`, `coreutils`), and daemons (`mysql`, `postgresql@15`, `redis`).
+Homebrew is intentionally retained only for things aqua can't manage: macOS GUI casks, shared libraries, build tools, language runtimes (Python, Perl, Lua, …), GNU userland (`gnu-sed`, `gnu-getopt`, `coreutils`), and daemons (MySQL, PostgreSQL, Redis). The examples name kinds of software, not pinned formulae; `brew list --installed-on-request` is the actual inventory.
 
 ### Adding / removing a package
 
