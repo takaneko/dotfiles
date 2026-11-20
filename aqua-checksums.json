@@ -31,13 +31,13 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/astral-sh/uv/0.13.6/uv-aarch64-apple-darwin.tar.gz",
-      "checksum": "60FBD5C8A1ED681845EEA28D9D622FCDE03C51E91A43465B64A1E17DB1ED3472",
+      "id": "github_release/github.com/astral-sh/uv/0.13.7/uv-aarch64-apple-darwin.tar.gz",
+      "checksum": "81B811B57E4624DF7ED3AAC148E0359100D9962F3D9DCE00AEC533DC2E086731",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/caddyserver/caddy/v2.11.7/caddy_2.11.7_mac_arm64.tar.gz",
-      "checksum": "68F592DF8F0EC058FBDB9B137B64E9A0AA792D28C06E1E3B9EC12D0E7FB371683A54E73EF6D8E6D0DD70DC6B941A5B5D5B73FAEDD3F89DE119AD2EB78BDC668E",
+      "id": "github_release/github.com/caddyserver/caddy/v2.11.9/caddy_2.11.9_mac_arm64.tar.gz",
+      "checksum": "166A8FDD183DC597EBE3A12D71E2E8EB313AB673AE8D3E286CB92BB0078D04233C23347543F7D7E8285B44136416E6718B0D106AFE973DE8EDE4D81B6809C6BB",
       "algorithm": "sha512"
     },
     {
@@ -76,8 +76,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/junegunn/fzf/v0.74.5/fzf-0.74.5-darwin_arm64.tar.gz",
-      "checksum": "ADA808C7401B9949CE8842274AC16A6B6193FD32DCADA396884A6A9A89E5985A",
+      "id": "github_release/github.com/junegunn/fzf/v0.75.0/fzf-0.75.0-darwin_arm64.tar.gz",
+      "checksum": "1E76698EB481436E42119BEA6AA6E2BD9552FF090789D769C286E3C3A4E0DED6",
       "algorithm": "sha256"
     },
     {
@@ -106,8 +106,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/sharkdp/fd/v10.5.0/fd-v10.5.0-aarch64-apple-darwin.tar.gz",
-      "checksum": "B67E1836C468E42E411984B56E52FA7ABEC08C2BD22C867398E7CC134AAC5E12",
+      "id": "github_release/github.com/sharkdp/fd/v10.5.2/fd-v10.5.2-aarch64-apple-darwin.tar.gz",
+      "checksum": "81BF98A16D3D7230E4A9123FCEDE243D71EA31A577113476ED43F1CDF4773162",
       "algorithm": "sha256"
     },
     {
@@ -116,13 +116,13 @@
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/tree-sitter/tree-sitter/v0.27.1/tree-sitter-macos-arm64.gz",
-      "checksum": "46CB97D9A2C52C94E22D9A76C2F1116156B8B61F98360E2A9CCE05FCB197CD4D",
+      "id": "github_release/github.com/tree-sitter/tree-sitter/v0.27.2/tree-sitter-macos-arm64.gz",
+      "checksum": "5A08B66E5713B0C69691611250B2191D07139647A3C6E39BA85954284B634D2D",
       "algorithm": "sha256"
     },
     {
-      "id": "github_release/github.com/zizmorcore/zizmor/v1.31.1/zizmor-aarch64-apple-darwin.tar.gz",
-      "checksum": "AD5AA633CD56215B11E6C51D51F90C7E6B22904A75047D1215ABBD422F61D698",
+      "id": "github_release/github.com/zizmorcore/zizmor/v1.32.0/zizmor-aarch64-apple-darwin.tar.gz",
+      "checksum": "6EFED18C4539A663FD3C851A2BE9533FD8456C4E646D9416206DA059154A0D3C",
       "algorithm": "sha256"
     },
     {
@@ -141,8 +141,8 @@
       "algorithm": "sha256"
     },
     {
-      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.581.1/registry.yaml",
-      "checksum": "4E93900B95DFA557FB596905B205090F22224A2DDF71DF984FCAF4D2ECA775ECDA75A3E0CA3B7E100475B698907746A3FBF79565ED171AD4222A4C7752C23750",
+      "id": "registries/github_content/github.com/aquaproj/aqua-registry/v4.583.0/registry.yaml",
+      "checksum": "E2150058215825F29C823432094EDFE94B7B676BE6182BA054E912554CADC61560CD2E80C974E1EB7F6A9E9EB69A05144966AA906801B83DD219000736B59DC9",
       "algorithm": "sha512"
     }
   ]
